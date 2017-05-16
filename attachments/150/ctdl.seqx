@@ -1,0 +1,67 @@
+!#MADX
+!Definition of CT + DL line 
+
+if (CTLINE_SEQX < 1)
+ {
+   print, text="Call ct-dl/ctline.seqx before calling this file";
+   stop;
+ };
+
+if (DL_SEQX < 1)
+ {
+   print, text="Call ct-dl/dl.seqx before calling this file";
+   stop;
+ };
+
+
+
+!this line starts at MID of girder 15 (the last cavity is treated as a drift)
+!because MID15 defines initial conditions (bet=4, alf=0)
+ctdl : line=(tl1,tl2,delay); ! former tutto !here it starts at mid15 
+
+ctdlinj : line=(tl1,tl2,lin,kckn1,drkp,kckc);
+!to asamble full machine use ctline and delay lines
+
+return;
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+!
+!  RRR   EEEE  TTTTT  U   U  RRR   N   N
+!  R  R  E       T    U   U  R  R  NN  N
+!  RRR   EEE     T    U   U  RRR   N N N
+!  R R   E       T    U   U  R R   N  NN
+!  R  R  EEEE    T     UUU   R  R  N   N
+!
+
+
+
+
+!Testing stuff below, survey and layout drawings
+!<<<<<<<<<<<<<<<<<<<
+! theta0=7.488950561
+runtest = 0;
+if (runtest > 0)
+  {
+    use, period=ctdl, range=CL.BPM0402/#e;
+    survey, file="linac_ct_tl1.survey",
+             X0= -2231.377528, Y0=2433.66, Z0=2057.683673,
+             THETA0=1.205765252;
+!            X0=-2231.569230, Y0=2433.66, Z0=2057.610400,  back calculated by Piotr
+
+
+!    use, period=linctdl, range=CD.SHD0105_1TURN/#e;
+!    survey, file="linac_ct_tl1.survey",!this is position of CD.SHD0105_1TURN postion in "coming from DL" through dipols
+!            X0=-2153.824325 -0.01047 , Y0=2433.66, Z0=2087.290141 + 0.02707, !corrected for the fact that we use kickers here 
+!            THETA0=7.488950561;  !instead of dipols that do not change the reference orbit
+
+
+    ptc_create_universe;
+      ptc_create_layout, model=1, method=6, nst=10, exact=true, closed_layout=false;
+      ptc_setswitch, debuglevel=0, nocavity=false,
+	 maxacceleration=true, fringe=true, exact_mis=true, time=true, totalpath=true;
+      ptc_printframes, file="test.C",format=rootmacro;
+    ptc_end;
+
+    stop;
+  };
+!>>>>>>>>>>>>>>>>>>

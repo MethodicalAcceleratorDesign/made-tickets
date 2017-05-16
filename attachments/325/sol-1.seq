@@ -1,0 +1,28 @@
+!**********Definitions of variables**********
+
+!INITIAL CONDITIONS
+BXIP =0.5;	AXIP =0.0;
+BYIP =1E-3;	AYIP =0.0;
+DXIP =0.0;	DPXIP=0.0;
+
+L_cross=-30E-3/2;
+
+D0=0;
+
+KS1=0;
+KS2=0;
+
+sol1: solenoid, L=1, KS:=KS1;
+sol2: solenoid, L=1, KS:=KS2;
+
+MQ0 : QUADRUPOLE, L = 3.6*0.5, K1 := KQ0;
+
+!**********************************************************************
+!Left and Right Final Focus Telescope
+test_length:=D0+sol1->L+sol2->L;
+
+test_seq: sequence,refer=centre, l:= test_length;
+L.IP	: marker,  at := 0;
+L.sol1	: sol1,    at :=D0+sol1->L/2       , from=L.IP;
+L.sol2	: sol2,    at :=sol1->L/2+sol2->L/2, from=L.sol1;
+endsequence;

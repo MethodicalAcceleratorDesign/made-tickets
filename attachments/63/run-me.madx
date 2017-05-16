@@ -1,0 +1,207 @@
+//======================================================//
+//              TT66 BEAM LINE 				//
+//======================================================//
+//   File:	jobs.tt66-v10.madx			//
+//   based on:	jobs.tt66-v9.madx			//
+//		jobs.tt66-v8.madx			//
+//		jobs.tt66-v7.madx			//
+//		TT60T9a-v6.mad				//
+//   		TT60T9a-v5.mad,TT60T9a-v4.mad,		//
+//		TT60T9d-v3.mad,				//
+//		TT60-v6.mad, TT60T9-v1c.mad		//
+//   Version:	10					//
+//   Date:	17-JUN-2010				//
+//   Author:	C. Hessler				//
+//======================================================//
+
+OPTION, -ECHO, WARN, -INFO;
+
+beam;
+!SET,	FORMAT="18.10f";
+
+// read in macro definitions
+CALL,	FILE = "macros.madx";
+
+version_nr = 10;
+EXEC,	settitle($version_nr);
+
+// read in sequence file (real beam direction)
+EXEC,	loadsequence($version_nr);
+
+// include vacuum equipment
+beamlineid=1;
+mbsmarker =0;
+!CALL,	FILE = "install-vacuum.madx";
+
+// read in beam properties
+call, file = "beam.madx";
+
+
+//----------------------- Survey matching to T9 target ------------------------
+/*
+USE,	SEQUENCE = TT66; 
+
+// define macro for position matching routine:
+m1: MACRO={USE,	SEQUENCE = TT66; 
+	SURVEY,	x0	=-2083.527880, 
+		y0	= 2402.179520, 
+		z0	= 2586.131300, 
+		theta0	= 2.011786673, 
+		phi0	= 0.000045000-1.6e-6, // change due to change in ref. altitude
+		psi0	= 0.000000000;};
+
+// match position and angles at T9 target:
+MATCH, USE_MACRO;
+
+	VARY, name = abie.660224,	STEP = 0.001,	LOWER =-0.001,	UPPER = 0.001;
+	//VARY, name = abis.660004,	STEP = 0.001,	LOWER = 0.002,	UPPER = 0.003;
+	VARY, name = abib.660107,	STEP = 0.001,	LOWER = 0.005,	UPPER = 0.007;
+	!VARY, name = abie.660409,	STEP = 0.001,	LOWER =-0.001,UPPER = 0.001;
+	VARY, name = t9.frontsurface.at,STEP = 0.001,	LOWER = 400, UPPER = 420;
+
+	USE_MACRO, name= m1;
+
+	CONSTRAINT,	expr= TABLE(SURVEY,T9.CENTER,x) =-1701.13894;
+	CONSTRAINT,	expr= TABLE(SURVEY,T9.CENTER,y) = 2413.02280;
+	CONSTRAINT,	expr= TABLE(SURVEY,T9.CENTER,z) = 2424.68816;
+	!CONSTRAINT,	expr= TABLE(SURVEY,T9.CENTER,theta)= 1.93418749;
+	!CONSTRAINT,	expr= TABLE(SURVEY,T9.CENTER,phi)  = 0.04253030;
+
+	LMDIF, CALLS:=5000, TOLERANCE:=1.E-10;
+	//JACOBIAN,  CALLS= 500, TOLERANCE= 1.0E-21;
+ENDMATCH;
+*/
+
+
+//--------------------- Boundary conditions (Twiss) ---------------------------
+
+// read in initial TT60 Twiss parameters (from the SPS)
+// (real beam direction)
+call, file = "sps-twiss.inBeam.ini.madx";
+PSHIFT	= 0.0006;
+BETX0	= sps.BETX0;
+ALFX0	= sps.ALFX0;
+DX0 	= sps.DX0  ;
+DPX0	= sps.DPX0 ;
+BETY0	= sps.BETY0;
+ALFY0	= sps.ALFY0;
+DY0 	= sps.DY0  ;
+DPY0	= sps.DPY0 ;
+
+//----------------
+
+dp = 0.0006;
+
+//----------------------- Set focal point properties --------------------------
+fp.rx = 0.1; // [mm]
+fp.ry = 0.1; // [mm]
+
+EXEC,	int($fp.rx);
+fp.rx.intpart = intout;
+fp.rx.realpart = 100*(fp.rx-fp.rx.intpart);
+VALUE,	fp.rx.intpart, fp.rx.realpart;
+
+EXEC,	int($fp.ry);
+fp.ry.intpart = intout;
+fp.ry.realpart = 100*(fp.ry-fp.ry.intpart);
+VALUE,	fp.ry.intpart, fp.ry.realpart;
+
+// calculate BETX, BETY @ focal point
+fp.betx = (fp.rx * 0.001)^2 /beam->ex;
+fp.bety = (fp.ry * 0.001)^2 /beam->ey;
+VALUE,	fp.betx;
+VALUE,	fp.bety;
+
+
+//----------------------- Match TT66 to focal point ---------------------------
+
+// read in strengths file
+!CALL,	FILE = "TT60T9a-v6-0_1mm.str";
+!CALL,	FILE = "out.match-0_5mm.str.madx";
+EXEC,	openstr($version_nr, $fp.rx.intpart, $fp.rx.realpart, $fp.ry.intpart, $fp.ry.realpart);
+!CALL,	FILE = "out.tt66-v7-1_50mm-1_50mm.str";
+!EXEC,	openstr($version_nr, 0, 10, 0, 10);
+
+
+USE,	SEQUENCE = TT66; 
+MATCH,	SEQUENCE = TT66,	VLENGTH = TRUE,
+				BETX	= BETX0,	ALFX	= ALFX0,
+				DX 	= DX0,		DPX	= DPX0,
+				BETY	= BETY0,	ALFY	= ALFY0,
+				DY 	= DY0,		DPY	= DPY0;
+
+	VARY, name = kqid.610100, STEP = 0.001,   LOWER = -0.016, UPPER = 0.0;
+	VARY, name = kqif.610200, STEP = 0.001,   LOWER =  0.0,   UPPER = 0.016;
+	VARY, name = kqid.610300, STEP = 0.001,   LOWER = -0.016, UPPER = 0.0;
+	VARY, name = kqif.610400, STEP = 0.001,   LOWER =  0.0,   UPPER = 0.016;
+	VARY, name = kqid.610500, STEP = 0.001,   LOWER = -0.016, UPPER = 0.0;
+	VARY, name = kqif.610600, STEP = 0.001,   LOWER =  0.0,   UPPER = 0.016;
+	VARY, name = kqif.660100, STEP = 0.001,   LOWER =  0.0,   UPPER = 0.016;
+	VARY, name = kqid.660200, STEP = 0.001,   LOWER = -0.016, UPPER = 0.0;
+	VARY, name = kqif.660300, STEP = 0.001,   LOWER =  0.0,   UPPER = 0.016;
+	VARY, name = kqid.660400, STEP = 0.001,   LOWER = -0.016, UPPER = 0.0;
+	VARY, name = kqif.660500, STEP = 0.001,   LOWER =  0.0,   UPPER = 0.016;
+
+	//CONSTRAINT,	range = QTLD.610100,	BETY<5000.0;
+	//CONSTRAINT,	range = QTLF.610200,	BETX<5000.0;
+	//CONSTRAINT,	range = QTLD.610300,	BETY<5000.0;
+	//CONSTRAINT,	range = QTLF.610400,	BETX<800.0;
+	//CONSTRAINT,	range = QTLD.610500,	BETY<5000.0;
+	//CONSTRAINT,	range = QTLF.610600,	BETX<5000.0;
+	//CONSTRAINT,	range = QTLF.660100,	BETX<5000.0;
+	CONSTRAINT,	range = QTLD.660200,	BETY<700.0;
+	//CONSTRAINT,	range = QTLF.660300,	BETX<5000.0;
+	//CONSTRAINT,	range = QTLD.660400,	BETY<5000.0;
+	//CONSTRAINT,	range = QTLF.660500,	BETX<5000.0;
+	CONSTRAINT,	range = MBB.610405,	BETY<1500.0;
+	CONSTRAINT,	range = MBE.610438,	BETX<1500.0;
+	CONSTRAINT,	range = MBE.610514,	BETX<1500.0;
+	CONSTRAINT,	range = MBB.610531,	BETY<1500.0;
+	CONSTRAINT,	range = MBS.660028,	BETY<1500.0;
+	//CONSTRAINT,	range = MBB.660205,	BETY<800.0;
+	CONSTRAINT,	range = QTLF.610600,	BETX<2000.0,	BETY<2000.0;
+
+	CONSTRAINT,	range = FP,	DX=0,	DY=0;
+	!CONSTRAINT,	range = FP,	DPX=0,	DPY=0;
+	//CONSTRAINT,	range = FP,	DX<0.1,	DX>-0.1,	DY<0.1,	DY>-0.1;
+	CONSTRAINT,	range = FP,	ALFX=0.0,	ALFY=0.0;
+	CONSTRAINT,	range = FP,	BETX=fp.betx,	BETY=fp.bety;
+	
+	LMDIF, CALLS:=5000, TOLERANCE:=1.E-10;
+ENDMATCH;
+
+
+///////////////////////////////// MATCH FOR THE CORRECT BEAM SIZE AT H AND V POSITION.
+
+//SELECT,	FLAG=TWISS, COLUMN=NAME,S,X,Y,PX,PY,BETX,BETY,ALFX,ALFY,DX,DPX,DY,DPY,MUX,MUY;
+//TWISS,	FILE="twiss", 
+//	!DELTAP	= PSHIFT,
+//	BETX = BETX0, ALFX = ALFX0, DX = DX0, DPX = DPX0, BETY = BETY0, ALFY = ALFY0, DY = DY0, DPY = DPY0;
+
+MVAR1 := sqrt((1000*SQRT(TABLE(twiss, BETX)*BEAM->EX))^2+(1000*abs(TABLE(twiss, DX)*dp))^2);
+MVAR2 := sqrt((1000*SQRT(TABLE(twiss, BETY)*BEAM->EY))^2+(1000*abs(TABLE(twiss, DY)*dp))^2);
+
+select, flag=twiss, clear;
+select, flag=twiss, COLUMN=NAME,S,BETX,BETY,DX,DY,MVAR1,MVAR2;
+TWISS,	FILE="twiss", 
+	!DELTAP	= PSHIFT,
+	BETX = BETX0, ALFX = ALFX0, DX = DX0, DPX = DPX0, BETY = BETY0, ALFY = ALFY0, DY = DY0, DPY = DPY0;
+
+
+MATCH, SEQUENCE = TT66, BETX = BETX0,ALFX = ALFX0, DX = DX0, DPX = DPX0, BETY = BETY0, ALFY = ALFY0, DY = DY0, DPY	= DPY0;
+	VARY, name = abih.610104, STEP = 0.0000001,   LOWER =  0.0,   UPPER = 0.016;
+	//VARY, name = abih.610206, STEP = 0.0000001,   LOWER =  0.0,   UPPER = 0.016;
+	
+	CONSTRAINT, RANGE = MBE.610422, MVAR2 = 9.861025;
+	//CONSTRAINT, RANGE = MBB.610531, MVAR1 = 11.44353;
+	
+	LMDIF, CALLS:=5000, TOLERANCE:=1.E-10;
+ENDMATCH;
+
+
+
+
+
+
+STOP;
+

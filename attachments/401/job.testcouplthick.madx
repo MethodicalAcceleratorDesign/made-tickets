@@ -1,0 +1,194 @@
+! Links definitions
+option, warn,info;
+!###################################################################################################################################
+!############################## CREATE SOFT LINKS AND DIRECTORIES ##################################################################
+!###################################################################################################################################
+System,"rm -r temp";
+System,"rm -r output";
+System,"mkdir temp";
+System,"mkdir output";
+!######################################################################
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/SLHCV1.0 slhc";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/FiDeL fidel";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/WISE wise";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/runII/2016 optics2016";
+!######################################################################
+Option, -echo,warn,-info;
+
+!###################################################################################################################################
+!############################## TUNE AND CHROMA ####################################################################################
+!###################################################################################################################################
+qxinit=64.28;
+qyinit=59.31;
+   ptcqxinit=qxinit-64.0;
+   ptcqyinit=qyinit-59.0;
+dqxinit=3.0;
+dqyinit=3.0;
+!###################################################################################################################################
+!############################## OPTIONS ############################################################################################
+!###################################################################################################################################
+mylhcbeam=1;
+is_thin=1;
+
+!###################################################################################################################################
+!############################## SET UP LATTICE #####################################################################################
+!###################################################################################################################################
+if(mylhcbeam<3){ call,file="optics2016/lhc_as-built.seq";   };
+if(mylhcbeam>3){ call,file="optics2016/lhcb4_as-built.seq"; };
+if(is_thin==1) { call,file="optics2016/toolkit/slice.madx"; };
+
+if(is_thin==0){ call, file="optics2016/opt_inj.madx";
+	       !call, file="optics2016/opt_800_10000_800_3000_thin.madx";
+  	       !call, file="optics2016/opt_400_10000_400_3000_thin.madx"; ! These .str files now set the NRJ variable
+}
+else {          call, file="optics2016/opt_inj_thin.madx";
+       	       !call, file="optics2016/opt_800_10000_800_3000_thin.madx";
+      	       !call, file="optics2016/opt_400_10000_400_3000_thin.madx"; ! These .str files now set the NRJ variable
+}
+
+thisemit:=3.75e-6/(NRJ/0.938);
+value, NRJ;
+value, thisemit;
+
+if (mylhcbeam<3){ beam, sequence=lhcb1, bv= 1, energy=NRJ, particle=proton, npart=1.0e10, kbunch=1, ex=thisemit,ey=thisemit;
+   		  beam, sequence=lhcb2, bv=-1, energy=NRJ, particle=proton, npart=1.0e10, kbunch=1, ex=thisemit,ey=thisemit;};
+if (mylhcbeam>3){ beam, sequence=lhcb2, bv= 1, energy=NRJ, particle=proton, npart=1.0e10, kbunch=1, ex=thisemit,ey=thisemit;};
+
+if(mylhcbeam==1) {Use, sequence=lhcb1;}
+if(mylhcbeam>1) {stop;}
+
+!###################################################################################################################################
+!################################ SETUP FOR ORBIT and ERROR CORRECTIONS ############################################################
+!###################################################################################################################################
+on_x1= 0    ; on_sep1= 0 ; on_o1= 0 ;
+on_x2= 0    ; on_sep2= 0 ; on_o2= 0 ; on_oe2=0; on_a2= 0 ;                                       
+on_x5= 0    ; on_sep5= 0 ; on_o5= 0 ;                                                 
+on_x8= 0    ; on_sep8= 0 ; on_o8= 0 ; on_a8= 0 ;  on_sep8h= 0 ; on_x8v= 0 ;   
+on_alice= 0 ;  
+on_sol_alice=0;                                                                    
+on_lhcb = 0 ;  
+on_sol_atlas=0;
+on_sol_cms=0;
+
+select,flag=twiss,clear;
+if(mylhcbeam==1) {twiss,sequence=lhcb1,table=nominal; };
+if(mylhcbeam>1)  {twiss,sequence=lhcb2,table=nominal; };
+beta.ip1=table(twiss,IP1,betx);
+
+!###################################################################################################################################
+!################################ CALL ERROR SUBROUTINES ###########################################################################
+!###################################################################################################################################
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!         Call error subroutines (nominal machine and new IT/D1)
+!                         and error tables
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+! Error routine and measured error table for nominal LHC
+call,file="optics2016/measured_errors/Msubroutines.madx";
+readtable, file="optics2016/measured_errors/rotations_Q2_integral.tab";
+call,file="optics2016/errors/macro_error.madx";
+call,file="optics2016/toolkit/Orbit_Routines.madx";
+
+
+!################################################################
+!################ tune matchng  #################################
+!################################################################
+if(mylhcbeam==1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b1, step=1.0E-7 ;
+     vary,   name=kqtd.b1, step=1.0E-7 ;
+     vary,   name=ksf.b1, step=1.0E-7 ;
+     vary,   name=ksd.b1, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+
+/*
+!###################################################################################################################################
+!################################ LINEAR OPTICS ERRORS ########################################################################
+!###################################################################################################################################
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                Switch ON/OFF some multipole
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+exec ON_ALL_MULT;
+ON_LSF:=0;             ! to be set to 0 if run is performed on BOINC. ! double check if this is still true - and if wise actually includes any of these errors
+
+ ON_A1s  =  0 ; ON_A1r  =  0 ; ON_B1s  =  0 ; ON_B1r  =  0 ;
+ ON_A2s  =  1 ; ON_A2r  =  1 ; ON_B2s  =  0 ; ON_B2r  =  0 ;
+ ON_A3s  =  0 ; ON_A3r  =  0 ; ON_B3s  =  0 ; ON_B3r  =  0 ;
+ ON_A4s  =  0 ; ON_A4r  =  0 ; ON_B4s  =  0 ; ON_B4r  =  0 ;
+ ON_A5s  =  0 ; ON_A5r  =  0 ; ON_B5s  =  0 ; ON_B5r  =  0 ;
+ ON_A6s  =  0 ; ON_A6r  =  0 ; ON_B6s  =  0 ; ON_B6r  =  0 ;
+ ON_A7s  =  0 ; ON_A7r  =  0 ; ON_B7s  =  0 ; ON_B7r  =  0 ;
+ ON_A8s  =  0 ; ON_A8r  =  0 ; ON_B8s  =  0 ; ON_B8r  =  0 ;
+ ON_A9s  =  0 ; ON_A9r  =  0 ; ON_B9s  =  0 ; ON_B9r  =  0 ;
+ ON_A10s =  0 ; ON_A10r =  0 ; ON_B10s =  0 ; ON_B10r =  0 ;
+ ON_A11s =  0 ; ON_A11r =  0 ; ON_B11s =  0 ; ON_B11r =  0 ;
+ ON_A12s =  ON_LSF; ON_A12r = ON_LSF; ON_B12s = ON_LSF; ON_B12r =  ON_LSF;
+ ON_A13s =  ON_LSF; ON_A13r = ON_LSF; ON_B13s = ON_LSF; ON_B13r =  ON_LSF;
+ ON_A14s =  ON_LSF; ON_A14r = ON_LSF; ON_B14s = ON_LSF; ON_B14r =  ON_LSF;
+ ON_A15s =  ON_LSF; ON_A15r = ON_LSF; ON_B15s = ON_LSF; ON_B15r =  ON_LSF;
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+! Define the seed number (for statistical error assignment in the new IT/D1)
+! and call the corresponding measured error table for nominal LHC magnets
+!++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!For the madx file
+eoption,seed=1;
+readtable, file="wise/After_sector_3-4_repair/injection/injection_errors-emfqcs-1.tfs";
+
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!             apply field errors to MB and MQ magnets
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ call,   file="optics2016/measured_errors/Efcomp_MB.madx"  ;
+*/
+
+
+Rr  = 0.017; 
+SELECT, FLAG=ERROR, PATTERN=MB.A8R1.B1;
+EFCOMP, ORDER=0, RADIUS=Rr, DKS={0,1e-4};
+
+/*
+Rr  = 0.017; 
+SELECT, FLAG=ERROR, PATTERN=MQ.11R1.B1;
+EFCOMP, ORDER=1, RADIUS=Rr, DKS={0,1e-4};
+*/
+
+/*
+!###################################################################################################################################
+!############################## CALL THE GLOBAL COUPLING KNOBS #####################################################################
+!###################################################################################################################################
+if(mylhcbeam==1){call, file="/afs/cern.ch/eng/sl/lintrack/Beta-Beat.src/MODEL/LHCB/tools/LHCB1_coupling_knob.madx";};
+if(mylhcbeam>=2){call, file="/afs/cern.ch/eng/sl/lintrack/Beta-Beat.src/MODEL/LHCB/tools/LHCB2_coupling_knob.madx";};
+b1_re_ip7_knob=0.01;
+*/
+
+
+select, flag=error, clear;
+select, flag=error, pattern=MB\.;
+esave,  file="MB.errors";
+
+select, flag=error, clear;
+select, flag=error, pattern=MQ\.;
+esave,  file="MQ.errors";
+
+  kqtfINIT=kqtf.b1;
+  kqtdINIT=kqtd.b1;
+  match;
+     global, q1=64.315, q2=59.315;
+     vary,   name=kqtf.b1, step=1.0E-7 ;
+     vary,   name=kqtd.b1, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+  endmatch;
+  dqmin = abs(table(summ,q1)-table(summ,q2)-5.0);
+  kqtf.b1=kqtfINIT;
+  kqtd.b1=kqtdINIT;
+assign, echo="./dqmin.dat";
+value, dqmin;
+value, b1_re_ip7_knob;
+value, b1_im_ip7_knob;
+assign, echo=terminal;
+
+
+stop;

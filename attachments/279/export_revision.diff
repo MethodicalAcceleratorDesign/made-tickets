@@ -1,0 +1,81 @@
+Index: cmake/madxInit.cmake
+===================================================================
+--- cmake/madxInit.cmake	(revision 4872)
++++ cmake/madxInit.cmake	(working copy)
+@@ -28,8 +28,18 @@
+ string(REGEX MATCH "VERSION_DATE += *[^\n]+" VERSION_DATE  ${VERSION_INFO})
+ string(REGEX REPLACE "VERSION_DATE += *" "" VERSION_DATE  ${VERSION_DATE})
+ 
++# Determine the current SVN revision number:
++find_package(Subversion)
++if(Subversion_FOUND AND EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/.svn)
++    Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} PROJECT)
++    set(SVN_REVISION ${PROJECT_WC_LAST_CHANGED_REV})
++else()
++    set(SVN_REVISION "unknown")
++endif()
++
+ message(STATUS "Mad-X version: ${MADX_VERSION}")
+ message(STATUS "Version date: ${VERSION_DATE}")
++message(STATUS "SVN Revision: ${SVN_REVISION}")
+ 
+ # Append _dev/-dev to binary/package name
+ if(NOT MADX_PATCH_LEVEL EQUAL 00)
+Index: cmake/setupCompilerSpecifics.cmake
+===================================================================
+--- cmake/setupCompilerSpecifics.cmake	(revision 4872)
++++ cmake/setupCompilerSpecifics.cmake	(working copy)
+@@ -54,8 +54,9 @@
+    add_definitions(-D_DEBUG -DDEBUG_ALL)
+ endif()
+ 
+-add_definitions(-D_FULL -D_VERSION=${MADX_VERSION} -D_VERSION_DATE=${VERSION_DATE} -D_VERSION_OSTYPE=${CMAKE_SYSTEM_NAME})
+ 
++add_definitions(-D_FULL -D_VERSION=${MADX_VERSION} -D_VERSION_DATE=${VERSION_DATE} -D_VERSION_OSTYPE=${CMAKE_SYSTEM_NAME} -D_SVN_REVISION=${SVN_REVISION})
++
+ # C stuff:
+ # -- not needed for gnu/intel --
+ if(CMAKE_C_COMPILER_ID MATCHES "GNU" AND NOT CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+Index: src/mad_core.c
+===================================================================
+--- src/mad_core.c	(revision 4872)
++++ src/mad_core.c	(working copy)
+@@ -154,7 +154,7 @@
+   printf("\n  +++++++++++++++++++++++++++++++++++++++++++\n");
+   printf("  +    %s  (%s bit, %s) %s    +\n", version_name, version_arch, version_ostype, pad[pad_idx]);
+   printf("  +    %s     +\n", version_is_pro ? version_type_pro : version_type_dev);
+-  printf("  + %s      +\n", version_date_mod);
++  printf("  + Code Modification Date: %s      +\n", version_date_mod);
+   printf("  + Execution Time Stamp: %02d.%02d.%02d %02d.%02d.%02d +\n",
+          tm->tm_mday, tm->tm_mon+1, tm->tm_year%100,
+          tm->tm_hour, tm->tm_min, tm->tm_sec);
+Index: src/mad_gcst.c
+===================================================================
+--- src/mad_gcst.c	(revision 4872)
++++ src/mad_gcst.c	(working copy)
+@@ -14,9 +14,10 @@
+ const char *version_name     = "MAD-X " mkstr(_VERSION);
+ const char *version_arch     = sizeof(void*) == 4 ? "32" : sizeof(void*) == 8 ? "64" : "??";
+ const char *version_ostype   = mkstr(_VERSION_OSTYPE);
+-const char *version_date_mod = "Code Modification Date: " mkstr(_VERSION_DATE);
++const char *version_date_mod = mkstr(_VERSION_DATE);
+ const char *version_type_dev = "DEBUG Version - use at own risk!";
+ const char *version_type_pro = "       Production Version       ";
++const char *version_revision = mkstr(_SVN_REVISION);
+ 
+ #undef mkstr
+ #undef mkstr_
+Index: src/mad_gcst.h
+===================================================================
+--- src/mad_gcst.h	(revision 4872)
++++ src/mad_gcst.h	(working copy)
+@@ -12,6 +12,9 @@
+ extern const char *version_date_mod;
+ extern const char *version_type_dev;
+ extern const char *version_type_pro;
++// although in SVN the revision is just a number, storing it as a string
++// provides forward compatibility if migrating to git or the like:
++extern const char *version_revision;
+ 
+ extern char* const functs[];
+ extern const char op_string[];

@@ -1,0 +1,337 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +              MAD-X 5.00.00              +
+  +           Production Version            +
+  + Code Modification Date: 28.02.2011      +
+  + Execution Time Stamp: 04.04.12 10.35.53 +
+  +++++++++++++++++++++++++++++++++++++++++++
+X: ==>
+TITLE,'PETRA III-Extension Lattice with 20 DWs as on 30.03.2012';
+
+X: ==>
+set,format="14s","10d","22.12g";
+
+X: ==>
+;
+
+X: ==>
+OPTION, WARN, -INFO, -ECHO;
+
+X: ==>
+**** INFO **** Loading PETRA III Optics with Magnet effective lengths.
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+;
+
+X: ==>
+BEAM, PARTICLE=POSITRON, ENERGY=6.0, kbunch=40, bcurrent=0.1/40,bunched, RADIATE, sequence=RING;
+
+X: ==>
+USE, period=RING;
+
+X: ==>
+;
+
+X: ==>
+!**************************************************************************************************
+
+select,flag=TWISS,clear;
+
+X: ==>
+select,flag=TWISS,column=name,s,x,y,betx,bety,mux,muy,dx,dy,k1l,k2l,l,angle,px,py,dpx,dpy,alfx,alfy,hkick,vkick,e1,e2,parent;
+
+X: ==>
+!select,flag=TWISS,column=name,s,betx,bety,mux,muy,l;
+
+TWISS,deltap=0.0,file='twiss.out',sequence=RING;
+
+enter Twiss module
+  
+iteration:   1 error:   2.495814E-04 deltap:   0.000000E+00
+orbit:  -1.229570E-06  6.712056E-08  1.089238E-22  3.836213E-24  6.012095E-03  6.459458E-05
+  
+iteration:   2 error:   1.708458E-07 deltap:   0.000000E+00
+orbit:  -1.310429E-06  7.712839E-08 -5.821873E-21  2.596640E-22  6.017066E-03  6.461585E-05
+ ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+         2303.95249302         -0.00601706575       0.00111429996327          29.9570429378 
+
+                    q1                    dq1                betxmax                  dxmax 
+         37.2099428973         0.885166352521          44.0588736493          0.83141785592 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+        0.352198200526       0.00010294872819     2.72769395649e-005          30.3711349563 
+
+                   dq2                betymax                  dymax                  dyrms 
+         1.29192638197          42.9887659637     8.39458097755e-019     2.55622781726e-019 
+
+                ycomax                 ycorms                 deltap                synch_1 
+    1.12069937343e-020     4.59520667252e-021                      0                      0 
+
+               synch_2                synch_3                synch_4                synch_5 
+                     0                      0                      0                      0 
+X: ==>
+plot,table=twiss,haxis=s,vaxis=betx,bety, style=100,colour=100;
+
+
+ GXPLOT-X11  1.50 initialized
+
+ plot number =            1
+X: ==>
+plot,table=twiss,haxis=s,vaxis=dx,dy,     style=100,colour=100;
+
+ plot number =            2
+X: ==>
+plot,table=twiss,haxis=s,vaxis=x,y,       style=100,colour=100;
+
+ plot number =            3
+X: ==>
+plot,table=twiss,hmin=910, hmax=980, haxis=s,vaxis=betx,bety, style=100,colour=100;
+
+ plot number =            4
+X: ==>
+plot,table=twiss,hmin=1430, hmax=1500, haxis=s,vaxis=betx,bety, style=100,colour=100;
+
+ plot number =            5
+X: ==>
+plot,table=twiss,hmin=1490, hmax=1555, haxis=s,vaxis=betx,bety, style=100,colour=100;
+
+ plot number =            6
+X: ==>
+emit,deltap=0.0;
+
+enter EMIT module
+ 
+ Global parameters for positrons, radiate = T:
+
+ C                  2303.95249302 m          f0                0.130120936877 MHz
+ T0                 7.68515831501 musecs     alfa            0.00111431210148 
+ eta             0.00111430484815            gamma(tr)          29.9568797762 
+ Bcurrent                  0.0025 A/bunch    Kbunch            40 
+ Npart               119917474407 /bunch     Energy                         6 GeV 
+ gamma              11741.7080205            beta              0.999999996373
+guess:          0                      0                      0
+     U0              1.260264 [MeV/turn]
+ 
+                                                  M o d e   1         M o d e   2         M o d e   3
+ Fractional tunes            undamped              0.20994290          0.37113496          0.04796455
+                             damped                0.20994300          0.37113485          0.04796588
+ 
+ beta* [m]                   x                 0.95800130E+01      0.40997782E-40      0.18014753E-07
+                             y                 0.89483992E-34      0.30523321E+02      0.33060720E-29
+                             t                 0.18141968E-07      0.19865617E-30      0.86490145E+01
+ 
+ gamma* [1/m]                px                0.10438408E+00      0.12160452E-42      0.48697760E-12
+                             py                0.59490361E-36      0.32761913E-01      0.51701313E-31
+                             pt                0.21935999E-10      0.51808545E-33      0.11689571E+00
+ 
+ beta(max) [m]               x                 0.44058874E+02      0.38122415E-36      0.37593000E-01
+                             y                 0.37162047E-31      0.42988766E+02      0.51159936E-29
+                             t                 0.80811441E-01      0.80703248E-30      0.87518541E+01
+ 
+ gamma(max) [1/m]            px                0.27535105E+01      0.45051846E-38      0.48697760E-12
+                             py                0.48131482E-33      0.44434084E+01      0.51701313E-31
+                             pt                0.15071775E-02      0.89450147E-31      0.11689571E+00
+ 
+ Damping partition numbers                         1.00206509          1.00005523          1.99810209
+ Damping constants [1/s]                           0.13693786E+02      0.13666320E+02      0.27305195E+02
+ Damping times [s]                                 0.73025824E-01      0.73172587E-01      0.36623068E-01
+ Emittances [pi micro m]                       0.50640732E-02      0.55355954E-29      0.57852708E+01
+
+ RF system: 
+         Cavity              length[m]            voltage[MV]                    lag              freq[MHz]                 harmon
+            rf7                    2.1                   1.66                    0.5          499.664397609                   3840
+X: ==>
+!**************************************************************************************************
+
+BEAM, PARTICLE=POSITRON, ENERGY=6.0, RADIATE, sequence=RING;
+
+X: ==>
+USE, period=RING;
+
+X: ==>
+save, sequence=RING, file=p3ext_lattice_upv13.seq;
+
+++++++ warning: SAVE makes all previous USE invalid !  
+X: ==>
+!stop;
+
+;
+
+X: ==>
+OPTION, WARN, INFO, -ECHO;
+
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+Spliting of magnets to install correctors in between-> dk
+++++++ info: seqedit - number of elements installed:  318
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    106
+Spliting of magnets to install correctors in between-> pda
+++++++ info: seqedit - number of elements installed:  24
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    8
+Spliting of magnets to install correctors in between-> pdak
+++++++ info: seqedit - number of elements installed:  30
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    10
+Spliting of magnets to install correctors in between-> pda_n1
+++++++ info: seqedit - number of elements installed:  6
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    2
+Spliting of magnets to install correctors in between-> pda_n2
+++++++ info: seqedit - number of elements installed:  6
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    2
+Spliting of magnets to install correctors in between-> pda_o1
+++++++ info: seqedit - number of elements installed:  6
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    2
+Spliting of magnets to install correctors in between-> pda_o2
+++++++ info: seqedit - number of elements installed:  6
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    2
+Spliting of magnets to install correctors in between-> s1
+++++++ info: seqedit - number of elements installed:  87
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    29
+Spliting of magnets to install correctors in between-> s3
+++++++ info: seqedit - number of elements installed:  93
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    31
+Spliting of magnets to install correctors in between-> sdu
+++++++ info: seqedit - number of elements installed:  75
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    25
+Serial Numbering of Elements-> bpm
+++++++ info: seqedit - number of elements installed:  246
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    246
+Serial Numbering of Elements-> pch
+++++++ info: seqedit - number of elements installed:  25
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    25
+Serial Numbering of Elements-> pkh
+++++++ info: seqedit - number of elements installed:  41
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    41
+Serial Numbering of Elements-> pkhw
+++++++ info: seqedit - number of elements installed:  12
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    12
+Serial Numbering of Elements-> pkhs
+++++++ info: seqedit - number of elements installed:  37
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    37
+Serial Numbering of Elements-> pkhsa
+++++++ info: seqedit - number of elements installed:  12
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    12
+Serial Numbering of Elements-> pkdk
+++++++ info: seqedit - number of elements installed:  106
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    106
+Serial Numbering of Elements-> pkpda
+++++++ info: seqedit - number of elements installed:  26
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    26
+Serial Numbering of Elements-> pcv
+++++++ info: seqedit - number of elements installed:  27
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    27
+Serial Numbering of Elements-> pcvm
+++++++ info: seqedit - number of elements installed:  15
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    15
+Serial Numbering of Elements-> pkv
+++++++ info: seqedit - number of elements installed:  55
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    55
+Serial Numbering of Elements-> pkvw
+++++++ info: seqedit - number of elements installed:  12
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    12
+Serial Numbering of Elements-> pkvs
+++++++ info: seqedit - number of elements installed:  35
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    35
+Serial Numbering of Elements-> pkvsa
+++++++ info: seqedit - number of elements installed:  14
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    14
+Serial Numbering of Elements-> pkvsx
+++++++ info: seqedit - number of elements installed:  60
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    60
+Serial Numbering of Elements-> pkvsu
+++++++ info: seqedit - number of elements installed:  25
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    25
+enter Twiss module
+  
+iteration:   1 error:   2.495973E-04 deltap:   0.000000E+00
+orbit:  -1.264158E-06  6.532034E-08  1.879056E-22 -5.849931E-24  6.012091E-03  6.460080E-05
+  
+iteration:   2 error:   1.708633E-07 deltap:   0.000000E+00
+orbit:  -1.344876E-06  7.532537E-08 -4.986407E-22 -2.512588E-22  6.017062E-03  6.462207E-05
+ ++++++ warning: TWCPGO: TWISS uses the RF system or synchrotron radiation only to find the closed orbit, for optical calculations it ignores both.        
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+         2303.95249302      -0.00601706160273       0.00111429995351          29.9570430689 
+
+                    q1                    dq1                betxmax                  dxmax 
+         37.2099427465         0.885159644159          45.2054603811         0.843018138726 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+        0.362616557214      0.000104370448351     2.80660440216e-005           30.371134464 
+
+                   dq2                betymax                  dymax                  dyrms 
+         1.29192718652          42.9887625118     1.33128872049e-018      4.1424183319e-019 
+
+                ycomax                 ycorms                 deltap                synch_1 
+    5.66708343864e-005     7.41439196981e-021                      0                      0 
+
+               synch_2                synch_3                synch_4                synch_5 
+                     0                      0                      0                      0 
+Actual replacement of Elements-> bpm
+++++++ info: seqedit - number of elements installed:  246
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    246
+Actual replacement of Elements-> pch
+++++++ info: seqedit - number of elements installed:  25
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    25
+Actual replacement of Elements-> pkh
+++++++ info: seqedit - number of elements installed:  41
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    41
+Actual replacement of Elements-> pkhw
+++++++ info: seqedit - number of elements installed:  12
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    12
+Actual replacement of Elements-> pkhs
+++++++ info: seqedit - number of elements installed:  37
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    37
+Actual replacement of Elements-> pkhsa
+++++++ info: seqedit - number of elements installed:  12
+++++++ info: seqedit - number of elements moved:      0
+++++++ info: seqedit - number of elements removed:    12
+Actual replacement of Elements-> pkdk
++=+=+= fatal: memory overflow, called from routine: new_char_array

@@ -1,0 +1,15 @@
+
+fintvalue = 0.4;
+
+b: rbend, l=1, angle=0.2, hgap=0.02, fint:=fintvalue;
+myline: line=(b);
+beam;
+
+use, period=myline;
+
+twiss, betx=10, bety=10;
+show, b;
+plot, haxis=s, vaxis=betx, bety, colour=100, interpolate;
+show, b;
+
+stop;

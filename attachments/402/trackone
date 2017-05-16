@@ -1,0 +1,12 @@
+@ NAME             %08s "TRACKONE"
+@ TYPE             %08s "TRACKONE"
+@ TITLE            %08s "no-title"
+@ ORIGIN           %16s "5.02.10 Linux 64"
+@ DATE             %08s "28/11/16"
+@ TIME             %08s "18.21.11"
+*     NUMBER       TURN                  X                 PX                  Y                 PY                  T                 PT                  S                  E 
+$         %d         %d                %le                %le                %le                %le                %le                %le                %le                %le 
+#segment       1       2       1       0 start                                           
+          1          0              0.001              0.001              0.001              0.001               0.01               0.01                  0                 45
+#segment       2       2       1    3970 end                                             
+          1          1    -0.004165318559     0.001278865373     0.003215297614    0.0008545683304      0.01243590611     -0.02005151725            6300.16                 45

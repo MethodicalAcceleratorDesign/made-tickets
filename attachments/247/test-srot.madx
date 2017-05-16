@@ -1,0 +1,12 @@
+H: sequence, refer=centre, L=2;
+D1: drift, L=1, at=0.5; 
+R: srotation, at=1, angle=-PI/2;
+D2: drift, L=1, at=1.5; 
+endsequence;
+
+beam, particle=proton, energy=2, ex=1e-3, ey=2e-3, sequence=H;
+use, sequence=H;
+
+select, flag=twiss, column=name, s, betx, bety, alfx, alfy, mux, muy;
+twiss, betx=0.1, bety=0.2, sequence=H, file="test.twiss";
+

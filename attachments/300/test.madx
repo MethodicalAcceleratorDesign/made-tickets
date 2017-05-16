@@ -1,0 +1,67 @@
+ct: marker; 
+ctline: marker; 
+enct: marker; 
+
+inusect = 1; 
+seclev = 1; 
+treslev = 1;
+quarlev = 1; 
+value, inusect, seclev, treslev, quarlev; 
+
+if ( inusect == 1 ) { 
+   print, text="debut 1er niveau"; 
+
+  if (seclev == 1) {
+     print, text=" debut 2eme niveau";
+
+     if (treslev == 1) {
+        print, text="  debut 3eme niveau";
+
+        if (quarlev == 1) {
+           print, text="   debut 4eme niveau 1/2";
+	   ! if any of the following two statements is enabled, 
+	   ! the part between { two lines above and the next print (excluded)
+	   ! is simply ignored; hence the previous print disappears and the macro
+	   ! or line are not defined. 
+           !myctline: line=(ct, ctline, enct);
+	   !aba: macro={ printf, text="macro"};
+           print, text="   fin 4eme niveau 1/2";
+        }
+
+        if (quarlev == 1) {
+           print, text="   debut 4eme niveau 2/2";
+	   ! if any of the following two statements is enabled, 
+	   ! the part between { two lines above and the next print (excluded)
+	   ! is simply ignored; hence the previous print disappears and the macro
+	   ! or line are not defined. 
+	   aba: macro={ printf, text="macro"};
+           myctline: line=(ct, ctline, enct);
+           print, text="   fin 4eme niveau 2/2";
+        }
+
+        if (quarlev == 1) {
+           print, text="   4eme niveau";
+           if (quarlev == 1) {
+              print, text="    5eme niveau";
+              if (quarlev == 1) {
+                 print, text="     6eme niveau";
+              }
+           }  
+        }
+
+
+        print, text="  fin 3eme niveau";
+     }
+     print, text=" fin 2eme niveau";
+  }   
+  print, text="fin 1er niveau";
+}
+
+beam; 
+use, period=myctline; 
+select, flag=twiss, column=s,name;
+twiss, betx=1, bety=1;
+
+exec, aba;
+
+stop;

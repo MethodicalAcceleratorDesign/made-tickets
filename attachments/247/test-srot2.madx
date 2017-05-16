@@ -1,0 +1,17 @@
+
+rotangle = 2*Pi/2.;
+value, rotangle;
+
+H: sequence, refer=centre, L=2;
+D1: drift, L=1, at=0.5; 
+R1: srotation, at=1, angle=rotangle;
+R2: srotation, at=1, angle=rotangle;
+D2: drift, L=1, at=1.5; 
+endsequence;
+
+beam, particle=proton, energy=2, ex=1e-3, ey=2e-3, sequence=H;
+use, sequence=H;
+
+select, flag=twiss, column=name, s, betx, bety, alfx, alfy, mux, muy, x, px, y, py;
+twiss, betx=10, bety=1, x=1.e-6, sequence=H, file="test.twiss";
+

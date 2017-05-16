@@ -1,0 +1,92 @@
+! calculation and plotting of the aperture
+
+set,    format="13.6f";
+
+!readmytable, table=apertures, file="aperture-data.tfs";
+readmytable, table=apertures, file="aperture.tfs";
+
+create, table=output, column=_name,s,x,y,betx,bety,on_elem, nx_m, ny_m, n_1,x_,y_, sig_x, sig_y;
+
+!value, table(apertures, mq.18r1.b1, betx);
+!stop;
+
+option, -info, -echo;
+
+ real last_nx = 0.009;
+ real last_ny = 0.009;
+ real last_n1 = 10.5;
+ real emmit = 3.75E-6 * (0.93826 / 450.0);
+ one_elem(j_elem) : macro = {
+     setvars, table=apertures, row=j_elem;
+
+     print, text=tabstring(apertures, name, j_elem);
+     if(n1x_m > 0.009) {
+	nx_m = last_nx;
+     } else {
+	nx_m = n1x_m;
+	last_nx = n1x_m;
+     }
+
+     if(n1y_m > 0.009) {
+	ny_m = last_ny;
+     } else {
+	ny_m = n1y_m;
+	last_ny = n1y_m;
+     }
+
+     if(n1 > 10.5) {
+	n_1 = last_n1;
+     } else {
+	n_1 = n1;
+	last_n1 = n1;
+     }
+
+     sig_x := sqrt(betx * emmit);
+     sig_y := sqrt(bety * emmit);
+
+     x_ := 1000*x;
+     y_ := 1000*y;
+
+     value, nx_m,ny_m,n_1,sig_x,sig_y,x_,y_;
+!     fill,  table=apertures, row=j_elem;
+     fill,  table=output;
+ }
+
+ i_elem = 0;
+ n_elem  =  table(apertures, tablelength);
+
+ while (i_elem < n_elem) {
+     i_elem = i_elem + 1; 
+     exec,  one_elem($i_elem);
+ }
+
+print, text="done calculation";
+
+write, table=output, file="./proc-apertures.tfs";
+
+resplot;
+setplot,post=1,			! 1 - post-script / 2 - eps
+	font=1, 		
+	lwidth=1,		! line width scaling factor
+	xsize=28.0,		! bounding box 
+	ysize=20.0,		! bounding box 
+	ascale=0.8, 		! annotation scaling
+	lscale=0.8, 		! axis label character scaling
+	sscale=0.8, 		! plot label character scaling
+	rscale=0.8; 		! axis text character scaling
+
+print, text="done plot setup";
+
+plot,	table=output,
+	noline,
+	haxis=s, 
+	vaxis1=x_,y_,n_1,on_elem,
+	vaxis2=betx,bety, 
+	vaxis3=nx_m,ny_m,
+	vaxis4=sig_x,sig_y,
+	vmin=	0,	-360,	-0.03,		-0.004,
+	vmax=	30,	360,	0.0115,		0.0065,
+	style=100, 
+	file="./n-aper-metric";
+
+stop;

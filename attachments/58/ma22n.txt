@@ -1,0 +1,99 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with madX
+!   Derived from mar22n.txt 
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20, 
+        post=1,font=-4,lwidth=5;
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=16, 
+        post=2,font=-4,lwidth=10;
+
+!-- Define doublet lattice for medical C6+ ring with magnets split into two
+title,"Doublet lattice for 1st H+ ring - mar22n";
+beam;  
+periodL:=0.72;
+periodN:=48;
+fang=-0.07434413245;
+dang:=2*pi/periodN-fang;
+fk1:=+5;
+dk1:=-5;
+bf: sbend,l=0.17,angle=fang,k1:=bfi->k1,e1:=fang/2,e2:=fang/2;
+bd: sbend,l=0.18,angle=dang,k1:=bdi->k1,e1:=dang/2,e2:=dang/2;
+bfi: sbend,l=0.085,angle:=fang/2,k1=25.57051159,e1:=fang/2;
+bdi: sbend,l=0.09,angle:=dang/2,k1=-21.6595443,e1:=dang/2;
+bfo: sbend,l=0.085,angle:=fang/2,k1:=bfi->k1,e2:=fang/2;
+bdo: sbend,l=0.09,angle:=dang/2,k1:=bdi->k1,e2:=dang/2;
+d1: drift,l=0.08;
+d2: drift,l=0.05;
+rfvolt:=0;
+rflag:=0.125;
+rfc: rfcavity,l=0.19,volt:=rfvolt,lag:=rflag,harmon=1;
+col: ecollimator,xsize=0.025,ysize=0.012;
+! dou: line=(col,bf,col,d1,col,bd,col);
+! dou: line=(col,bfi,bfo,col,d1,col,bdi,bdo,col);
+! dou: line=(bfi,bfo,d1,bdi,bdo);
+dou: line=(bf,d1,bd);
+rfs: line=(d2,rfc,d2);
+rfcell: line=(dou,rfs);
+d3: drift,l=0.29;
+norfcell: line=(dou,d3);
+ring: line=(4*(rfcell,11*norfcell));
+
+!-- Use twiss for plot of orbit functions 
+use,period=rfcell;
+select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,x,px,
+bety,alfy,muy,dy,dpy,y,py,t,pt,alfa;
+system,"erase mar22n_twiss.lis";
+twiss,rmatrix,table,file="mar22n_twiss.lis";
+title," ";
+plot,file="mar22n",haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,interpolate,
+noversion,notitle;!,vmin=0.5,0.01,vmax=1.2,0.06;
+use,period=ring;
+system,"erase tmp.lis";
+select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,x,px,
+bety,alfy,muy,dy,dpy,y,py,t,pt,alfa;
+system,"erase mar22n_twiss.lis";
+twiss,rmatrix,table,file="mar22n_twiss.lis";
+title," ";
+plot,file="mar22n",haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,interpolate,
+noversion,notitle;!,vmin=0.5,0.01,vmax=1.2,0.06;
+
+!-- Compute ideal orbit at one value of dpp with PTC_TWISS 
+use,period=ring; 
+survey,file="mar22n.srv";
+dpp=0; 
+trunc=2.5; 
+ptc_create_universe; 
+ptc_create_layout,model=2,method=6,nst=30,exact,time=false; 
+select,flag=ptc_twiss,column=name,s,beta11,alfa11,mu1,disp1,
+ beta22,alfa22,mu2,disp3,x,px,y,py,t,pt; 
+ptc_twiss,closed_orbit,icase=5,deltap=dpp,file="ptc.lis",table; 
+ptc_end; 
+system,"copy /y ptc.lis mar22n.lis"; 
+option,echo=true,info=true; 
+value,rfc->volt,rfc->lag,rfc->harmon,rfc->freq,n1,n2,n3; 
+ 
+!-- Compute closed orbit at one value of dpp with PTC_TWISS 
+use,period=ring; 
+dpp=0; 
+trunc=2.5; 
+maxorb=1;
+norb=0;
+eoption,add=false;
+while(norb<maxorb)
+{
+norb=norb+1;
+select,flag=error,class=bd;
+select,flag=error,class=bf;
+ealign,dx:=1e-4*tgauss(trunc),dy:=1e-4*tgauss(trunc);
+!eprint;
+ptc_create_universe; 
+ptc_create_layout,model=2,method=6,nst=30,exact,time=false; 
+select,flag=ptc_twiss,column=name,s,beta11,alfa11,mu1,disp1,
+ beta22,alfa22,mu2,disp3,x,px,y,py,t,pt;
+system,"erase ptc.lis";
+ptc_align;
+ptc_twiss,closed_orbit,icase=5,deltap=dpp,file="ptc.lis",table; 
+ptc_end; 
+system,"copy /y mar22n.lis+ptc.lis mar22n.lis"; 
+}
+
+stop;

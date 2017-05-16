@@ -1,0 +1,14 @@
+@ NAME             %06s "OFFSET"
+@ TYPE             %06s "OFFSET"
+@ REFERENCE        %10s "QTLF.610600"
+@ Modified by CH
+* NAME           S_IP  DDX_OFF        DX_OFF       X_OFF      DDY_OFF        DY_OFF       Y_OFF
+$ %s              %le              %le           %le           %le           %le           %le           %le
+MBS.660004 0  0   -0.0007         0 0    0         0 
+MBS.660008 0  0   -0.0022         -0.0035 0    0         0 
+MBS.660011 0  0   -0.0036         -0.0124 0    0         0 
+VVSB.660015 0  0   -0.0044         -0.0249 0    0         0 
+VCBJ.660015 0  0   -0.0044         -0.0256 0    0         0 
+VCGA.660016 0  0   -0.0044         -0.0290 0    0         0 
+MBS.660024 0  0   -0.0078         -0.1460 0    0         0 
+MBS.660028 0  0   -0.0108         -0.1755 0    0         0 

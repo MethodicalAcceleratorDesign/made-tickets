@@ -1,0 +1,39 @@
+call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.1/hllhc.seq";
+call, file="/afs/cern.ch/eng/lhc/optics/HLLHCV1.1/opt_ions.madx";
+
+seqedit, sequence=lhcb1;
+flatten;
+cycle, start=IP5;
+endedit;
+
+on_x1 := 1;
+on_x5 := 1;
+on_x2 := 0.176471;
+on_x8 := 1;
+on_sep1 := 0;
+on_sep2 := 0;
+on_sep5 := 0;
+on_sep8 := 0;
+on_alice := 1;
+
+Beam1: BEAM,SEQUENCE=LHCB1, BV=1, ENERGY=574000., PARTICLE=ION, MASS=193.68727293831492,
+       CHARGE=82, KBUNCH=364, NPART=1.4E8, EX=5.0615143893322709E-10, EY=5.0615143893322709E-10,
+       ET=2.5, SIGE=0.00013000000000000002, SIGT=0.075;
+
+xinit =     0.000000000092622 ;
+yinit =     0.000000000020062 ;
+pxinit =     0.000294999490616 ;
+pyinit =    -0.000000000011370 ;
+betxinit =     0.440001059351018 ;
+betyinit =     0.439999694528180 ;
+alfxinit =    -0.000004864836425 ;
+alfyinit =    -0.000000712893447 ;
+
+use, period=lhcb1;
+
+select, flag=twiss,clear;
+select, flag=twiss,range=IP5/MB.C17R5.B1,column={name,keyword,parent,s,l,lrad,kick,hkick,vkick,angle,k0l,k1l,k2l,k3l,x,y
+        ,px,py,betx,bety,alfx,alfy,mux,muy,dx,dy,dpx,dpy,kmax,kmin,calib,polarity,apertype,n1};
+
+twiss, sequence =lhcb1,file="test.tfs",DELTAP=0.012345679012345678, X=XINIT, Y=YINIT,
+        PX=PXINIT,PY=PYINIT,BETX=BETXINIT,BETY=BETYINIT,ALFX=ALFXINIT,ALFY=ALFYINIT ;

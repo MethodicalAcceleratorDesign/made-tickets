@@ -1,0 +1,79 @@
+title, "HL-LHC Error simulations";
+
+option, -echo, -info;
+
+System, "test -e db5   || ln -ns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.0 slhc";
+
+REAL CONST l.TAN   = 3.7;
+REAL CONST l.TANAL = l.TAN;
+REAL CONST l.TANAR = l.TAN;
+REAL CONST l.TANC  = l.TAN;
+REAL CONST l.TCT   = 1.0;
+REAL CONST l.TCTH  = l.TCT;
+REAL CONST l.TCTVA = l.TCT;
+
+call, file = "db5/V6.5.seq";
+call, file = "slhc/hllhc_sequence.madx";
+
+bs_type=4;
+ap_mqx=150;
+
+seqedit, sequence=LHCB1;
+flatten;               
+cycle, start=MSIA.EXIT.B1;
+endedit;
+
+seqedit, sequence=LHCB2;
+flatten;
+cycle, start=MKI.A5R8.B2;
+endedit;
+
+beam, sequence=LHCB1, particle=proton, energy=450, kbunch=1, npart=1.15E11, bv=1;
+beam, sequence=LHCB2, particle=proton, energy=450, kbunch=1, npart=1.15E11, bv=-1;
+
+on_x1   := 0; on_x2   := 0; on_x5   := 0; on_x8   := 0;
+on_sep1 := 0; on_sep2 := 0; on_sep5 := 0; on_sep8 := 0;
+on_alice:= 0; on_lhcb := 0; on_a8 := 0; on_o8 := 0;
+
+use, period = LHCB1;
+
+option, -echo;
+call, file = "modifiers_15cm.madx";
+option, echo;
+
+GCUTR = 3; ! Cut for truncated gaussians (sigmas)
+select, flag=error, clear;
+select, flag=error, pattern = ^MQXF.*[RL]1;
+eoption, seed = 158712795;
+ealign, dpsi := 0.002 * TGAUSS(GCUTR);
+
+kqsx3.l1  =  kqsx3.l1  -  0.0002664522474 ;
+kqsx3.r1  =  kqsx3.r1  -  0.001269001696 ;
+
+match;
+vary, name=KQTD.B1;
+vary, name=KQTF.B1;
+constraint, range=#E, mux=62.31, muy=60.32;
+lmdif;
+endmatch;
+
+select, flag=twiss, clear;
+select, flag=twiss, class=monitor, column=name, s, betx, alfx, bety, alfy, 
+                                          mux, muy, dx, dy, dpx, dpy, x, y,
+                                          k1l, k1sl, k2l, k3l, k4l, wx, wy, phix,
+                                          phiy, dmux, dmuy, keyword, dbx, dby,
+                                          r11, r12, r21, r22;
+select, flag=twiss, class=monitor;
+select, flag=twiss, class=instrument;
+select, flag=twiss, class=marker;
+select, flag=twiss, class=quadrupole;
+select, flag=twiss, class=skewquadrupole;
+select, flag=twiss, class=sextupole;
+select, flag=twiss, class=octupole;
+select, flag=twiss, class=tkicker;
+select, flag=twiss, class=rcollimator;
+select, flag=twiss, class=collimator;
+select, flag=twiss, class=rbend;
+twiss, chrom, sequence=LHCB1, deltap=0.0, file="twiss_err.dat";
+

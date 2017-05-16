@@ -1,0 +1,46 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with mad version 8.51/02 or later
+!   Derived from jun14b.txt
+assign print="jun17f.lis"
+assign echo="jun17f.eco"
+setplot ascale=1 lscale=1.5 sscale=3 rscale=1.5 xsize=28 ysize=20 &
+        post=1 font=-4 lwidth=5
+setplot ascale=2 lscale=2 sscale=1.5 rscale=2 xsize=28 ysize=20 &
+        post=2 font=-4 lwidth=10
+
+!-- Define triplet lattice for gantry
+option,-echo
+call,file="jun17c.sav"
+option,echo
+title "Triplet lattice for gantry - jun17f"
+
+!-- Analyse matching result
+beam,ex=3.6692e-6,ey=3.6692e-6,sige=0.03
+use gantry
+print clear
+twiss betx=beta bety=beta dx=0 save
+twiss tunes betx=beta bety=beta dx=0 deltap=-0.3:-0.21:0.01 save
+twiss tunes betx=beta bety=beta dx=0 deltap=-0.2:-0.11:0.01 save
+twiss tunes betx=beta bety=beta dx=0 deltap=-0.1:-0.01:0.01 save
+twiss tunes betx=beta bety=beta dx=0 deltap=+0.0:+0.1:0.01 save
+twiss tunes betx=beta bety=beta dx=0 deltap=+0.11:+0.2:0.01 save
+twiss tunes betx=beta bety=beta dx=0 deltap=+0.21:+0.3:0.01 save
+
+!-- Compute fields and gradients
+amu:=0.931494320;
+beam,mass=12*amu,charge=6,pc=8.414;
+use,period=cell;
+value,beam[energy],beam[mass],beam[charge];               
+kinE:=beam[energy]-beam[mass];
+emu:=(beam[energy]-beam[mass])*amu/beam[mass];
+brho:=beam[pc]*1e9/clight/beam[charge];
+value,kinE,emu,brho;
+fieldF=bf[angle]*brho/bf[l];
+fieldD=bd[angle]*brho/bd[l];
+gradF=bf[k1]*brho;
+gradD=bd[k1]*brho;
+value,fieldF,fieldD,gradF,gradD;
+value,beam[beta],beam[gamma],beam[beta]*beam[gamma];
+value,bf[k1],bd[k1];
+
+stop

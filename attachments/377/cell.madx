@@ -1,0 +1,29 @@
+!FODO
+
+!Constants
+tb=2e-3;	//Bending angle in the main dipole
+Ldipole:=21.5;		//Length of the main dipole
+
+KQ1 =      0.0367454293 ;
+KQ2 =     -0.0300649075 ;
+
+!QUADRUPOLES
+Q1     : QUADRUPOLE,L=0.75, K1:=KQ1;
+Q2     : QUADRUPOLE,L=1.5, K1:=KQ2;
+
+!BENDS
+B1  : SBEND, L:=Ldipole, ANGLE:=tb, E1:=0.5*tb, E2:=0.5*tb;
+
+!**************************************************************
+
+cell_length:=50;
+
+cell_seq: sequence,refer=centre, l:= cell_length;
+MQ1:  Q1,  at := Q1->L/2;
+M.B1: B1,  at := Q1->L/2+1+B1->L/2, from=MQ1;
+MQ2:  Q2,  at := B1->L/2+1+Q2->L/2, from=M.B1;
+M.B2: B1,  at := Q2->L/2+1+B1->L/2, from=MQ2;
+MQ3:  Q1,  at := B1->L/2+1+Q1->L/2, from=M.B2;
+endsequence;
+
+RETURN;

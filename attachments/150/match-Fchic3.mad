@@ -1,0 +1,65 @@
+! rematches optics in F-chicane and bypass
+! The matching is done in several steps
+! 1. Find initial conditions at the beginning of the F-Chicane (period=stretcher)
+! 2. Vary quads inside the F-Chicane to get required r56 and zero despersions at the end of F-Chicane
+! 3. Same as above, but add constraint for small betas
+! 4. Very quads before and after F-Chicane to get small betas along the whole CT-line and DL-bypass
+!    and measured parameters at the end of DL-bypass (in front of CT0520)
+! 5. The same as above but very only quads after the F-Chicane 
+!
+! P.Skowronski (CERN)
+
+
+ptc_enforce6d, flag=true;
+
+!assign, echo="OUTPUT";
+
+call, file="common.seqx";
+call, file="currents";
+
+
+/*******CT-DL Bypass*****/
+!call, file="ct-dlbp.seqx";
+/*******CT-DL Bypass*****/
+
+
+call, file="ctline.seqx";!ctline.seqx";
+call, file="dl.seqx";
+call, file="ctdl.seqx";
+
+
+value, r56;
+
+
+beam, particle=electron, energy=en/1000;
+use, period=ctdl, range=#s/kckc;
+
+
+!This b0 corresponds to MID15 (between the accel structs on gird 15)
+betaini  :  BETA0, BETX=BET0X15, ALFX=ALF0X15, BETY=BET0Y15, ALFY=ALF0Y15;
+
+dx10:= 10*table(twiss,dx);
+select, flag=twiss,column=name,s,angle, betx,bety,alfx,alfy, dx,x,y,dx10,sigx,sigy, re56;
+
+
+bxmax = 200;
+bymax = 200;
+
+
+ef := en/100;
+
+
+twiss, rmatrix, beta0=betaini, save, file="initial.twiss";
+
+
+plot, noversion=true, haxis=s, vaxis=betx,bety,dx10, interpolate,
+     title="TL1 (F-chicane) present values", colour=100;
+
+value, BHE0210->angle;
+
+
+plot, noversion=true, haxis=s, vaxis=dx, interpolate,
+     title="TL1 (F-chicane) present values", colour=100;
+
+value, BHE0210->angle;
+stop;

@@ -1,0 +1,134 @@
+TITLE, "q1    : QUADRUPOLE, L=1, k1=10;";
+
+set,  format =  "-20s";
+set,  format = "15.9f";
+
+
+
+/***********************************************************
+ * Element definitions
+ ***********************************************************/
+ q1    : QUADRUPOLE, L=1,  k1:=0.7;
+
+
+
+/***********************************************************
+ * Initial parameters
+ ***********************************************************/
+
+BETX0  :=  1.0;
+ALFX0  :=  0.0;
+MUX0   :=  0.0;
+BETY0  :=  1.0;
+ALFY0  :=  0.0;
+MUY0   :=  0.0;
+X0     :=  0.001;
+PX0    :=  0.0;
+Y0     :=  0.0;
+PY0    :=  0.0;
+T0     :=  0.0;
+PT0    :=  0.0;
+DX0    :=  0.0;
+DPX0   :=  0.0;
+DY0    :=  0.0;
+DPY0   :=  0.0;
+
+
+INITBETA0: BETA0,
+  BETX=BETX0,
+  ALFX=ALFX0,
+  MUX=MUX0,
+  BETY=BETY0,
+  ALFY=ALFY0,
+  MUY=MUY0,
+  X=X0,
+  PX=PX0,
+  Y=Y0,
+  PY=PY0,
+  T=T0,
+  PT=PT0,
+  DX=DX0,
+  DPX=DPX0,
+  DY=DY0,
+  DPY=DPY0;
+
+
+
+
+
+
+
+
+
+/***********************************************************
+ ***********************************************************
+ * PTC
+ ***********************************************************
+ ***********************************************************/
+
+
+/***********************************************************
+ * MACRO: makePTC
+ ***********************************************************/
+ d=0;
+ makePTC : macro={
+      option, echo;
+     /***********************************************************
+      * sequence definition
+      ***********************************************************/
+
+      seq    : SEQUENCE      , L  = 20.0;
+      q1                     , at :=  5.0-0.943025844; // d will be optimized
+      ENDSEQUENCE;
+
+
+     /***********************************************************
+      * BEAM and USE
+      ***********************************************************/
+      beam; use, sequence=seq;
+
+
+     /***********************************************************
+      * PTC
+      ***********************************************************/
+      select,flag=ptc_twiss,clear;
+      select,flag=ptc_twiss,column = name,s,x,y,alfa11,beta11,alfa22,beta22;
+
+      ptc_create_universe;
+      ptc_create_layout,model=2,method=6,nst=5,exact, time=false;
+      ptc_twiss, table=ptc_twiss,icase=5,no=1,BETA0=INITBETA0,file="optics.out" ;
+      ptc_end;
+
+      save, sequence=seq, file="ps.save";
+      system, "cat ps.save";
+      write,table=ptc_twiss,file="ptc_twiss";
+
+      beta11 = table(ptc_twiss,seq$END,beta11);
+      value, beta11, d;
+
+ }; ! end of makePTC
+
+ exec, makePTC;
+
+  exit;
+
+/***********************************************************
+ * Match
+ ***********************************************************/
+
+
+
+ match, use_macro;
+      vary, name = d,  step=1e-3;
+
+      use_macro,name=makePTC;
+
+      constraint, expr=table(ptc_twiss,seq$END,BETA11) =  500;
+
+      simplex, calls=100, tolerance=1e-10;
+ endmatch;
+
+
+
+STOP;
+

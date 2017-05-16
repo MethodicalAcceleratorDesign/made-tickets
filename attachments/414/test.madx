@@ -1,0 +1,41 @@
+d : drift, l = 2.0;
+qf : quadrupole, l=0.1, k1 = 3.5;
+qd : quadrupole, l=0.1, k1 = -3.5;
+m : marker;
+
+fodo : line = (qf,d,qd,qd,d,qf,qf,d,qd,qd,d,qf,qf,d,qd,qd,d,qf,m);
+
+
+beam, particle=electron, energy=42;
+use, period = fodo;
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,betx, bety, alfx, alfy, Dx, Dpx, mux, muy;
+twiss;  !  -0.2084065867
+plot, haxis=s, vaxis1=betx, bety, colour=100;
+
+twiss, chrom;  ! the results is slightly different from twiss without chrom
+               ! this can make a noticable difference for a large machine
+
+! This works.
+match, sequence = fodo;
+vary, name = qf->k1;
+vary, name = qd->k1;
+constraint, sequence=fodo,range=m,mux=0.7;
+jacobian, calls =500;
+endmatch;
+
+! the next does not
+! from the match summary it looks like there is a factor 2 pi in units
+! MATCH SUMMARY
+!
+!Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+!--------------------------------------------------------------------------------------------------
+!m:1                        mux          4     7.00000000E-01     4.39822963E+00     1.36769024E+03
+
+match, chrom, sequence = fodo;
+vary, name = qf->k1;
+vary, name = qd->k1;
+constraint, sequence=fodo,range=m,mux=0.7;
+jacobian, calls =500;
+endmatch;

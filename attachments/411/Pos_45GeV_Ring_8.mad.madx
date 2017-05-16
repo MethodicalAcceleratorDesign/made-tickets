@@ -1,0 +1,159 @@
+! 6.039 GeV Ring
+! warning !! multipoles might not be correct
+
+! RF Cavities !lag=0.46 with rad on
+RFVOLT := 12.0*RF_ON;![MV]
+L_RFC  := 5.4;![m]
+!HRFc    : RFCAVITY, L=L_RFC/2, VOLT:=RFVOLT/2, LAG:=0.46, HARMON:=10510,
+RFc    : RFCAVITY, L=L_RFC, VOLT:=RFVOLT, LAG:=0.46, HARMON:=10510,
+        freq:=500.117256;!;!500MHz,
+!RFc : LINE = (HRFc,HRFc);
+
+! Dipoles
+DL1A_1: SBEND,L=4.0, ANGLE = 0.00230,     K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DL1A_2: SBEND,L=4.0, ANGLE = 0.00300,     K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DL1A_3: SBEND,L=4.0, ANGLE = 0.00380,     K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DL1A_4: SBEND,L=4.0, ANGLE = 0.00500,     K1 = 0.0, E1=  0.0, E2=  0.0 ;
+DL1A_5: SBEND,L=4.0, ANGLE = 0.00700,     K1 = 0.0, E1=  0.0, E2= -0.0 ;
+DL1E_1: SBEND,L=4.0, ANGLE = 0.00230,     K1 = 0.0, E1=  0.0, E2= -0.0 ;
+DL1E_2: SBEND,L=4.0, ANGLE = 0.00300,     K1 = 0.0, E1=  0.0, E2= -0.0 ;
+DL1E_3: SBEND,L=4.0, ANGLE = 0.00380,     K1 = 0.0, E1=  0.0, E2= -0.0 ;
+DL1E_4: SBEND,L=4.0, ANGLE = 0.00500,     K1 = 0.0, E1=  0.0, E2=  0.0 ;
+DL1E_5: SBEND,L=4.0, ANGLE = 0.00700,     K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DL2B_1: SBEND,L=4.0, ANGLE = 0.00230,     K1 = 0.0, E1=  0.0, E2= -0.0 ;
+DL2B_2: SBEND,L=4.0, ANGLE = 0.00300,     K1 = 0.0, E1=  0.0, E2= -0.0 ;
+DL2B_3: SBEND,L=4.0, ANGLE = 0.00380,     K1 = 0.0, E1=  0.0, E2= -0.0 ;
+DL2B_4: SBEND,L=4.0, ANGLE = 0.00500,     K1 = 0.0, E1=  0.0, E2=  0.0 ;
+DL2B_5: SBEND,L=4.0, ANGLE = 0.00700,     K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DL2D_1: SBEND,L=4.0, ANGLE = 0.00230,     K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DL2D_2: SBEND,L=4.0, ANGLE = 0.00300,     K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DL2D_3: SBEND,L=4.0, ANGLE = 0.00380,     K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DL2D_4: SBEND,L=4.0, ANGLE = 0.00500,     K1 = 0.0, E1=  0.0, E2=  0.0 ;
+DL2D_5: SBEND,L=4.0, ANGLE = 0.00700,     K1 = 0.0, E1=  0.0, E2= -0.0 ;
+DQ1A_1: SBEND,L=6.0, ANGLE = 0.009329128, K1 = 0.0, E1=  0.0, E2=  0.0 ;
+DQ1A_2: SBEND,L=6.0, ANGLE = 0.009329128, K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DQ1B_1: SBEND,L=6.0, ANGLE = 0.009329128, K1 = 0.0, E1=  0.0, E2=  0.0 ;
+DQ1B_2: SBEND,L=6.0, ANGLE = 0.009329128, K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DQ2C_1: SBEND,L=6.0, ANGLE = 0.009329128, K1 = 0.0, E1=  0.0, E2=  0.0 ;
+DQ2C_2: SBEND,L=6.0, ANGLE = 0.009329128, K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DQ2E_1: SBEND,L=6.0, ANGLE = 0.009329128, K1 = 0.0, E1=  0.0, E2=  0.0 ;
+DQ2A_2: SBEND,L=6.0, ANGLE = 0.009329128, K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DQ1D_1: SBEND,L=6.0, ANGLE = 0.009329128, K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DQ1D_2: SBEND,L=6.0, ANGLE = 0.009329128, K1 = 0.0, E1=  0.0, E2=  0.0 ;
+DQ1E_1: SBEND,L=6.0, ANGLE = 0.009329128, K1 = 0.0, E1= -0.0, E2=  0.0 ;
+DQ1E_2: SBEND,L=6.0, ANGLE = 0.009329128, K1 = 0.0, E1=  0.0, E2=  0.0 ;
+
+! quads
+LQ20    := 0.400 ;! LENGTH 20 CM QUAD
+LQ20    := 0.400 ;! LENGTH 20 CM QUAD
+LQ36    := 0.720 ;! LENGTH 33 CM QUAD
+LQ36    := 0.720 ;! LENGTH 33 CM QUAD
+LQ50    := 1.000 ;! LENGTH 50 CM QUAD
+LQ50    := 1.000 ;! LENGTH 50 CM QUAD
+
+! ID matching quads
+QF1A  : QUADRUPOLE, L=  LQ50,   K1 := KQF1;! ,FRGF=.TRUE.
+QF1E  : QUADRUPOLE, L=  LQ50,   K1 := KQF1;! ,FRGF=.TRUE.
+
+QF2A  : QUADRUPOLE, L=  LQ36,   K1 := KQF2;
+QF2E  : QUADRUPOLE, L=  LQ36,   K1 := KQF2;
+
+QD1A  : QUADRUPOLE, L=  LQ20/2, K1 := KQD1;! ,FRGF=.TRUE.
+QD1E  : QUADRUPOLE, L=  LQ20/2, K1 := KQD1;! ,FRGF=.TRUE.
+
+QD2A  : QUADRUPOLE, L=  LQ20,   K1 := KQD2;! ,FRGF=.TRUE.
+QD2E  : QUADRUPOLE, L=  LQ20,   K1 := KQD2;! ,FRGF=.TRUE.
+
+QD3A  : QUADRUPOLE, L=  LQ20,   K1 := KQD3;! ,FRGF=.TRUE.
+QD3E  : QUADRUPOLE, L=  LQ20,   K1 := KQD3;! ,FRGF=.TRUE.
+
+! 3pi Cell Quads
+QF4A  : QUADRUPOLE, L=  LQ20,   K1 := KQF4;! ,FRGF=.TRUE.
+QF4B  : QUADRUPOLE, L=  LQ20,   K1 := KQF4;! ,FRGF=.TRUE.
+QF4D  : QUADRUPOLE, L=  LQ20,   K1 := KQF4;! ,FRGF=.TRUE.
+QF4E  : QUADRUPOLE, L=  LQ20,   K1 := KQF4;! ,FRGF=.TRUE.
+
+QD7B  : QUADRUPOLE, L=  LQ20,   K1 := KQD7;! ,FRGF=.TRUE.
+QD7D  : QUADRUPOLE, L=  LQ20,   K1 := KQD7;! ,FRGF=.TRUE.
+
+QD9C  : QUADRUPOLE, L=  LQ20/2, K1 := KQD9;! ,FRGF=.TRUE.
+
+QD5B  : QUADRUPOLE, L=  LQ20,   K1 := KQD5;! ,FRGF=.TRUE.
+QD5D  : QUADRUPOLE, L=  LQ20,   K1 := KQD5;! ,FRGF=.TRUE.
+
+QF6B  : QUADRUPOLE, L=  LQ36,   K1 := KQF6;! ,FRGF=.TRUE.
+QF6D  : QUADRUPOLE, L=  LQ36,   K1 := KQF6;! ,FRGF=.TRUE.
+
+QF8B  : QUADRUPOLE, L=  LQ50,   K1 := KQF8;! ,FRGF=.TRUE.
+QF8D  : QUADRUPOLE, L=  LQ50,   K1 := KQF8;! ,FRGF=.TRUE.
+
+! Sextupoles
+LS20 = 0.40          ;! Sextupole lenght
+SF2A : SEXTUPOLE, L =LS20/2, K2 := KSF2;
+SF2E : SEXTUPOLE, L =LS20/2, K2 := KSF2;
+SD1A : SEXTUPOLE, L =LS20,   K2 := KS1A;
+SD1B : SEXTUPOLE, L =LS20,   K2 := KS1B;
+SD1D : SEXTUPOLE, L =LS20,   K2 := KS1D;
+SD1E : SEXTUPOLE, L =LS20,   K2 := KS1E;
+
+! Octupoles
+OF1B : OCTUPOLE, L = 0.15,   K3 := KOF1;
+OF1D : OCTUPOLE, L = 0.15,   K3 := KOF1;
+
+/*
+!dec6: multipole, LRAD=0, TILT=0,
+KNL:={cos(0*1)*0,cos(0*2)*0,cos(0*3)*0,cos(0*4)*0,cos(0*5)*0,cos(0*6)* 1.0e6*0 !
+Spurious dodecapole ,cos(0*7)*0,cos(0*8)*0,cos(0*9)*0,cos(0*10)*0},
+KSL:={sin(0*1)*0,sin(0*2)*0,sin(0*3)*0,sin(0*4)*0,sin(0*5)*0,sin(0*6)* 1.0e6*0 !
+Spurious dodecapole ,sin(0*7)*0,sin(0*8)*0,sin(0*9)*0,sin(0*10)*0};
+*/
+
+DF1B: MULTIPOLE, LRAD=0, TILT=0,
+KNL:={cos(0*1)*0,cos(0*2)*0,cos(0*3)*0,cos(0*4)*0,cos(0*5)*
+KDF1,cos(0*6)*0,cos(0*7)*0,cos(0*8)*0,cos(0*9)*0,cos(0*10)*0},
+KSL:={sin(0*1)*0,sin(0*2)*0,sin(0*3)*0,sin(0*4)*0,sin(0*5)*
+KDF1,sin(0*6)*0,sin(0*7)*0,sin(0*8)*0,sin(0*9)*0,sin(0*10)*0};
+DF1D: MULTIPOLE, LRAD=0, TILT=0,
+KNL:={cos(0*1)*0,cos(0*2)*0,cos(0*3)*0,cos(0*4)*0,cos(0*5)*
+KDF1,cos(0*6)*0,cos(0*7)*0,cos(0*8)*0,cos(0*9)*0,cos(0*10)*0},
+KSL:={sin(0*1)*0,sin(0*2)*0,sin(0*3)*0,sin(0*4)*0,sin(0*5)*
+KDF1,sin(0*6)*0,sin(0*7)*0,sin(0*8)*0,sin(0*9)*0,sin(0*10)*0};
+DD1B: MULTIPOLE, LRAD=0, TILT=0,
+KNL:={cos(0*1)*0,cos(0*2)*0,cos(0*3)*0,cos(0*4)*0,cos(0*5)*
+KDD1,cos(0*6)*0,cos(0*7)*0,cos(0*8)*0,cos(0*9)*0,cos(0*10)*0},
+KSL:={sin(0*1)*0,sin(0*2)*0,sin(0*3)*0,sin(0*4)*0,sin(0*5)*
+KDD1,sin(0*6)*0,sin(0*7)*0,sin(0*8)*0,sin(0*9)*0,sin(0*10)*0};
+DD1D: MULTIPOLE, LRAD=0, TILT=0,
+KNL:={cos(0*1)*0,cos(0*2)*0,cos(0*3)*0,cos(0*4)*0,cos(0*5)*
+KDD1,cos(0*6)*0,cos(0*7)*0,cos(0*8)*0,cos(0*9)*0,cos(0*10)*0},
+KSL:={sin(0*1)*0,sin(0*2)*0,sin(0*3)*0,sin(0*4)*0,sin(0*5)*
+KDD1,sin(0*6)*0,sin(0*7)*0,sin(0*8)*0,sin(0*9)*0,sin(0*10)*0};
+
+DR40  : DRIFT, L = L_RFC+0.3;
+DR08  : DRIFT, L = 0.15;
+
+!-----------------------------------------
+! arc cells
+!-----------------------------------------
+
+ARCA: LINE=(QD1A,DR08,DQ2A_2,DR08, QF1A,DR08, DQ1A_1,DR08,QD2A,DR08, DQ1A_2,
+DR08, QF2A, DR08, DL1A_5 ,DL1A_4 ,DL1A_3 ,DL1A_2 ,DL1A_1,DR08, QD3A, DR08, SD1A,
+DR08,DD1B,DR08,RFc,DR08,DF1B,DR08, QF4A,DR08, 2*SF2A, DR08, QF4B,DR08,
+OF1B,DR40, SD1B,DR08, QD5B, DR08, DL2B_1, DL2B_2, DL2B_3, DL2B_4, DL2B_5,DR08,
+QF6B,DR08, DQ1B_1,DR08,QD7B,DR08, DQ1B_2,DR08, QF8B,DR08,
+DQ2C_1,DR08,2*QD9C,DR08 DQ2C_2, DR08, QF8D,DR08,DQ1D_2, DR08,QD7D,DR08, DQ1D_1,
+DR08, QF6D, DR08, DL2D_5, DL2D_4 ,DL2D_3 ,DL2D_2, DL2D_1,DR08, QD5D, DR08,SD1D,
+DR40,OF1D, DR08,QF4D, DR08, 2*SF2E, DR08, QF4E,DR08,DF1D,
+DR08,RFc,DR08,DD1D,DR08, SD1E, DR08, QD3E, DR08,DL1E_1, DL1E_2 ,DL1E_3 ,DL1E_4
+,DL1E_5,DR08, QF2E, DR08, DQ1E_1,DR08,QD2E,DR08, DQ1E_2, DR08,QF1E,
+DR08,DQ2E_1,DR08,QD1E);
+
+!----------------------------------------------------
+! ring without injection
+!----------------------------------------------------
+
+Low_Emit_Ring : LINE = ( ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA,
+ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA,
+ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA, ARCA );
+
+RETURN;

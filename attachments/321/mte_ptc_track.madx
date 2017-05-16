@@ -1,0 +1,30 @@
+/******************************************************************
+ * Call lattice files
+ ******************************************************************/
+Pc = 14;
+beam, particle=PROTON, pc=Pc;
+
+call,  file = 'PS.ele';
+call,  file = 'PS_new.seq';
+call,  file = 'PS_10GeVc_for_OP_group.str';
+
+C10MTE :  RFCAVITY,  L=2.4, VOLT:=VRFMTE, LAG=0.5,  HARMON:=HMTE, no_cavity_totalpath; 
+seqedit, sequence=PS91;
+  remove, element=PR.C1091;
+  install, element=C10MTE, at=1.2;
+endedit;
+
+VRFMTE:=0.012;
+HMTE:=16;
+
+/******************************************************************
+ * Tracking
+ ******************************************************************/
+use, sequence=PS;
+ptc_create_universe;
+ptc_create_layout,time=true, model=2, exact=false, method=6, nst=5;
+ptc_start,X=0.0,PX=0.0,Y=0.0,PY=0.0,T=8.0,PT=0.0;
+ptc_start,X=0.0,PX=0.0,Y=0.0,PY=0.0,T=2.0,PT=0.0;
+ptc_track, deltap=0.0,icase=6,turns=3000,file=PTC_time_true,element_by_element,dump;
+ptc_track_end;
+ptc_end;

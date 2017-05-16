@@ -1,0 +1,126 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.02.01  (64 bit, Darwin)      +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2014.04.25      +
+  + Execution Time Stamp: 08.05.14 15.43.40 +
+  +++++++++++++++++++++++++++++++++++++++++++
+beam;
+
+
+
+cps:sequence, l=3, refer=entry;
+
+q1: drift, l=.1, at=0;
+
+rot1: yrotation, angle=PI/4, at=0.1;
+
+rot2: yrotation, angle=-PI/4, at=0.1+sqrt(2);
+
+q2: drift, l=.1, at=0.1+sqrt(2);
+
+endsequence;
+
+
+
+use, sequence=cps;
+
+twiss, betx=1, bety=1;
+
+enter Twiss module
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+  
+open line - error with deltap:   0.000000E+00
+end values:  -1.106497E+00  2.071068E-01  0.000000E+00  0.000000E+00  6.145816E-01  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+                 3                 -0                  0                  0 
+
+                q1                dq1            betxmax              dxmax 
+      0.1380151868                  0        9.555952378    3.469446952e-18 
+
+             dxrms             xcomax             xcorms                 q2 
+   1.226634733e-18        1.414213562        0.961153085       0.1987918088 
+
+               dq2            betymax              dymax              dyrms 
+                 0                 10                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+SELECT,FLAG=TWISS,column=name,s,betx,alfx,x,angle,px;
+
+write, table=twiss;
+
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %03s "CPS"
+@ PARTICLE         %08s "POSITRON"
+@ MASS             %le      0.000510998928
+@ CHARGE           %le                   1
+@ ENERGY           %le                   1
+@ PC               %le        0.9999998694
+@ GAMMA            %le         1956.951268
+@ KBUNCH           %le                   1
+@ BCURRENT         %le                   0
+@ SIGE             %le                   0
+@ SIGT             %le                   0
+@ NPART            %le                   0
+@ EX               %le                   1
+@ EY               %le                   1
+@ ET               %le                   1
+@ LENGTH           %le                   3
+@ ALFA             %le                   0
+@ ORBIT5           %le                  -0
+@ GAMMATR          %le                   0
+@ Q1               %le        0.1380151868
+@ Q2               %le        0.1987918088
+@ DQ1              %le                   0
+@ DQ2              %le                   0
+@ DXMAX            %le     3.469446952e-18
+@ DYMAX            %le                   0
+@ XCOMAX           %le         1.414213562
+@ YCOMAX           %le                   0
+@ BETXMAX          %le         9.555952378
+@ BETYMAX          %le                  10
+@ XCORMS           %le         0.961153085
+@ YCORMS           %le                   0
+@ DXRMS            %le     1.226634733e-18
+@ DYRMS            %le                   0
+@ DELTAP           %le                   0
+@ SYNCH_1          %le                   0
+@ SYNCH_2          %le                   0
+@ SYNCH_3          %le                   0
+@ SYNCH_4          %le                   0
+@ SYNCH_5          %le                   0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %23s "MAD-X 5.02.01 Darwin 64"
+@ DATE             %08s "08/05/14"
+@ TIME             %08s "15.43.40"
+* NAME                                S               BETX               ALFX                  X              ANGLE                 PX 
+$ %s                                %le                %le                %le                %le                %le                %le 
+ "CPS$START"                          0                  1                  0                  0                  0                  0
+ "Q1"                               0.1               1.01               -0.1                  0                  0                  0
+ "ROT1"                             0.1               2.02               -0.1                  0       0.7853981634      -0.7071067812
+ "DRIFT_0"                  1.514213562        3.302842712      -0.8071067812                 -1                  0      -0.7071067812
+ "ROT2"                     1.514213562        6.605685425      -0.8071067812       -1.414213562      -0.7853981634       0.2071067812
+ "Q2"                       1.614213562        6.769606781      -0.8321067812       -1.393502884                  0       0.2071067812
+ "DRIFT_1"                            3        9.555952378       -1.178553391       -1.106497116                  0       0.2071067812
+ "CPS$END"                            3        9.555952378       -1.178553391       -1.106497116                  0       0.2071067812
+survey, file=survey;
+
+ YROT
+ angle  0.78539816339744828     
+ YROT
+ angle -0.78539816339744828     
+
+  Number of warnings: 0
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.01 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

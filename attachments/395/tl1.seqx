@@ -1,0 +1,345 @@
+!#MADX
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! TL1
+!!!
+!!! jun 2013 - davide.gamba@gmail.com
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+! FROM the Delay Loop to the combiner ring
+
+! updated for correct quad length (FT 15.09.2006)
+
+! add -0.20 to recover from septa lengthening - 24 nov 04
+!   ldl6:  DRIFT , L = 0.6 +0.30 -0.20;
+! shift the two quads after DL by 184mm towards gun (FT 19.12.2005)
+! and add 20mm drift to allow for space after valve (FT 19.12.2005)
+! shorten drift by 0.1836931919m due to lengthening of TL1
+! to get the CR centred to the linac axis (FT 20.12.2005)
+! add 0.04940672m to get 4471.7mm between centre of RF deflector and
+! first CT line quad after DL  as from Nicolas' drawing (FT 21.12.2005)
+! subtract 0.0965m to get 4375.2mm between centre of RF deflector and
+! first CT line quad after DL  as from Nicolas' drawing (FT 11.01.2006)
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! DIPOLES
+
+!VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+!The original model from Frank
+!
+! the k1 value for the combined function dipoles depends on
+! the bending angle
+! so the values have to be scaled from the DL bend definition
+! FT 2.2.06
+!
+!!k1_30 := -0.7918910273;  ! k1 value based on 400 MeV magnet
+! effective length for dipole and quadrupole field (FT 07.06.06)
+! measurements for EPA bending magnet with 30 degrees
+!!k1_12 := k1_30 * 26 /30;
+!!k1_34 := k1_30 * 32 /30;
+!
+
+ct.tl1.abend12 := 26 * twopi/360.;    ! dipole deflection angle
+ct.tl1.abend34 := 32 * twopi/360.;    ! dipole deflection angle
+ct.tl1.abend30 := 30 * twopi/360.;    ! dipole deflection angle
+
+!ct.tl1.lBend := 0.5648    ; ct.tl1.Bin   :=  0.52485;    ! @ 400 MeV
+!ct.tl1.lgrad := 0.4681    ; ct.tl1.Gin   := -0.37157;    ! @ 400 MeV
+ct.tl1.lBend := 0.5653    ; ct.tl1.Bin   :=  0.26089;    ! @ 200 MeV
+ct.tl1.lgrad := 0.4682    ; ct.tl1.Gin   := -0.18382;    ! @ 200 MeV
+ct.tl1.lsext := 0.6531    ; ct.tl1.Sint  :=  0.48000;    ! @ 200 MeV
+
+ct.tl1.g0       := ct.tl1.gin  / ct.tl1.lgrad;
+ct.tl1.s0       := ct.tl1.sint / ct.tl1.lsext;
+
+ct.tl1.mybrho12 := ct.tl1.bin  / ct.tl1.abend12;
+ct.tl1.mybrho34 := ct.tl1.bin  / ct.tl1.abend34;
+ct.tl1.mybrho30 := ct.tl1.bin  / ct.tl1.abend30;
+
+ct.tl1.myk1_12 := ct.tl1.g0/ct.tl1.mybrho12;  !myk1:= g0 / mybrho * k1fact; from file myksave2
+ct.tl1.myk1_34 := ct.tl1.g0/ct.tl1.mybrho34;  !myk1:= g0 / mybrho * k1fact; from file myksave2
+ct.tl1.myk1_30 := ct.tl1.g0/ct.tl1.mybrho30;  !myk1:= g0 / mybrho * k1fact; from file myksave2
+
+
+! straight length of BHF dipoles tuned to get the same path length as in DL
+ct.tl1.lBends := 0.5599680577; 
+
+! because of sextupole component and offset the gradient is 1.66% lower
+ct.tl1.BHF0630OffX   = -0.00769 ;!7.7mm
+! TODO: check this. was (wrong): 
+!ct.tl1.BHF0630OffXk1:= ct.tl1.s0*ct.tl1.BHF0630OffX / tl1.mybrho;
+ct.tl1.BHF0630OffXk1:= ct.tl1.s0*ct.tl1.BHF0630OffX / ct.tl1.mybrho12;
+ct.tl1.myk1Factor   := ct.tl1.lgrad/ct.tl1.lBends;
+
+
+CT.BHE0540: RBEND, L = 0.561, k1 := 0, ANGLE := -26*pi/180, 
+              ptcrbend=true, truerbend=true,
+              hgap:=bhe.hgap, fint:=ct.bhe.fint; ! k1 was -0.75 like for other bends
+
+CT.BHF0630: rbend, l:=ct.tl1.lBends, angle=-ct.tl1.abend12, k1:= (ct.tl1.myk1_12 + ct.tl1.BHF0630OffXk1) * ct.tl1.myk1Factor,
+              ptcrbend=false, truerbend=true,
+              hgap:=bhf.hgap, fint := bhf.fint;
+
+CT.BHF0670: rbend, l:=ct.tl1.lBends, angle= ct.tl1.abend34, k1:= 1.0067 * ct.tl1.myk1_34 * ct.tl1.myk1Factor,
+              ptcrbend=false, truerbend=true,
+              hgap:=bhf.hgap, fint := bhf.fint;
+
+CT.BHF0710: rbend, l:=ct.tl1.lBends, angle= ct.tl1.abend34, k1:= 1.0067 * ct.tl1.myk1_34 * ct.tl1.myk1Factor,
+              ptcrbend=false, truerbend=true,
+              hgap:=bhf.hgap, fint := bhf.fint;
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! SEPTUM
+! new septa for cr 
+! from specs, the ratio should be 48/161
+! from measurement shown in collabmeeting it more 160mT*m
+
+! septum angles
+! for a total of 12 degrees
+ct.sptcrang := -12*pi/180;
+ct.spt1ang  := ct.sptcrang *  48/(48+160);
+ct.spt2ang  := ct.sptcrang * 160/(48+160);
+
+! septum lenghts and path lenghts
+ct.lsept1= 0.782;
+ct.lsept2= 0.650;
+ct.ssept2 := ct.lsept2 / sin(ct.spt2ang/2) * ct.spt2ang/2; ! path length
+
+! septum2 is turned by half the bending angle and is properly
+! represented by an RBEND with the physical lenght
+! septum1 is turned by angrot1 with respect to the straight CR 
+! trajectory
+ct.angrot1 := asin(-3/782);  ! 3mm over the 782mm length
+
+! path length in septum1
+ct.ssept1 := ct.lsept1 * (ct.spt1ang-ct.angrot1) / sin(ct.spt1ang-ct.angrot1);
+
+! DEVICES definition
+CT.SHC0780: rbend, l:= ct.lsept2, angle:=ct.spt2ang, fint=0.5, hgap=0.02;
+CT.SHD0790: rbend, l:= ct.lsept1, angle:=ct.spt1ang, fint=0.5, hgap=0.02;
+ 
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! CORRECTORS
+
+CT.DVF0612: KICKER, L:=0, hkick:=kf.CORRCALIB * ct.idhf0612 / en, vkick:=-kf.CORRCALIB * ct.idvf0612 / en;
+CT.DVF0632: KICKER, L:=0, hkick:=kf.CORRCALIB * ct.idhf0632 / en, vkick:=-kf.CORRCALIB * ct.idvf0632 / en;
+CT.DVF0648: KICKER, L:=0, hkick:=kf.CORRCALIB * ct.idhf0648 / en, vkick:=-kf.CORRCALIB * ct.idvf0648 / en;
+CT.DVF0658: KICKER, L:=0, hkick:=kf.CORRCALIB * ct.idhf0658 / en, vkick:=-kf.CORRCALIB * ct.idvf0658 / en;
+CT.DVF0695: KICKER, L:=0, hkick:=kf.CORRCALIB * ct.idhf0695 / en, vkick:=-kf.CORRCALIB * ct.idvf0695 / en;
+CT.DVF0735: KICKER, L:=0, hkick:=kf.CORRCALIB * ct.idhf0735 / en, vkick:=-kf.CORRCALIB * ct.idvf0735 / en;
+CT.DVF0755: KICKER, L:=0, hkick:=kf.CORRCALIB * ct.idhf0755 / en, vkick:=-kf.CORRCALIB * ct.idvf0755 / en;
+
+ct.idhf0612 = 0;
+ct.idhf0632 = 0;
+ct.idhf0648 = 0;
+ct.idhf0658 = 0;
+ct.idhf0695 = 0;
+ct.idhf0735 = 0;
+ct.idhf0755 = 0;
+
+ct.idvf0612 = 0;
+ct.idvf0632 = 0;
+ct.idvf0648 = 0;
+ct.idvf0658 = 0;
+ct.idvf0695 = 0;
+ct.idvf0735 = 0;
+ct.idvf0755 = 0;
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! QUADRUPOLES
+
+CT.QFD0520: QUADRUPOLE, L = 0.22, K1 :=  ct.IQDD0520 * FQD / en;
+CT.QDD0530: QUADRUPOLE, L = 0.22, K1 := -ct.IQFD0530 * FQD / en;
+CT.QFH0610: QUADRUPOLE, L = 0.38, K1 :=  ct.IQFH0610 * FQH / en;
+CT.QFH0620: QUADRUPOLE, L = 0.38, K1 :=  ct.IQFH0620 * FQH / en;
+CT.QFH0640: QUADRUPOLE, L = 0.38, K1 :=  ct.IQFH0640 * FQH / en;
+CT.QDI0650: QUADRUPOLE, L = 0.359,K1 := -ct.IQDI0650 * FQI / en;
+CT.QFF0660: QUADRUPOLE, L = 0.328,K1 :=  ct.IQFF0660 * FQF / en;
+CT.QFH0680: QUADRUPOLE, L = 0.38, K1 :=  ct.IQFH0680 * FQH / en;
+CT.QFF0690: QUADRUPOLE, L = 0.328,K1 :=  ct.IQFF0690 * FQF / en;
+CT.QDF0720: QUADRUPOLE, L = 0.328,K1 := -ct.IQDF0720 * FQF / en;
+CT.QFJ0730: QUADRUPOLE, L = 0.40, K1 :=  ct.IQFJ0730 * FQJ / en;
+CT.QDJ0740: QUADRUPOLE, L = 0.40, K1 := -ct.IQDJ0740 * FQJ / en;
+CT.QFG0750: QUADRUPOLE, L = 0.30, K1 :=  ct.IQFG0750 * FQG / en;
+
+ct.IQDD0520 = 0;
+ct.IQFD0530 = 0;
+ct.IQFH0610 = 0;
+ct.IQFH0620 = 0;
+ct.IQFH0640 = 0;
+ct.IQDI0650 = 0;
+ct.IQFF0660 = 0;
+ct.IQFH0680 = 0;
+ct.IQFF0690 = 0;
+ct.IQDF0720 = 0;
+ct.IQFJ0730 = 0;
+ct.IQDJ0740 = 0;
+ct.IQFG0750 = 0;
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! SEXTUPOLES
+
+CT.XLC0615: SEXTUPOLE, L:=0, k2:=ct.kXLC0615;
+ct.kXLC0615 := 0.00000001 * ct.iXLC0615 / en; ! TODO: find the right k...
+ct.iXLC0615  = 0;
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! MONITOR
+CT.BPR0532:  MONITOR, L = 0;
+CT.BPI0608:  MONITOR, L = 0; !L=0.25 
+CT.BPI0622:  MONITOR, L = 0; !L=0.25 
+CT.BPI0645:  MONITOR, L = 0; !L=0.25 
+CT.BPI0665:  MONITOR, L = 0; !L=0.25 
+CT.BPI0692:  MONITOR, L = 0; !L=0.25 
+CT.BPI0722:  MONITOR, L = 0; !L=0.25 
+CT.BPI0758:  MONITOR, L = 0; !L=0.25 
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! DRIFTS
+
+ct.tl1.drift01  : drift, l=0.6 +0.30 -0.20 -0.184 +0.020 -0.1836931919 +0.04940672 -0.0965 +(0.30 - 0.22)/2;  
+ct.tl1.drift02  : drift, l=0.71 - 0.11-0.22;			
+ct.tl1.drift03  : drift, l=0.949805-0.71-0.22/2;		
+ct.tl1.drift04  : drift, l=1.623687849-0.949805   -ct.tl1.lBends/2-0.002937211;	
+ct.tl1.drift05  : drift, l=2.944475699-1.623687849-ct.tl1.lBends/2-0.002937211;
+ct.tl1.drift06  : drift, l=3.393375699-2.944475699-0.38/2 ;	
+ct.tl1.drift07  : drift, l=3.838375699-3.393375699-0.38/2;	
+ct.tl1.drift09  : drift, l=4.628375699-3.838375699;       
+ct.tl1.drift10  : drift, l=5.273375699-4.628375699-0.38/2;	
+ct.tl1.drift11  : drift, l=5.663275699-5.273375699-0.38/2;	
+ct.tl1.drift12  : drift, l=6.158705483-5.663275699;       
+ct.tl1.drift15  : drift, l=7.113836896-6.723507112;       
+ct.tl1.drift16  : drift, l=8.508836896-7.113836896-0.38/2;	
+ct.tl1.drift17  : drift, l=10.18922247-8.508836896-0.38/2;	
+ct.tl1.drift18  : drift, l=11.24032247-10.18922247;       
+ct.tl1.drift19  : drift, l=11.68532247-11.24032247-0.359/2;
+ct.tl1.drift20  : drift, l=14.36680804-11.68532247-0.359/2;
+ct.tl1.drift21  : drift, l=14.76180804-14.36680804-0.328/2;
+ct.tl1.drift22  : drift, l=15.10430804-14.76180804-0.328/2;
+ct.tl1.drift23  : drift, l=15.43579358-15.10430804;       
+ct.tl1.drift26  : drift, l=17.66709185-16.00310631-0.38/2;
+ct.tl1.drift27  : drift, l=19.14709185-17.66709185-0.38/2-0.328/2;	
+ct.tl1.drift28  : drift, l=19.56379185-19.14709185-0.328/2;	
+ct.tl1.drift29  : drift, l=20.54209185-19.56379185;	
+ct.tl1.drift30  : drift, l=21.65107738-20.54209185;	
+ct.tl1.drift33  : drift, l=22.78237565-22.21839011-0.328/2;
+ct.tl1.drift34  : drift, l=23.34987565-22.78237565-0.328/2;
+ct.tl1.drift35  : drift, l=24.16237565-23.34987565-0.40/2;	
+ct.tl1.drift36  : drift, l=24.57737565-24.16237565-0.40/2;	
+ct.tl1.drift37  : drift, l=24.99237565-24.57737565-0.40/2;	
+ct.tl1.drift38  : drift, l=25.77237565-24.99237565-0.40/2 -0.15;
+ct.tl1.drift39  : drift, l=27.06737565-25.77237565-0.15;
+ct.tl1.drift40  : drift, l=27.31337565-27.06737565;
+ct.tl1.drift41  : drift, l=28.03237565-27.31337565-ct.lsept2/2 - 0.00035175;
+ct.tl1.drift42  : drift, l=29.09823317-28.03237565-ct.lsept2/2 - ct.lsept1/2 - 0.00038981;	
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! MARKERS
+CT.qscanQFD0520: marker;
+CT.QS520: marker;
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! LINES
+
+ct.tl1line: line=( 
+                ct.tl1.drift01, CT.qscanQFD0520, CT.QS520, ct.qfd0520,
+                ct.tl1.drift02, ct.qdd0530, 
+                ct.tl1.drift03, ct.bpr0532, 
+                ct.tl1.drift04, ct.bhe0540, 
+                ct.tl1.drift05, ct.bpi0608, 
+                ct.tl1.drift06, ct.qfh0610, 
+                ct.tl1.drift07, ct.dvf0612, 
+                ct.tl1.drift09, ct.xlc0615, 
+                ct.tl1.drift10, ct.qfh0620, 
+                ct.tl1.drift11, ct.bpi0622, 
+                ct.tl1.drift12, ct.bhf0630, 
+                ct.tl1.drift15, ct.dvf0632, 
+                ct.tl1.drift16, ct.qfh0640, 
+                ct.tl1.drift17, ct.bpi0645, 
+                ct.tl1.drift18, ct.dvf0648, 
+                ct.tl1.drift19, ct.qdi0650, 
+                ct.tl1.drift20, ct.dvf0658, 
+                ct.tl1.drift21, ct.qff0660, 
+                ct.tl1.drift22, ct.bpi0665, 
+                ct.tl1.drift23, ct.bhf0670,
+                ct.tl1.drift26, ct.qfh0680, 
+                ct.tl1.drift27, ct.qff0690, 
+                ct.tl1.drift28, ct.bpi0692, 
+                ct.tl1.drift29, ct.dvf0695, 
+                ct.tl1.drift30, ct.bhf0710,
+                ct.tl1.drift33, ct.qdf0720, 
+                ct.tl1.drift34, ct.bpi0722, 
+                ct.tl1.drift35, ct.qfj0730, 
+                ct.tl1.drift36, ct.dvf0735, 
+                ct.tl1.drift37, ct.qdj0740, 
+                ct.tl1.drift38, ct.qfg0750, 
+                ct.tl1.drift39, ct.dvf0755, 
+                ct.tl1.drift40, ct.bpi0758, 
+                ct.tl1.drift41, ct.shc0780, 
+                ct.tl1.drift42, ct.shd0790);
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!
+!! CTS LINE
+!!
+
+!!!!!
+! description of CTS dipole
+
+cts.ang_ct   := 22.75 * pi / 180;  ! deflection angle
+cts.LBHB0800 := 0.497;             ! effective length
+
+! entry point according to mechanical drawing
+! start of spectro line 0.9234m behind centre of CT.MTV0550
+cts.sbhb0800e := 0.9234 - cts.LBHB0800/2/cos(cts.ang_ct/2);
+! bending radius
+cts.rbhb0800 := cts.LBHB0800 /(2*sin(cts.ang_ct/2));
+! path length
+cts.pbhb0800 := cts.rbhb0800 * cts.ang_ct;
+! exit position x/y
+cts.sbhb0800sx := cts.sbhb0800e + cts.rbhb0800 * sin(cts.ang_ct);
+cts.sbhb0800sy := cts.rbhb0800 * (1-cos(cts.ang_ct));
+cts.sag8  := cts.LBHB0800/2 * tan(cts.ang_ct/4);
+
+
+!!!!!!!
+! start description at the exit of CT.QDD0530
+! based on Nicolas` drawing of 22.8.2006
+
+cts.DRIFT_0545  : DRIFT, L := 0.23981 + 0.6796 + 0.81757 - 0.30/2;
+CT.PHM0545  : MARKER;
+CTS.DRIFT_0550  : DRIFT, L := 0.4175;  ! Reidar 30/09/14: Added 'CTS.' for consistency
+CT.MTV0550  : MONITOR;
+cts.DRIFT_0800  : DRIFT, L=cts.sbhb0800e;
+CT.BHB0800  : RBEND, L=cts.LBHB0800, ANGLE=cts.ang_ct; ! calibration is 2.7 MeV per Ampere
+cts.DRIFT_0840  : DRIFT, L=1.1803 - cts.LBHB0800/2/cos(cts.ang_ct/2);
+CTS.MTV0840 : MONITOR;
+cts.DRIFT_0899  : DRIFT, L=0.400;
+CTS.DUMP    : MARKER;
+
+cts.CTS: LINE = ( cts.DRIFT_0545, CT.PHM0545, 
+	cts.DRIFT_0550, CT.MTV0550,
+        cts.DRIFT_0800, CT.BHB0800, 
+	cts.DRIFT_0840, CTS.MTV0840, 
+	cts.DRIFT_0899, CTS.DUMP );
+
+ct.TL1TOCTS : LINE = ( 
+                ct.tl1.drift01, CT.qscanQFD0520, CT.QS520, ct.qfd0520,
+		ct.tl1.drift02, ct.qdd0530, 
+		cts.CTS);
+
+
+

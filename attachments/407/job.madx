@@ -1,0 +1,136 @@
+!! oblancog First twiss 20161123 
+option,echo,info,warn;
+
+! the beam 
+E0     := 45.000;![GeV]
+npar   := 1.9e10;
+emitx  := 5.73e-9;![m]
+emity  := 5.73e-11;![m] 
+blength:= 3.6e-3;![m]
+bcur   := 240e-3;![A]
+nbunch := 100;
+nparpb := 3.1e11;
+espread:= 1e-3;
+beam, PARTICLE=positron, ENERGY=E0,
+      ex=emitx, ey=emity, et=blength*espread,
+      sigt=blength, sige=espread, kbunch=nbunch,
+      NPART=nparpb, bcurrent=bcur, RADIATE=false;
+
+! The ring 
+call, file = "Pos_45GeV_Ring_8.mad.madx";
+use, sequence=Low_Emit_RING, range=#s/#e;
+SXT_ON := 1;
+
+! The cavity parameters
+RF_ON       := 1.0;
+RFc->LAG    := 0.133;!25;
+RFc->FREQ   := 500.117256e6;
+RFc->HARMON := 10510;
+!show, rfc;
+!save,sequence=Low_Emit_RING, file="temp.seq";
+!call, file="temp.seq";
+!use, sequence=LER_mod, range=#s/rfc;
+!stop;
+
+! Beam pipe
+Rpipe = 30e-3;![m]
+AngMax = 1.0; !maximum angle 1[rad]=
+
+
+! arcs twiss parameters definition (from last match in mad)
+KSF2 :=   1.95*sxt_on;
+KS1A :=  -2.17*sxt_on;
+KS1B :=  -1.56*sxt_on;
+KS1D :=  -1.56*sxt_on;
+KS1E :=  -2.17*sxt_on;
+KOF1 := -38.5;
+KDF1 := 150.0;
+KDD1 :=   0.0;
+KQD9 :=  -3.502004E-01;
+KQF8 :=   2.355622E-01;
+KQD7 :=  -3.659796E-01;
+KQF6 :=   2.317365E-01;
+KQD5 :=  -2.041680E-01;
+KQF4 :=   1.784162E-01;
+KQD3 :=  -2.234357E-01;
+KQD2 :=  -3.917201E-01;
+KQD1 :=  -3.801510E-01;
+KQF2 :=   2.048242E-01;
+KQF1 :=   1.977323E-01;
+
+! the hinv
+hinv := (1+(table(twiss,alfx))^2)/table(twiss,betx)*table(twiss,dx)^2
+     + 2*table(twiss,alfx)*table(twiss,dx)*table(twiss,dpx)
+     + table(twiss,betx)*table(twiss,dpx)^2;
+
+
+! some plots for comparison of twiss functions
+system, "rm -f *tws";
+savebeta,label=betaSTART,place=#s;
+savebeta,label=betaEND,place=#e;
+select, flag=twiss, clear;
+select, flag=twiss, column= name,s,betx,bety,alfx,alfy,mux,muy,dx,dy,x,
+	dpx,dpy,ddx,ddy,hinv;
+TWISS, chrom, SAVE, file="LEMMAp_SXT_ON.tws";
+
+system, "rm -f madx.ps";
+plot, colour=100, haxis=s, vaxis1=betx,bety, vaxis2=dx,hmin=0,hmax=200,title="First ARC Cell";
+plot, colour=100, haxis=s, vaxis=hinv, hmin=0, hmax=200, title="First ARC Cell";
+plot, colour=100, haxis=s, vaxis1=betx,bety, vaxis2=dx,dy,title="Low Emit Ring (LER)";
+plot, colour=100, haxis=s, vaxis1=wx,wy, vaxis2=ddx,title="LER";
+system, "ps2pdf madx.ps";
+! End of initial twiss plots and comparison
+
+! Here I get the beam and twiss params for the part. generation
+system, "rm -f betaSTART.txt betaEND.txt beam0.txt";
+assign, echo="betaSTART.txt";
+show, betaSTART;
+assign, echo="betaEND.txt";
+show, betaEND;
+assign, echo="beam0.txt";
+show, beam;
+assign, echo=terminal;
+! ! Generating particles(flagname,Nparticles)
+! system, 'root -l -x -q "GenerateInrays.C(\"START\",1e3)"';
+
+
+
+! beggining track
+! NO purpuse tracking in PTC
+!stop;
+!set parameters
+system, "rm -f track*";
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=10,
+!exact;!,
+resplit,even;
+!ptc_observe, place="IP.1";
+!set particles
+!ptc_start, X=0, PX=0, Y=0, PY=0, T=0, PT=0;
+!ptc_start, X=1e-3, PX=1e-3, Y=1e-3, PY=1e-3, T=1e-9, PT=1e-9;
+call, file="madxInrays.madx";
+!run
+!ptc_track, icase=6,element_by_element,turns=1,dump,onetable,norm_no=1,file;!,
+!norm_no is order of the normal form : 1=linear, 2 ...!
+!ptc_setcavities;
+!ptc_setswitch,debuglevel=1,maxacceleration=false,totalpath=false,
+!	radiation=true,fringe=false,time=true,nocavity=false;
+ptc_track, icase=6,turns=1,dump,onetable,element_by_element,
+maxaper={Rpipe,AngMax,Rpipe,AngMax,0,0},
+! the t and pt vars do not change anything
+!norm_no=4,
+file,
+radiation;
+
+!ptc_observe,place=#e;
+!ptc_trackline, turns=1,onetable,file;
+ptc_track_end;
+ptc_end;
+!end of NO purpose tracking in PTC
+
+! split tracking results inf plot friendly files
+!system, "./getobservedata trackone";
+! plot the phase  space
+!system, 'root -x -l -q "DrawPhaseSpace.C(\"START\")" ';
+!system, 'root -x -l -q "DrawPhaseSpace.C(\"END\")" ';
+

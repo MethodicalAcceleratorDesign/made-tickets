@@ -1,0 +1,97 @@
+!--------------------------------------------------------------
+! title,"FCC-ee Racetrack,100km";
+!
+! author: Andreas Doblhammer.
+!		  Sandra Aumon, CERN ABP-BE-LAT, sandra.aumon@cern.ch 
+!		  Bastian Harer, CERN ABP-BE-LAT, bastian.harer@cern.ch
+! 		  
+!--------------------------------------------------------------
+
+option -echo, -info;
+ENERGY := 175.0;
+!GeV2TM := 1E9/3e8;
+!BRHO   := ENERGY * GeV2TM;
+!value, BRHO;
+
+!BETXSTAR = 1.000;
+!BETYSTAR = 0.002;
+!TUNECELX = 1/4;
+!TUNECELY = 1/6;
+
+!--------------------------------------------------------------
+! Call files with machine description
+! 2ips - 1m -2mm beta star
+! Racetrack
+!--------------------------------------------------------------
+!
+  call, file="lattice_files.madx";
+  call, file="kicker.madx";
+
+  THB = THBracetrack;
+
+!--------------------------------------------------------------
+! FCC-ee Optics: prepare twiss contents
+!--------------------------------------------------------------
+
+    beam, particle = electron, energy=ENERGY, radiate=false;
+
+   	select, flag = twiss, clear;
+   	select,flag=twiss,column=name,s,betx,bety,mux,muy,dx,alfx,alfy,x,y,dy,k2l;
+
+    VRF1    =  0;
+    LGRF1   =  0.0;
+
+	value, k2sd, k2sf;
+
+    SEQEDIT, sequence= FCCeeRacetrackIP;
+    ! Switching off sextupoles (Arc 2 and 3, Arc 4 and 5 have same sextupoles)
+        remove, element=MSD11[57];
+        remove, element=msd11[58];
+        remove, element=msd71[57];
+        remove, element=msd71[57];
+    !
+        remove, element=msd31[108];
+        remove, element=msd31[109];
+        remove, element=msd91[108];
+        remove, element=msd91[109];
+    !
+        remove, element=msd41[1];
+        remove, element=msd41[2];
+        remove, element=msd101[1];
+        remove, element=msd101[2];
+    !
+        remove, element=msd61[1];
+        remove, element=msd61[2];
+        remove, element=msd121[1];
+        remove, element=msd121[2];
+    ENDEDIT;
+
+    seqedit, sequence=FCCeeRacetrackIP;
+    flatten;
+    cycle, start=LSS1;
+    //call, file = "/afs/cern.ch/user/s/saumon/FCCee/TLEP_lattice_version/Racetrack_Bastian/v17/skews/skew.seq";
+    endedit;
+
+!--------------------------- Twiss No SR ------------------------------------
+
+	use, sequence=FCCeeRacetrackIP; 
+
+	twiss, chrom, centre, file="twiss_bare_175_2mm.twiss";
+
+!--------------------------- Introducing transverse/roll etc.displacement ------------------
+!
+    graine=291239;
+    erquad=100.0;
+
+
+    EOPTION, SEED=291239 , ADD = false;
+
+    select, flag=error, clear;
+    select, flag=error, class=QUADRUPOLE;
+    ealign, dy:=tgauss(3)*10.0e-6; !dx:=tgauss(3)*10.0e-6;
+
+    twiss, chrom, centre, file="twiss_100micro_noff.twiss";
+
+    value, k2sd, k2sf;
+
+stop;

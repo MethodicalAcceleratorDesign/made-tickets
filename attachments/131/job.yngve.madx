@@ -1,0 +1,72 @@
+//********************************************************************
+ * LHC optics
+ * Call with the command: > madx_dev < job.madx
+ ********************************************************************/
+title, "LHC version 6.503 -  July 2009" ;
+system, "ln -sfn /afs/cern.ch/eng/lhc/optics/V6.503 db";
+
+real const l.tanal = 0;
+real const l.tanar = 0;
+real const l.tanc = 0;
+real const l.tcdqa = 0;
+real const l.tcp   = 0.0;
+
+real const l.mbxwt = 0.0;
+real const l.mbls2 = 0.0;
+real const l.tasb  = 0.0;
+real const l.btvss075 = 0.0;
+real const l.mblw = 0.0;
+
+real const l.tctvb = 0;
+real const l.x5zdc002 = 0;
+real const l.tcddm = 0;
+
+real const l.MBAW  = 0.0; ! When calling "exp_pipe_model.madx" & "exp_pipe_install.madx"
+
+
+
+option, -echo, -warn, info;
+call,    file="db/V6.5.as-built.thin.seq";
+call, file="db/V6.5.thin.coll_special.3.5TeV_1m10m1m3m.str";
+
+option,  echo, -warn, -info, -verify;
+
+
+beam,    sequence=lhcb1, particle=proton, exn=3.75E-6,eyn=3.75E-6, pc=3500;
+
+! Warning: potential impact on survey files!
+on_x1:=1; on_sep1:=0; on_atlas:=2;
+on_x2:=1; on_sep2:=0; on_alice:=2;
+on_x5:=1; on_sep5:=0; on_cms  :=2;
+on_x8:=1; on_sep8:=0; on_lhcb :=-2;
+
+setplot, post=1;
+
+plotJob(): macro
+{
+    plot,   table=twiss, file='madx.thinseq.twiss', vaxis1=betx,bety,vaxis2=dx,dy,haxis=s, vmin=0.0,-3.0, vmax=3000.0,3.0, colour=100, range=IP1/IP2;
+    title,"IP1 dstream";
+    plot,   table=twiss, vaxis1=betx,bety,vaxis2=dx,dy,haxis=s, vmin=0.0,-2.5, vmax=1500.0,2.5, colour=100, range=IP1/S.DS.R1.B1;
+    title,"IP1 ustream";
+    plot,   table=twiss, vaxis1=betx,bety,vaxis2=dx,dy,haxis=s, vmin=0.0,-2.5, vmax=1500.0,2.5, colour=100, range=E.DS.L1.B1/IP1.L1;
+    title,"IP2";
+    plot,   table=twiss, vaxis1=betx,bety,vaxis2=dx,dy,haxis=s, vmin=0.0,-2.5, vmax=1500.0,2.5, colour=100, range=E.DS.L2.B1/S.DS.R2.B1;
+    title,"IP5";
+    plot,   table=twiss, vaxis1=betx,bety,vaxis2=dx,dy,haxis=s, vmin=0.0,-2.5, vmax=1500.0,2.5, colour=100, range=E.DS.L5.B1/S.DS.R5.B1;
+    title,"IP8";
+    plot,   table=twiss, vaxis1=betx,bety,vaxis2=dx,dy,haxis=s, vmin=0.0,-2.5, vmax=1500.0,2.5, colour=100, range=E.DS.L8.B1/S.DS.R8.B1;
+}
+twissJob(): macro
+{
+    select, flag=twiss, clear;
+    select, flag=twiss, full, column=name,s,betx,bety,alfx,alfy,dx,dy,x,px,y,py,mux,muy;
+    use,    sequence=lhcb1;
+    twiss,  sequence=lhcb1, file="twiss.b1.data";
+}
+
+use, sequence=lhcb1;
+title,"Initial twiss";
+exec, twissJob();
+
+exec, plotJob();
+stop;

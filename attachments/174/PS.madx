@@ -1,0 +1,36 @@
+/******************************************************************
+ * MAD-X PS Optics
+ **
+ ** Cedric Hernalsteens
+ ** Created 16/02/2012
+ ******************************************************************/
+
+/******************************************************************
+ * Call lattice files and MAD-X macros
+ ******************************************************************/
+Pc := 14; ! 14 GeV/c
+call,  file = 'PS_2011.ele';
+call,  file = 'PS_2011.seq';
+call,  file = 'PS_2011.str';
+
+/******************************************************************
+* Magnetic configuration of the machine
+******************************************************************/
+! --- Injection quadrupoles
+IQF  := 6.0820699930087;    ! inj quad F
+IQD  := 2.8330839593621;    ! inj quad D
+ 
+/******************************************************************
+ * Initialize and match the tunes using the Qlow's
+ ******************************************************************/
+beam, particle=proton, pc=14; 
+use, sequence=PS;
+
+!twiss;
+emit;
+stop;
+ptc_create_universe;
+ptc_create_layout,time=false,model=2,method=4,nst=2,exact=true;
+ptc_twiss, icase=56;
+ptc_end;
+

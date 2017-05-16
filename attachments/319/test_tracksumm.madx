@@ -1,0 +1,98 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with madX
+
+!-- Define EMMA lattice  with dipoles
+title,"EMMA baseline lattice - oct27u";
+beam,particle=electron,energy=0.015+beam->mass;
+periodL:=0.394481;
+periodN:=42;
+fang:=-0.05;
+dang:=2*pi/periodN-fang;
+qf: sbend,l=0.058782,k1:=+129.469,angle:=fang,e1:=-fang;
+qd: sbend,l=0.075699,k1:=-90.967,angle:=dang,e2:=dang;
+ld: drift,l=0.21;
+sd: drift,l=0.05;
+cell: line=(qf,sd,qd,ld);
+ring: line=(42*cell);
+
+!-- Adjust fang 
+use,period=cell;
+match,use_macro; 
+vary,name=fang,step=0.01; 
+m1: macro={twiss,rmatrix;}; 
+constraint, expr= table(summ,alfa)=0.001085326514; 
+jacobian,tolerance=1e-20; 
+endmatch; 
+
+removefile, file="oct27u.lis";
+removefile, file="oct27u.trk";
+
+!-- Loop over DELTAP
+maxdpp:= 5;
+ndpp:=0;
+dpp:=1/3; 
+stepdpp:=-1/240;
+trunc=2.5;
+
+while(ndpp<maxdpp) {
+   ndpp=ndpp+1;
+   printf, text="--- Outer loop with ndpp=%F, dpp=%F;", value = ndpp,dpp;
+
+   !-- Launch PTC_TWISS orbit from perfect machine
+   select,flag=ptc_twiss,column=name,s,beta11,alfa11,mu1,disp1, 
+                                beta22,alfa22,mu2,disp3,x,px,y,py,t,pt; 
+   use,period=cell;
+   ptc_create_universe; 
+   ptc_create_layout,model=2,method=6,nst=30,exact;!
+   ptc_twiss,closed_orbit,icase=5,file="ptc.lis",deltap:=dpp,table; 
+   ptc_end; 
+
+   copyfile, file="ptc.lis", to="oct27u.lis", append=true;
+   removefile, file="ptc.lis";
+
+   x0=table(ptc_twiss,cell$start,x);
+   px0=table(ptc_twiss,cell$start,px); 
+   y0=table(ptc_twiss,cell$start,y);
+   py0=table(ptc_twiss,cell$start,py);
+   t0=table(ptc_twiss,cell$start,t);
+   pt0=table(ptc_twiss,cell$start,pt);
+
+   eoption,add=false,seed=22021955; 
+   norb=0;
+   maxorb= 3;
+
+   while(norb<maxorb) {
+	norb=norb+1;
+	printf, text="--- --- Inner loop with norb=%F;", value = norb;
+
+	use,period=ring;
+	ptc_create_universe; 
+	ptc_create_layout,model=2,method=6,nst=30,exact;!
+	select,flag=error,class=qd;
+	select,flag=error,class=qf;
+	ealign,dx:=3e-5*tgauss(trunc);
+	ealign,dy:=3e-5*tgauss(trunc);
+	ptc_align; 
+	ptc_start,x=x0,px=px0,y=y0,py=py0,t=t0,pt=pt0;
+	ptc_track,icase=5,dump,turns=10,ffile=10,file,maxaper={1,1,1,1,1,1};  
+	ptc_track_end; 
+	ptc_end; 
+
+	copyfile, file="track.obs0001.p0001", to="oct27u.trk", append=true;
+	removefile, file="track.obs0001.p0001";
+
+	! in order to avoid the accumulation of particles in the track table...
+	! delete, table=tracksumm;
+    }
+
+    dpp=dpp+stepdpp;
+}
+
+
+value,beam->sige,beam->sigt;
+
+removefile, file="Maxwellian_bend_for_ptc.txt";
+stop; 
+
+
+

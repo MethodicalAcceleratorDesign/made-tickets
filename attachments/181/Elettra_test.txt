@@ -1,0 +1,104 @@
+TITLE, s='MAD-X test';
+
+option, echo=true, warn,info, no_fatal_stop;
+assign,echo=echo_elettra.txt;
+
+
+Beam, sequence=Elettra,particle = electron, energy = 2.0,radiate=true, ET=0.002,
+     sige= 7e-4,sigt=0.0053;//,Ex=7e-9 , Ey=7e-11;
+
+option, RBARC=FALSE;
+
+// Read input file with machine description
+call file="Elettra_lattice.txt";
+
+// Define the beam for the machine etc
+
+//RFC: RFCAVITY,L=0.3, VOLT=2.6, HARMON=432, LAG=0.4;
+/*
+use, period=Elettra; 
+select, flag=makethin, class=quadrupole, slice=1; 
+select, flag=makethin, class=rbend, slice=10; 
+select, flag=makethin, class=sextupole, slice=10;
+
+makethin,sequence=Elettra;
+*/
+
+//MAKETHIN,SEQUENCE=Elettra,
+//        STYLE=simple;
+
+// Use the sequence with the name: elettra
+use, period=Elettra; 
+
+survey;
+write , table=survey, file=elettra_survey.txt;
+
+
+
+// save
+//select,flag=save;
+
+
+select,flag=twiss,column=name,s,x,y,mux,betx,muy,bety,dx,dy;
+
+twiss,save,centre,file=twiss_out.txt;
+
+
+//EMIT,DELTAP=0.0;
+
+
+
+
+//show, beam;
+
+
+match,sequence=Elettra;
+//constraint, sequence=elettra, range=q2, betx=19;
+//constraint, sequence=elettra, range=m1, dx=0;
+//constraint, sequence=elettra,betx<20;
+//constraint, sequence=elettra,range=m1,bety<1;
+GLOBAL,sequence=elettra,Q1=14.3,Q2=8.2,dq1=0.,dq2=0.;
+//GLOBAL,sequence=elettra,dx < 0.2;
+//constraint,sequence=elettra,range=m2,mux=1.19167,muy=0.6833;
+//vary,name=kqf,step=5.0e-3;
+//vary,name=kqd,step=5.0e-3;
+//vary,name=kq1,step=5.0e-3;
+
+vary,name=kq2,step=5.0e-3;//,lower=0.,upper=4;
+vary,name=kq1,step=5.0e-3;//,lower=-4.,upper=0;
+
+vary, name=ksf, step=0.1;
+vary, name=ksd, step=0.1;
+
+//vary,name=kb1,step=5.0e-3;
+//vary,name=kb2,step=5.0e-3;
+
+lmdif,calls=5000,tolerance=1.e-10;
+//jacobian,calls=5000,tolerance=1.e-10;
+endmatch;
+
+
+
+
+
+
+// Execute the Twiss command to calculate the Twiss parameters
+// Compute at the centre of the element and write to: twiss1.out
+
+use,period=Elettra;
+
+twiss,save,centre,file=twiss1_out.txt;
+//EMIT,DELTAP=0.0;
+
+
+plot, haxis=s, vaxis=x, betx, bety,colour=100,
+     range=m1[1]/m1[5];
+plot, haxis=s, vaxis=dx, colour=100,
+      range=m1[1]/m1[5];
+
+
+stop;
+
+
+
+

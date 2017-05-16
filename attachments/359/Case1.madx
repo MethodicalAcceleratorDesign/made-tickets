@@ -1,0 +1,27 @@
+m1: marker;
+m2: marker;
+
+
+ts: sequence, refer=centre, l=10.0;
+m1, at=2;
+endsequence;
+
+ts2: sequence, refer=centre, l=30.0;
+ts, at=5;
+m2, at=12;
+endsequence;
+
+! No error if the following sequence editing is skipped.
+seqedit, sequence=ts2;
+flatten;
+extract,sequence=ts2,from=m1,to=m2,newname=te;
+endedit;
+
+ts: sequence, refer=centre, l=10.0;
+m1, at=2;
+endsequence;
+
+ts2: sequence, refer=centre, l=30.0;
+ts, at=5;
+m2, at=12;
+endsequence;

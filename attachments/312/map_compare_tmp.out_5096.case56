@@ -1,0 +1,416 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.04  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.11.14               +
+  + Execution date: 2014.12.08 11:48:09      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+call,file=foborodobo8.lat;
+
+! File fobodobo_s.lat
+
+! 
+
+! Written for the January, 2007 USPAS.
+
+! To be used in conjunction with CHEF.
+
+! 
+
+! Send complaints to the author: Leo Michelotti
+
+! 
+
+! Add an RF cavity (EGS) 01/30/2009
+
+!
+
+! ------------------
+
+! Parameters
+
+! ------------------
+
+twopi       :=   6.2831853072;
+
+++++++ warning: ignored: attempt to redefine constant: twopi
+n           :=   32;                   !         : number of cells
+
+momentum    := 10;                   ! [GeV/c] : particle momentum; 
+
+                                     !         :   arbitrary number
+
+bendangle   := twopi/(2*n);           ! [rad]   : dipole bend angle
+
+focus       :=   7;                   ! [m]     : focal length of equivalent 
+
+                                     !         :   thin quad
+
+sepn        :=  10;                   ! [m]     : distance between quad centers
+
+quadlength  :=   0.2;                 ! [m]     : quadrupole length
+
+strength    := 1/(focus*quadlength);  ! [m**-2] : quadrupole strength
+
+                                     !         :   = B'/brho, where
+
+                                     !         :   brho = momentum/0.299792458
+
+pct         :=   0.4;                 !         : fraction of space between
+
+                                     !         :   quads occupied by dipole
+
+bendlength  := pct*(sepn-quadlength); ! [m]     : length of dipole
+
+! bendlength := 0.4*(10-0.2) = 3.92
+
+driftlength := (sepn-quadlength-bendlength)/2;
+
+! driftlenth := (10-0.2-3.92)/2 = 2.94
+
+beam, particle=proton, pc=momentum;
+
+! harmonic number = 80  harmonic number, yields 2 meter wavelength
+
+! the actual frequence is harmno following
+
+harmno=32;
+
+lambda = 160.0/harmno;
+
+
+
+!hvoltage = 12500
+
+hvoltage = 5.0;
+
+
+
+cavlen = 0.0; ! rf cavity length 1 meter, (half bucket length)
+
+shortdlen = (driftlength - cavlen)/2.0;   ! 0.97 m
+
+! this lattice has 32 copies of a 20 m cell.
+
+
+
+! ------------------
+
+! Elements
+
+! ------------------
+
+o: drift,      l=driftlength;
+
+os: drift,      l=shortdlen;
+
+f: quadrupole, l=quadlength, k1=strength;
+
+d: quadrupole, l=quadlength, k1=(-strength);
+
+b: sbend,      l=bendlength, angle=bendangle;
+
+r: rfcavity,	l=cavlen, volt=hvoltage, harmon=harmno;
+
+
+
+! ------------------
+
+! Lattices
+
+! ------------------
+
+fobodobo:  line=( f, o, b, o, d, o, b, o );
+
+fobrdobo:  line=( f, o, b, os, r, os, d, o, b, o);
+
+model:     line=( fobrdobo,7*fobodobo );
+
+model2:     line=( 8*fobodobo );
+
+use, sequence=model;
+
+
+
+ptc_create_universe;
+
+ Now PTC
+ptc_create_layout,model=2,method=2,nst=4,exact,time=false;
+
+ MAD-X Beam Parameters
+                  Energy : 0.100439E+02
+          Kinetic Energy : 0.910565E+01
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.100000E+02
+ Setting MADx with 
+     energy           10.043921267727313     
+     method                   2
+     Num. of steps            4
+     charge           1.0000000000000000     
+  Length of machine:    159.99999999999991     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -101.70941370285578        0.0000000000000000        101.90941370285576     
+ HARMONIC NUMBER defined in the ring:           32
+++++++ warning: ptc_input   Cavity R                        defined with harmonic number    32.000000000000000      . Using SUM(LD) as ring length:    159.99999999999991       instead of real orbit length. Obtained freq. =    59696297.910280280       Hz
+ptc_align;
+
+select, flag=sectormap, clear;
+
+set, format="30.26g";
+
+select,flag=ptc_twiss,column=name,keyword,s,pos,k1,k2,k3,k4,k5,k6,
+
+    re11,re21,re31,re41,re51,re61,
+
+    re12,re22,re32,re42,re52,re62,
+
+    re13,re23,re33,re43,re53,re63,
+
+    re14,re24,re34,re44,re54,re64,
+
+    re15,re25,re35,re45,re55,re65,
+
+    re16,re26,re36,re46,re56,re66;
+
+ptc_twiss,closed_orbit,icase=56,file=map_compare_madx_output;
+
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     2
+  Default integration steps      4
+ This is a proton 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  FALSE
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+Deviation from symplecticity  0.5540516866373765E-11 %
+Deviation from symplecticity  0.5540516866373765E-11 %
+
+++++++ table: ptc_twiss_summary
+
+                        length                        alpha_c                      alpha_c_p                     alpha_c_p2 
+   159.99999999999991473487171  0.016653486956335696728137563                              0                       -1000000 
+
+                    alpha_c_p3                          eta_c                       gamma_tr                             q1 
+                      -1000000 0.0079267686843873027408013954    7.7490311979701331779324391  0.056031569751700933956772843 
+
+                            q2                            dq1                            dq2                             qs 
+0.0086501100442591769695832582                              0                              0                              0 
+
+                    beta_x_min                     beta_x_max                     beta_y_min                     beta_y_max 
+   5.6743193272254091041872925    33.378681737257828388010239    5.8671675684258337568621755    33.867061994639023225772689 
+
+                     beta11min                      beta11max                      beta12min                      beta12max 
+   5.6743193272254091041872925    33.378681737257828388010239                              0                              0 
+
+                     beta13min                      beta13max                      beta21min                      beta21max 
+                             0                              0                              0                              0 
+
+                     beta22min                      beta22max                      beta23min                      beta23max 
+   5.8671675684258337568621755    33.867061994639023225772689                              0                              0 
+
+                     beta31min                      beta31max                      beta32min                      beta32max 
+                             0                              0                              0                              0 
+
+                     beta33min                      beta33max                       disp1min                       disp1max 
+                             0                              0                              0    2.5187913526607310643612436 
+
+                      disp2min                       disp2max                       disp3min                       disp3max 
+ -0.18034326137476808238346848   0.18034326137476769380540986                              0                              0 
+
+                      disp4min                       disp4max                         deltap                        orbit_x 
+                             0                              0                              0                              0 
+
+                      orbit_px                        orbit_y                       orbit_py                       orbit_pt 
+                             0                              0                              0                              0 
+
+                     orbit_-cT                         xcorms                         ycorms                        pxcorms 
+                             0                              0                              0                              0 
+
+                       pycorms                         tcorms                        ptcorms                         xcomax 
+                             0                              0                              0                              0 
+
+                        ycomax                        pxcomax                        pycomax                         tcomax 
+                             0                              0                              0                              0 
+
+                       ptcomax                         xcomin                         ycomin                        pxcomin 
+                             0                              0                              0                              0 
+
+                       pycomin                         tcomin                        ptcomin 
+                             0                              0                              0 
+ptc_twiss,closed_orbit,icase=5,no=2,file=map_compare_madx_output5;
+
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     2
+  Default integration steps      4
+ This is a proton 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  FALSE
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_4D     =  TRUE 
+       DELTA       =  TRUE 
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Closed orbit:    0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000        0.0000000000000000     
+Deviation from symplecticity  0.7605027718682322E-12 %
+Deviation from symplecticity  0.7605027718682322E-12 %
+
+++++++ table: ptc_twiss_summary
+
+                        length                        alpha_c                      alpha_c_p                     alpha_c_p2 
+   159.99999999999991473487171   0.01665348695633577999486441                       -1000000                       -1000000 
+
+                    alpha_c_p3                          eta_c                       gamma_tr                             q1 
+                      -1000000 0.0079267686843873860075282423    7.7490311979701136380072057  0.056031569751700836812258189 
+
+                            q2                            dq1                            dq2                             qs 
+0.0086501100442591769695832582   -2.4909551734554882251870822   -2.5199642215087378893656478                              0 
+
+                    beta_x_min                     beta_x_max                     beta_y_min                     beta_y_max 
+    5.674319327225395781510997    33.378681737257863915147027    5.8671675684258337568621755    33.867061994639023225772689 
+
+                     beta11min                      beta11max                      beta12min                      beta12max 
+    5.674319327225395781510997    33.378681737257863915147027                              0                              0 
+
+                     beta13min                      beta13max                      beta21min                      beta21max 
+                             0                              0                              0                              0 
+
+                     beta22min                      beta22max                      beta23min                      beta23max 
+   5.8671675684258337568621755    33.867061994639023225772689                              0                              0 
+
+                     beta31min                      beta31max                      beta32min                      beta32max 
+                             0                              0                              0                              0 
+
+                     beta33min                      beta33max                       disp1min                       disp1max 
+                             0                              0                              0    2.5187913526608420866637061 
+
+                      disp2min                       disp2max                       disp3min                       disp3max 
+ -0.18034326137477652007845563   0.18034326137477738050129972                              0                              0 
+
+                      disp4min                       disp4max                         deltap                        orbit_x 
+                             0                              0                              0                              0 
+
+                      orbit_px                        orbit_y                       orbit_py                       orbit_pt 
+                             0                              0                              0                              0 
+
+                     orbit_-cT                         xcorms                         ycorms                        pxcorms 
+                             0                              0                              0                              0 
+
+                       pycorms                         tcorms                        ptcorms                         xcomax 
+                             0                              0                              0                              0 
+
+                        ycomax                        pxcomax                        pycomax                         tcomax 
+                             0                              0                              0                              0 
+
+                       ptcomax                         xcomin                         ycomin                        pxcomin 
+                             0                              0                              0                              0 
+
+                       pycomin                         tcomin                        ptcomin 
+                             0                              0                              0 
+ptc_end;
+
+ Killing LayoutNo name assigned                                                                                                        
+ Layout killed 
+twiss,chrom;
+
+enter Twiss module
+  
+iteration:   1 error:   1.402424E-06 deltap:   1.000000E-06
+orbit:  -3.843199E-07 -2.751764E-08  0.000000E+00  0.000000E+00 -3.745081E-09 -1.147588E-06
+  
+iteration:   2 error:   1.538152E-11 deltap:   1.000000E-06
+orbit:  -3.844614E-07 -2.752707E-08  0.000000E+00  0.000000E+00 -3.753067E-09 -1.147596E-06
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+                        length                         orbit5                           alfa                        gammatr 
+   159.99999999999991473487171                             -0  0.016653917455587821661033843    7.7489310421448456267512483 
+
+                            q1                            dq1                        betxmax                          dxmax 
+   2.0560357264749398176206796   0.38026619142428330633265432    33.381267661500039878319512    2.5300705373130130126924087 
+
+                         dxrms                         xcomax                         xcorms                             q2 
+   1.8825904953958423337923023                              0                              0    2.0086501100442588629846341 
+
+                           dq2                        betymax                          dymax                          dyrms 
+  0.38471980312593245798780117    33.867061994639009014917974                              0                              0 
+
+                        ycomax                         ycorms                         deltap                        synch_1 
+                             0                              0                              0    2.6645522452395629109389574 
+
+                       synch_2                        synch_3                        synch_4                        synch_5 
+ 0.039339941011995213648866354 0.0009852524687176333288013419 0.0016712903085316283859074193 0.00020714554176889214145117213 
+emit;
+
+enter EMIT module
+ 
+ Global parameters for protons, radiate = F:
+
+ C            159.99999999999982946974342 m          f0           1.8655093091186425446892372 MHz
+ T0          0.53604664158574943932933365 musecs     alfa       0.016653914133129131547317314 
+ eta       0.0079271958611807375599811465            gamma(tr)    7.7489318151013346636091228 
+ Bcurrent                               0 A/bunch    Kbunch             1 
+ Npart                                  0 /bunch     Energy       10.043921267727313306750148 GeV 
+ gamma        10.704700529602382275129457            beta        0.99562707964782259928426811
+guess:          0                              0                              0
+ 
+                                                  M o d e   1         M o d e   2
+ Fractional tunes            undamped              0.05604448          0.00865011
+ 
+ beta* [m]                   x                 0.33359778E+02      0.64193013E-31
+                             y                 0.26721094E-27      0.58671676E+01
+ 
+ gamma* [1/m]                px                0.20054580E+00      0.65758895E-34
+                             py                0.11610736E-29      0.20272394E+00
+ 
+ beta(max) [m]               x                 0.33399851E+02      0.36987138E-30
+                             y                 0.27793150E-27      0.33867062E+02
+ 
+ gamma(max) [1/m]            px                0.20773193E+00      0.25483492E-32
+                             py                0.15606593E-29      0.20272394E+00
+
+ RF system: 
+ Cavity                                  length[m]                    voltage[MV]                            lag                      freq[MHz]                         harmon
+ r                                               0                              5                              0     59.69629789179656143005559                             32
+stop;
+
+
+  Number of warnings: 2
+1 in C and 1 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  + MAD-X 5.02.04 (64 bit) finished normally +
+  ++++++++++++++++++++++++++++++++++++++++++++

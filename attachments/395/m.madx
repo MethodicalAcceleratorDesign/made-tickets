@@ -1,0 +1,34 @@
+call, file="currents.dat";
+call, file="common.seqx";
+call, file="dl.seqx";
+call, file="tl1.seqx";
+call, file="currents.dat"; ! has to be repeated
+
+cd.qdf0180scale =           1.361436 ;
+cd.qff0290scale =           1.375012 ;
+cd.qff0310scale =           0.966762 ;
+cd.qff0350scale =           0.976118 ;
+cd.qdf0420scale =               1.01 ;
+cd.qfe0430scale =                1.4 ;
+cd.qdf0460scale =                  1 ;
+cd.qff0470scale =                  1 ;
+cd.septa_k1 =                  0 ;
+
+    CT.IDVD0495 = -1.182922 ; 
+    CT.IDVD0505 = 1.182922 ; 
+
+mydlline: line=(cd.line.delayed, ct.tl1line  );
+
+beam;
+
+use, period=mydlline;
+
+TWISS, rmatrix, betx=10, bety=10;
+
+plot, haxis=s, vaxis=betx;
+plot, haxis=s, vaxis=bety;
+plot, haxis=s, vaxis=mux;
+plot, haxis=s, vaxis=muy;
+plot, haxis=s, vaxis=x;
+plot, haxis=s, vaxis=y;
+

@@ -1,0 +1,19 @@
+!test
+
+option,-echo;
+beam,ENERGY=8.,PARTICLE=proton,EX=5.E-6,EY=5.E-6,SIGE=.001;
+
+beta_IP: beta0, betx=0.3,alfx=0.,bety=0.3,alfy=0.;
+
+
+SOL_TARGET: solenoid, l=0.375, ks=-0.75;
+
+IP_line:  line=(SOL_TARGET);
+
+use,period=IP_line;
+SELECT,FLAG=TWISS,clear;
+set,    format="12.6f";
+SELECT,FLAG=SECTORMAP,clear; 
+select,flag=SECTORMAP,column=name,pos,k1,r11,r66,t111;
+twiss,beta0=beta_IP,sequence=IP_line,sectormap;
+stop;

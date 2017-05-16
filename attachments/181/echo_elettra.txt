@@ -1,0 +1,106 @@
+makethin: slicing sequence : elettra
+enter Twiss module
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             259.2      -0.4894662305     0.001457936678        26.18970877 
+
+                q1                dq1            betxmax              dxmax 
+         14.637864        2.926938894        19.59385382       0.3587603133 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1902335287   4.372116596e-005   1.981044962e-005        7.385078892 
+
+               dq2            betymax              dymax              dyrms 
+       6.459163044        18.82120934                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter EMIT module
+START MATCHING
+
+number of sequences: 1
+sequence name: elettra
+number of variables:    4
+user given constraints: 4
+total constraints:      4
+
+START LMDIF:
+
+
+MATCH SUMMARY
+
+Node_Name                  Constraint   Type  Target Value       Final Value        Penalty
+--------------------------------------------------------------------------------------------------
+
+
+Final Penalty Function =  6.61607746e-016
+
+
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+kq2                      2.28333e+000 2.22279e+000 -1.00000e+020 1.00000e+020
+kq1                      -2.25360e+000 -1.94300e+000 -1.00000e+020 1.00000e+020
+ksf                      4.09060e+001 4.07800e+001 -1.00000e+020 1.00000e+020
+ksd                      -3.23676e+001 -3.27800e+001 -1.00000e+020 1.00000e+020
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO  6.61607746e-016
+enter Twiss module
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+             259.2      -0.4894649598     0.001462000422        26.15328527 
+
+                q1                dq1            betxmax              dxmax 
+              14.3   1.471296183e-008        23.29229867       0.3459916529 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1852455641    4.55824346e-005   2.057669064e-005                8.2 
+
+               dq2            betymax              dymax              dyrms 
+  1.722365221e-008        15.84312884                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+enter EMIT module
+one pass is on
+damp is on
+
+++++++ table: tracksumm
+
+    number       turn                  x                 px 
+         1          0             0.0001                  0 
+         2          0          0.0001001                  0 
+         1       1024   -0.0004106565372   5.933710058e-005 
+         2       1024   -0.0004106814239   5.934607406e-005 
+
+                 y                 py                  t                 pt 
+           -0.0001                  0                  0             0.0002 
+           -0.0001                  0                  0             0.0002 
+  6.855297671e-005   5.835966693e-005      -0.1740980113     -0.01753438297 
+  6.854673309e-005   5.836112698e-005      -0.1740979919     -0.01753438504 
+
+                 s                  e 
+                 0                  0 
+                 0                  0 
+             259.2                  0 
+             259.2                  0 
+exit TRACK module
+
+table( dynaptune tunx ) =      0.01041523661 ;
+table( dynaptune tuny ) =       0.1943679234 ;
+table( dynaptune dtune ) =   9.507743656e-005 ;
+table( dynap dynapfrac ) =              

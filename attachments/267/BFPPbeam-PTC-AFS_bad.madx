@@ -1,0 +1,129 @@
+OPTION,ECHO;
+! <Temporary file created by runMAD at: {2014, 5, 28, 14, 21, 5.7413970}> ;
+OPTION,ECHO;
+! <Complete LHC setup by madLHCOptics[]> ;
+! New version with arguments, May 2012. Options of form madLHC*Switch are now ignored. ;
+OPTION,ECHO;
+! <MAD options> ;
+SET,FORMAT="21.15f";
+OPTION,ECHO;
+! </MAD options> ;
+OPTION,ECHO;
+! <madLHCProlog> ;
+OPTION,ECHO;
+! </madLHCProlog> ;
+OPTION,ECHO;
+! <MAD input information> ;
+! MAD input created by Mathematica package:  ;
+!       Madtomma`LHCapplications`MADinputLHC` ;
+! MAD input created: Wed 28 May 2014 14:21:05 ;
+! LHC Optics version: V6.503 ;
+! LHC Configuration: CollisionIons ;
+! Optics source directory: G:\Projects\ILHC\LHCOpticsSyncCopy\V6.503 ;
+! User: jowett ;
+! Computer: lapbe15864 ;
+! Domain: cern.ch ;
+! Working directory: C:\Workspaces\BFPP-IP1 ;
+! Mathematica version: 9.0 for Microsoft Windows (64-bit) (November 20, 2012) ;
+! MAD program: C:\PROGRA~1\mad\madx\madx-win64.exe ;
+!   ;
+OPTION,ECHO;
+! </MAD input information> ;
+Option, -echo, -warn,-info;
+
+TITLE,"LHC Optics (this is the default value of madLHCLabel option of madLHCOptics)";
+OPTION,-ECHO;
+! <LHC thick lens sequence build for version V6.503> ;
+CALL,FILE="V6.5.seq";
+OPTION,ECHO;
+! </LHC thick lens sequence build for version V6.503> ;
+OPTION,ECHO;
+! <LHC optics settings> ;
+OPTION,ECHO;
+! <Base settings> ;
+CALL,FILE="ats_2015.col_0.55_10.00_0.55_3.00.str";
+OPTION,ECHO;
+! </Base settings> ;
+OPTION,ECHO;
+! <Squeeze point settings> ;
+OPTION,ECHO;
+! </Squeeze point settings> ;
+OPTION,ECHO;
+! </LHC optics settings> ;
+OPTION,ECHO;
+! <Spectrometer magnets at normal field using beam energy> ;
+ON_ALICE=1.0769230769230769;
+ON_LHCB=1.0769230769230769;
+OPTION,ECHO;
+! </Spectrometer magnets at normal field using beam energy> ;
+OPTION,ECHO;
+! <LHC crossing angle switches> ;
+ON_X1=1;
+ON_X2=1;
+ON_X5=1;
+ON_X8=1;
+OPTION,ECHO;
+! </LHC crossing angle switches> ;
+OPTION,ECHO;
+! <LHC crossing angle switches (alternative plane, may not be implemented> ;
+ON_X1H=0;
+ON_X2H=0;
+ON_X5V=0;
+ON_X8V=0;
+OPTION,ECHO;
+! </LHC crossing angle switches (alternative plane, may not be implemented> ;
+OPTION,ECHO;
+! <LHC parallel separation switches> ;
+ON_SEP1=0;
+ON_SEP2=0;
+ON_SEP5=0;
+ON_SEP8=1;
+OPTION,ECHO;
+! </LHC parallel separation switches> ;
+OPTION,ECHO;
+! <LHC parallel separation switches (alternative plane, may not be implemented)> ;
+ON_SEP1V=0;
+ON_SEP2V=0;
+ON_SEP5H=0;
+ON_SEP8H=0;
+OPTION,ECHO;
+! </LHC parallel separation switches (alternative plane, may not be implemented)> ;
+Beam1: BEAM,SEQUENCE=LHCB1, BV=1, ENERGY=533000., PARTICLE=ION, MASS=193.68727293831492, CHARGE=82, KBUNCH=364, NPART=1.4E8, EX=5.450861699628336E-10, EY=5.450861699628336E-10, ET=2.5, SIGE=0.00013000000000000002, SIGT=0.075;
+Beam2: BEAM,SEQUENCE=LHCB2, BV=-1, ENERGY=533000., PARTICLE=ION, MASS=193.68727293831492, CHARGE=82, KBUNCH=364, NPART=1.4E8, EX=5.450861699628336E-10, EY=5.450861699628336E-10, ET=2.5, SIGE=0.00013000000000000002, SIGT=0.075;
+OPTION,ECHO;
+! <madLHCEpilog> ;
+OPTION,ECHO;
+! </madLHCEpilog> ;
+OPTION,ECHO;
+! </Complete LHC setup by madLHCOptics[]> ;
+USE,PERIOD=LHCB1;
+OPTION,ECHO;
+! <MADtwiss for sequence: LHCB1, making file: BFPPbeam-2014-05-28-14-21-05.tfs> ;
+SHOW,BEAM%LHCB1;
+SELECT,FLAG=TWISS,CLEAR;
+SELECT,FLAG=TWISS,RANGE=IP1/E.DS.R1.B1,COLUMN={NAME, KEYWORD, PARENT, S, L, LRAD, KICK, HKICK, VKICK, ANGLE, K0L, K1L, K2L, K3L, X, Y, PX, PY, BETX, BETY, ALFX, ALFY, MUX, MUY, DX, DY, DPX, DPY, KMAX, KMIN, CALIB, POLARITY, APERTYPE, N1, TILT};
+TWISS,SEQUENCE=LHCB1,file="BFPPbeam-2014-05-28-14-21-05.tfs",
+DELTAP=0.01, X=0, Y=0, PX=0, PY=0.00017000001377, BETX=0.549999732688434, BETY=0.549999894056119, ALFX=-1.506674634E-6, ALFY=2.48803696E-7, DX=0.015547218196882, DY=0.003256597440519;
+OPTION,ECHO;
+! </MADtwiss for sequence: LHCB1, making file: BFPPbeam-2014-05-28-14-21-05.tfs> ;
+OPTION,ECHO;
+
+
+! <TRY PTC>
+! following PTC_TWISS example 2 in MADX test suite
+! Initialize PTC
+PTC_CREATE_UNIVERSE;
+PTC_CREATE_LAYOUT,MODEL=2,METHOD=6,NST=2,EXACT;
+
+SELECT,FLAG=TWISS,CLEAR;
+SELECT,FLAG=TWISS,COLUMN=NAME,S,BETA11,BETA21,BETA12,BETA22,DISP1,DISP3,X,PX,Y,PY,PT;
+SELECT,FLAG=TWISS,RANGE=IP1/E.DS.R1.B1;
+PTC_TWISS , table=twiss,               ICASE=5,NO=2, FILE="PTC-TWISSpt2.tfs",
+   PT=0.03, X=0, Y=0, PX=0, PY=0.00017000001377, BETX=0.549999732688434, BETY=0.549999894056119,
+   ALFX=-1.506674634E-6, ALFY=2.48803696E-7, DX=0.015547218196882, DY=0.003256597440519;
+!PTC_NORMAL,CLOSED_ORBIT,MAPTABLE,NORMAL,ICASE=5,NO=3;
+
+PTC_END;
+! </TRY PTC>
+! </Temporary file created by runMAD at: {2014, 5, 28, 14, 21, 5.7413970}> ;
+stop;;

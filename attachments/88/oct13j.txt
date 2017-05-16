@@ -1,0 +1,58 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with MadX
+!   Derived from oct13h.txt 
+amu:=0.931494320;
+beam,particle=ion,mass=12*amu,charge=6,pc=11.42;
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20,
+        post=1,font=-4,lwidth=5;
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=20,
+        post=2,font=-4,lwidth=10;
+
+!-- Define  lattice for scanner
+HANG:=0.1;
+VANG:=0.1;
+BH1: SBEND, L=0.4, ANGLE:=0;
+BH2: SBEND, L=0.4, ANGLE:=0;
+BV1: SBEND, L=0.4, TILT=PI/2, ANGLE:=0;
+BV2: SBEND, L=0.4, TILT=PI/2, ANGLE:=0;
+D1: DRIFT, L=1.25;
+SCAN: LINE=(BH1,BV1,BH2,BV2,D1);
+ALFX := 0.0;
+ALFY := 0.0;
+BETX := 2;
+BETY := 1;
+
+!-- Survey scanner
+title,"Lattice for scanner - oct13j";
+use,period=scan;
+survey,file="oct13j.srv";
+
+!-- Calculate and plot orbit functions
+use,period=scan;
+select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,x,px, 
+bety,alfy,muy,dy,dpy,y,py,t,pt,alfa; 
+system,"erase oct13j_twiss.lis"; 
+system,"erase twiss.lis";
+select,flag=error,range=bh1;
+efcomp,order:=0,radius=0.1,dkn:={hang};
+select,flag=error,clear;
+select,flag=error,range=bh2;
+efcomp,order:=0,radius=0.1,dkn:={-hang};
+select,flag=error,clear;
+select,flag=error,range=bv1;
+efcomp,order:=0,radius=0.1,dkn:={vang};
+select,flag=error,clear;
+select,flag=error,range=bv2;
+efcomp,order:=0,radius=0.1,dkn:={-vang};
+dpp=0; 
+ptc_create_universe; 
+ptc_create_layout,model=2,method=6,nst=30,exact;!,time=false; 
+ptc_align;
+select,flag=ptc_twiss,column=name,s,beta11,alfa11,mu1,disp1,
+ beta22,alfa22,mu2,disp3,x,px,y,py,t,pt; 
+ptc_twiss,betx=betx,bety=bety,icase=5,deltap=dpp,file="ptc.lis",table; 
+system,"copy /y ptc.lis may31f.lis"; 
+ptc_end; 
+system,"copy ptc.lis oct13j.lis";
+
+stop;

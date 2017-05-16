@@ -1,0 +1,28 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with MadX
+!   Derived from dec17g.txt
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20,
+        post=1,font=-4,lwidth=5;
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=20,
+        post=2,font=-4,lwidth=10;
+
+!-- Define triplet lattice for gantry
+call,file="dec17c.sav";
+title,"Triplet lattice for gantry - dec23h";
+
+!-- Analyse matching result
+beam,ex=3.6692e-6,ey=3.6692e-6,sige=0.03;
+use,period=gantry;
+dpp:=-0.295;
+maxdpp:=+0.3;
+system,"erase dec23h.lis";
+ptc_create_universe; 
+ptc_create_layout,model=2,method=6,nst=30,exact,time=false; 
+select,flag=ptc_twiss,clear;
+select,flag=ptc_twiss,column=name,s,beta11,alfa11,mu1,disp1,
+ beta22,alfa22,mu2,disp2,x,px,y,py,t,pt; 
+ptc_twiss,betx=beta,bety=beta,icase=5,deltap=dpp,file="ptc.lis",table; 
+ptc_end; 
+system,"copy ptc.lis dec23h.lis"; 
+
+stop;

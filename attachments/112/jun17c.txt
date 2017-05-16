@@ -1,0 +1,81 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with mad version 8.51/02 or later
+!   Derived from jun14b.txt
+assign print="jun17c.lis"
+assign echo="jun17c.eco"
+setplot ascale=1 lscale=1.5 sscale=3 rscale=1.5 xsize=28 ysize=20 &
+        post=1 font=-4 lwidth=5
+setplot ascale=2 lscale=2 sscale=1.5 rscale=2 xsize=28 ysize=20 &
+        post=1 font=-4 lwidth=10
+
+!-- Define triplet lattice for gantry
+call,file="jun17b.sav"
+title "Triplet lattice for gantry - jun17c"
+use cell
+print full
+survey
+
+!-- Analyse matching result
+beam,ex=3.6692e-6,ey=3.6692e-6,sige=0.03
+savebeta place=#e label=d
+savebeta place=marker label=atmark
+savesigma,place=#e,label=sig
+twiss save
+plot filename="jun17c" haxis=s vaxis1=rbetx rbety vaxis2=dx colour=100 spline
+use cell
+twiss tunes deltap=-0.3:+0.3:0.1
+plot table=tunes haxis=deltap vaxis=qx qy colour=100 spline
+
+!-- Define gantry consisting of 10 cells and 20 cells with opposite deflection
+!   In an intermediate cell half the bending is the normal and oppositite
+!   at dpp=0 all orbit functions are matched
+!   Initial cell with quadrupoles transports beam to centre of triplet
+use,ins
+twiss betx=beta bety=beta dx=0 save
+plot filename="jun17c" haxis=s vaxis=rbetx rbety colour=100 spline
+use ins2
+twiss save
+savesigma place=#s label=sigi
+gantry: line=(ins,tri,d2,7*cell,d2,-tri,mid,rtri,d2,16*rcell,d2,-rtri)
+use gantry
+print mid
+survey,tape="jun17c_srv.lis"
+print clear
+twiss betx=beta bety=beta dx=0 save
+plot filename="jun17c" haxis=s vaxis=rbetx colour=100 spline noline
+plot filename="jun17c" haxis=s vaxis=rbety colour=100 spline noline
+plot filename="jun17c" haxis=s vaxis=dx colour=100 spline noline
+plot filename="jun17c" haxis=s vaxis1=rbetx rbety vaxis2=dx colour=100 spline &
+     noline 
+
+stop
+
+!-- Track through gantry starting with orbit functions at dpp=0
+!   All orbit functions are mismatched at dpp .ne. 0 in whole gantry
+!   Mismatch increases with |dpp|
+!   Orbit oscillates through whole gantry
+dpp:=0
+use,period=gantry
+do times=3
+set variable=dpp value=dpp+0.1
+twiss betx=beta bety=beta save deltap=dpp dx=0 x=0 px=0 y=0 py=0
+plot haxis=s vaxis1=rbetx rbety vaxis2=dx colour=100 spline noline
+plot haxis=s vaxis=x colour=100 spline noline
+plot haxis=s vaxis=px colour=100 spline noline
+twiss betx=beta bety=beta save deltap=-dpp dx=0 x=0 px=0 y=0 py=0
+plot haxis=s vaxis1=rbetx rbety vaxis2=dx colour=100 spline noline
+plot haxis=s vaxis=x colour=100 spline noline
+plot haxis=s vaxis=px colour=100 spline noline
+enddo
+value,fang,dang
+
+!-- Compute fields and gradients
+beam,mass=12*amu,charge=6,pc=8.414;
+use,period=cell;
+value,beam[energy],beam[mass],beam[charge];               
+value,kinE,emu,brho;
+value,fieldF,fieldD,gradF,gradD;
+value,beam[beta],beam[gamma],beam[beta]*beam[gamma];
+value,bf[k1],bd[k1];
+
+stop

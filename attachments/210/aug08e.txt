@@ -1,0 +1,132 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8 
+!-- This job should be run with madX 
+! Derived from aug08d.txt 
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20, 
+post=1,font=-4,lwidth=5; 
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=16, 
+post=2,font=-4,lwidth=10; 
+
+!-- Define doublet lattice for medical H+ ring
+!   Enter particle, reference momentum, cell length periodL, number of periods periodN,
+!   cell tunes qx and qy; the length of the drift d1 is the distance between the centres
+!   the the two thin multipoles 
+title,"Doublet lattice for 1st H+ ring - aug08e"; 
+beam,particle=proton,pc=0.1827,exn=4*0.5e-6,eyn=4*0.5e-6; 
+periodL:=0.72; 
+periodN:=48; 
+qx:=0.21844318;
+qy:=0.1677697;
+d1: drift,l=0.255; 
+rfvolt:=0; 
+rflag:=0.125; 
+rfc: rfcavity,l=0.19,volt:=rfvolt,lag:=rflag,harmon=1; 
+d3: drift,l:=periodL-d1->l; 
+d2: drift,l:=(d3->l-rfc->l)/2; 
+fang:=pi/periodN; 
+dang:=2*pi/periodN-fang; 
+tx=2*cos(2*pi*qx);
+ty=2*cos(2*pi*qy);
+k1lf:=(-d1->l*d3->l*(tx-ty)+sqrt(-8*d1->l*d3->l*(d1->l+d3->l)^2*(-4+tx+ty)+
+      (d1->l*d3->l*tx-d1->l*d3->l*ty)^2))/(4*d1->l*d3->l*(d1->l+d3->l));
+k1ld:=-(d1->l*d3->l*(tx-ty)+sqrt(-8*d1->l*d3->l*(d1->l+d3->l)^2*(-4+tx+ty)+
+      (d1->l*d3->l*tx-d1->l*d3->l*ty)^2))/(4*d1->l*d3->l*(d1->l+d3->l));
+bf: multipole,knl:={fang},ksl:={0,k1lf}; 
+bd: multipole,knl:={dang},ksl:={0,k1ld}; 
+col: ecollimator,xsize=0.025,ysize=0.012; 
+! dou: line=(col,bf,col,d1,col,bd,col); 
+dou: line=(bf,d1,bd); 
+rfs: line=(d2,rfc,d2); 
+rfcell: line=(dou,rfs); 
+norfcell: line=(dou,d3); 
+mrk: marker; 
+ring: line=(4*(rfcell,11*norfcell),mrk); 
+
+!-- Use twiss for plot of orbit functions 
+use,period=rfcell;
+select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,x,px, 
+bety,alfy,muy,dy,dpy,y,py,t,pt,alfa; 
+system,"rm aug08e_twiss.lis"; 
+twiss,rmatrix,table,file="aug08e_twiss.lis",chrom; 
+title," "; 
+plot,file="aug08e",haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,interpolate, 
+noversion,notitle;!,vmin=0.5,0.01,vmax=1.2,0.06; 
+use,period=ring; 
+system,"rm tmp.lis"; 
+select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,x,px, 
+bety,alfy,muy,dy,dpy,y,py,t,pt,alfa; 
+system,"rm aug08e_twiss.lis"; 
+twiss,rmatrix,table,file="aug08e_twiss.lis",chrom; 
+title," "; 
+plot,file="aug08e",haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,interpolate, 
+noversion,notitle;!,vmin=0.5,0.01,vmax=1.2,0.06; 
+
+!-- Compute SURVEY
+use,period=ring;
+survey,file="aug08e.srv"; 
+
+!-- Loop over DELTAP
+maxdpp=21;
+ndpp=0;
+dpp=-1/3; 
+stepdpp=1/30;
+while(ndpp<maxdpp)
+{
+ndpp=ndpp+1;
+
+!-- Launch PTC_TWISS orbit from perfect machine
+use,period=norfcell;
+eoption,add=false,seed=22021955; 
+maxorb=1;
+norb=0;
+while(norb<maxorb)
+{
+norb=norb+1;
+select,flag=error,class=bd;
+select,flag=error,class=bf;
+!ealign,dx:=1e-4*tgauss(trunc),dy:=1e-4*tgauss(trunc);
+system,"rm ptc.lis";
+ptc_create_universe; 
+ptc_create_layout,model=2,method=6,nst=30,exact,time=false; 
+ptc_align; 
+!select,flag=ptc_twiss,column=name,s,beta11,beta12,mu1,disp1, 
+!beta21,beta22,mu2,disp3,x,px,y,py,t,pt; 
+ptc_twiss,closed_orbit,icase=5,file="ptc.lis",deltap=dpp; 
+ptc_end; 
+if(ndpp == 1 && norb ==1){system,"cp ptc.lis aug08e.lis";}
+else{system,"cat ptc.lis >> aug08e.lis";} 
+}
+dpp=dpp+stepdpp;
+}
+value,k1lf,k1ld;
+value,d1->l,d2->l,d3->l;
+
+stop; 
+ 
+!-- Compute fields and gradients 
+beam,particle=proton,pc=0.1827,exn=4*0.5e-6,eyn=4*0.5e-6; 
+kinE:=beam->energy-beam->mass; 
+brho:=beam->pc*1e9/clight/beam->charge; 
+value,kinE,brho; 
+! fieldF:=bf->angle*brho/bf->l; 
+! fieldD:=bd->angle*brho/bd->l; 
+! gradF:=bf->k1*brho; 
+! gradD:=bd->k1*brho; 
+fieldF:=bfi->angle*brho/bfi->l; 
+fieldD:=bdi->angle*brho/bdi->l; 
+gradF:=bfi->k1*brho; 
+gradD:=bdi->k1*brho; 
+value,fieldF,fieldD,gradF,gradD; 
+value,beam->beta,beam->gamma,beam->beta*beam->gamma; 
+value,beam->energy,beam->mass,beam->charge; 
+value,2*bfi->angle,2*bdi->angle; 
+value,bfi->k1,bdi->k1; 
+value,fang,dang; 
+
+!-- Match phase advances
+use,period=rfcell;
+match;
+vary,name=k1lf,step=0.1;
+vary,name=k1ld,step=0.1;
+constraint,sequence=rfcell,range=#e,mux=0.21844318,muy=0.1677697;
+jacobian,tolerance=1e-20;
+endmatch;

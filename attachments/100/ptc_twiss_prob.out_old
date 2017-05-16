@@ -1,0 +1,400 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +              MAD-X 5.00.06              +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 15.05.2011      +
+  + Execution Time Stamp: 01.11.11 12.57.23 +
+  +++++++++++++++++++++++++++++++++++++++++++
+!--------1---------2---------3---------4---------5---------6---------7---------8
+
+!-- This job should be run with madX
+
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20, 
+
+        post=1,font=-4,lwidth=5;
+
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=16, 
+
+        post=2,font=-4,lwidth=10;
+
+
+
+!-- Define EMMA lattice  with dipoles
+
+title,"EMMA baseline lattice - oct21k";
+
+beam,particle=electron,energy=0.015+beam->mass;
+
+periodL:=0.394481;
+
+periodN:=42;
+
+fang:=-0.05;
+
+dang:=2*pi/periodN-fang;
+
+qf: sbend,l=0.058782,k1:=+129.469,angle:=fang,e1:=fang;!,fint=0.5,hgap=0.01;
+
+qd: sbend,l=0.075699,k1:=-90.967,angle:=dang,e2:=dang;!,fint=0.5,hgap=0.01;
+
+ld: drift,l=0.21;
+
+sd: drift,l=0.05;
+
+cell: line=(ld,qf,sd,qd);
+
+ring: line=(42*cell);
+
+
+
+!-- Adjust fang 
+
+use,period=cell;
+
+match,use_macro; 
+
+vary,name=fang,step=0.01; 
+
+m1: macro={twiss,rmatrix;}; 
+
+constraint, expr= table(summ,alfa)=0.001085326514; 
+
+jacobian,tolerance=1e-20; 
+
+number of variables:    1
+user given constraints: 0
+total constraints:      1
+
+START JACOBIAN:
+
+ JACOBIAN Strategy =           3
+Initial Penalty Function =   0.5465936389479228E-05
+
+
+ Solve system with            1 con,           1 var
+ Rank             1   Condition number   1.00000000000000     
+ Step length  0.336177645526992     
+call:     2 Dx =   0.33617765E+00  Penalty function =  0.3046530539362773E-09
+ Solve system with            1 con,           1 var
+ Rank             1   Condition number   1.00000000000000     
+ Step length  2.479019337115887E-003
+call:     3 Dx =   0.24790193E-02  Penalty function =  0.8673344262990109E-18
+ Solve system with            1 con,           1 var
+ Rank             1   Condition number   1.00000000000000     
+ Step length  1.322870840677439E-007
+call:     4 Dx =   0.13228708E-06  Penalty function =  0.4271368431904968E-30
+ ++++++++++ JACOBIAN ended: converged successfully
+ Final difference norm:  0.158540483427297     
+endmatch; 
+
+
+MATCH SUMMARY
+
+--------------------------------------------------------------------
+macro: m1                  
+  constraint: table(summ,alfa)=0.001085326514         
+  values:     +1.08533e-03=+1.08533e-03
+  weight:     +1.00000e+00
+  penalty:    +6.53557e-16
+
+
+
+Final Penalty Function =   4.27136843e-31
+
+
+
+Variable                 Final Value  Initial Value Lower Limit  Upper Limit 
+--------------------------------------------------------------------------------
+fang                     -7.51351e-02 -5.00000e-02 -1.00000e+20  1.00000e+20
+
+END MATCH SUMMARY
+
+VARIABLE "TAR" SET TO   4.27136843e-31
+
+
+value,fang,dang;
+
+fang =     -0.07513508489 ;
+dang =       0.2247347351 ;
+!stop;
+
+
+
+!-- Survey EMMA
+
+use,period=ring;
+
+survey,file="oct21k.srv";
+
+
+
+!-- Compute ideal orbit at one value of dpp with PTC_TWISS 
+
+use,period=ring; 
+
+dpp=0; 
+
+ptc_create_universe; 
+
+ Now PTC
+ptc_create_layout,model=2,method=6,nst=30,exact,time=false; 
+
+ MAD-X Beam Parameters
+                  Energy : 0.155110E-01
+          Kinetic Energy : 0.150000E-01
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.155026E-01
+ Setting MADx with 
+     energy          1.551099891000000E-002
+     method                   6
+     Num. of steps           30
+     charge          -1.00000000000000     
+  Length of machine:    16.5682020000001     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   6.722053469410127E-015  0.000000000000000E+000  1.387778780781446E-016
+select,flag=ptc_twiss,column=name,s,beta11,alfa11,mu1,disp1,
+
+ beta22,alfa22,mu2,disp3,x,px,y,py,t,pt; 
+
+ptc_twiss,closed_orbit,icase=5,deltap=dpp,file="ptc.lis",table; 
+
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps     30
+ This is an electron (positron actually if charge=1) 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  FALSE
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_4D     =  TRUE 
+       DELTA       =  TRUE 
+       SPIN        =  FALSE
+       MODULATION   = FALSE
+ Closed orbit:  -2.369452994440299E-016  7.082306027007884E-013  0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+Deviation from symplecticity  0.8115730310009894E-11 %
+  PARENT LAYOUT NAME :No name assigned
+  NUMBER OF ORIGINAL LAYOUT ELEMENTS :         170
+  NUMBER OF THIN OBJECTS :        3286
+  TOTAL IDEAL LENGTH OF STRUCTURE :   16.5682020000003     
+  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   16.5682020000003     
+Deviation from symplecticity  0.8115730310009894E-11 %
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+         16.568202     0.002169475095   -0.0002258560098                  0 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+                 0      0.00108414858        21.46953635       0.9905125839 
+
+                q2                dq1                dq2                 qs 
+      0.2538362156                  0                  0                  0 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+      0.1770435624       0.5565855529       0.1932773983        0.586174847 
+
+            deltap            orbit_x           orbit_px            orbit_y 
+                 0   -2.369452994e-16    7.082306027e-13                  0 
+
+          orbit_py           orbit_pt          orbit_-cT             xcorms 
+                 0                  0                  0    1.378352749e-13 
+
+            ycorms            pxcorms            pycorms             xcomax 
+                 0    7.227652782e-13                  0    2.443933944e-13 
+
+            ycomax            pxcomax            pycomax 
+                 0    1.226755299e-12                  0 
+ptc_end; 
+
+  killing last layout 
+  NODE LAYOUT HAS BEEN KILLED 
+  killed last layout 
+system,"cat ptc.lis >> oct21k.lis"; 
+
+option,echo=true,info=true; 
+
+
+
+!-- Compute orbits in a ring at dpp=0 with PTC_TWISS 
+
+use,period=ring;
+
+trunc=2.5; 
+
+maxorb=2;
+
+norb=0;
+
+eoption,add=false;
+
+while(norb<maxorb)
+
+{
+
+norb=norb+1;
+
+select,flag=error,class=qd;
+
+select,flag=error,class=qf;
+
+ealign,dx:=5e-5*tgauss(trunc),dy:=5e-5*tgauss(trunc);
+
+!ealign,dx:=0,dy:=0;
+
+dpp=0; 
+
+system,"rm ptc.lis";
+
+ptc_create_universe; 
+
+ptc_create_layout,model=2,method=6,nst=30,exact;!,time=false; 
+
+ptc_align;
+
+select,flag=ptc_twiss,column=name,s,beta11,alfa11,mu1,disp1,
+
+ beta22,alfa22,mu2,disp3,x,px,y,py,t,pt; 
+
+ptc_twiss,closed_orbit,icase=5,deltap=dpp,file="ptc.lis",table; 
+
+ptc_end; 
+
+system,"cat ptc.lis >> oct21k.lis"; 
+
+}
+
+++++++ info: norb redefined
+Assigned alignment errors to 84 elements
+++++++ info: dpp redefined
+ Now PTC
+ MAD-X Beam Parameters
+                  Energy : 0.155110E-01
+          Kinetic Energy : 0.150000E-01
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.155026E-01
+ Setting MADx with 
+     energy          1.551099891000000E-002
+     method                   6
+     Num. of steps           30
+     charge          -1.00000000000000     
+  Length of machine:    16.5682020000001     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   6.722053469410127E-015  0.000000000000000E+000  1.387778780781446E-016
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps     30
+ This is an electron (positron actually if charge=1) 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_4D     =  TRUE 
+       DELTA       =  TRUE 
+       SPIN        =  FALSE
+       MODULATION   = FALSE
+ Closed orbit:  -1.096159171318066E-002  2.023679345871403E-003 -4.609298000250129E-004  1.460699305287991E-003  0.000000000000000E+000
+Deviation from symplecticity  0.9138135669169156E-11 %
+  PARENT LAYOUT NAME :No name assigned
+  NUMBER OF ORIGINAL LAYOUT ELEMENTS :         170
+  NUMBER OF THIN OBJECTS :        3286
+  TOTAL IDEAL LENGTH OF STRUCTURE :   16.5682020000003     
+  TOTAL INTEGRATION LENGTH OF STRUCTURE (mad8 style survey) :   16.5682020000003     
+Deviation from symplecticity  0.9138135669169156E-11 %
+
+++++++ table: ptc_twiss_summary
+
+            length            alpha_c          alpha_c_p         alpha_c_p2 
+         16.568202       0.4953739579   -0.0001165665809                  0 
+
+        alpha_c_p3              eta_c           gamma_tr                 q1 
+                 0       0.4942886314        1.420801524      0.02417675363 
+
+                q2                dq1                dq2                 qs 
+      0.2284396665                  0                  0                  0 
+
+        beta_x_min         beta_x_max         beta_y_min         beta_y_max 
+     0.08805975567        1.227800706       0.1411796394       0.6893855174 
+
+            deltap            orbit_x           orbit_px            orbit_y 
+                 0     -0.01096159171     0.002023679346      -0.0004609298 
+
+          orbit_py           orbit_pt          orbit_-cT             xcorms 
+    0.001460699305                  0                  0      0.01168906967 
+
+            ycorms            pxcorms            pycorms             xcomax 
+   0.0007910130715      0.06056417879     0.004055918234      0.02019729707 
+
+            ycomax            pxcomax            pycomax 
+     0.00211133061       0.1010861359      0.01030670017 
+  killing last layout 
+  NODE LAYOUT HAS BEEN KILLED 
+  killed last layout 
+++++++ info: norb redefined
+Replaced alignment errors for 84 elements
+++++++ info: dpp redefined
+ Now PTC
+ MAD-X Beam Parameters
+                  Energy : 0.155110E-01
+          Kinetic Energy : 0.150000E-01
+      Particle Rest Mass : 0.510999E-03
+                Momentum : 0.155026E-01
+ Setting MADx with 
+     energy          1.551099891000000E-002
+     method                   6
+     Num. of steps           30
+     charge          -1.00000000000000     
+  Length of machine:    16.5682020000001     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ Before   end:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After  start:   0.000000000000000E+000  0.000000000000000E+000  0.000000000000000E+000
+ After    end:   6.722053469410127E-015  0.000000000000000E+000  1.387778780781446E-016
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     6
+  Default integration steps     30
+ This is an electron (positron actually if charge=1) 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  TRUE 
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_4D     =  TRUE 
+       DELTA       =  TRUE 
+       SPIN        =  FALSE
+       MODULATION   = FALSE
+ Closed orbit:   8.093974375902786E-002  0.392487150270864       5.196773822305444E-003 -1.506716014960794E-002  0.000000000000000E+000

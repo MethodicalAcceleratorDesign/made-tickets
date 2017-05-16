@@ -1,0 +1,26 @@
+MAD-X: mad_aper.c, aper_build_screen(), line 450
+
+type		parameters			processed by
+----		----------			------------
+circle		var1				aper_rectellipse
+ellipse		var1, var2			aper_rectellipse
+rectangle	var1, var2			aper_rectellipse
+lhcscreen	var1, var2, var3		aper_rectellipse
+rectcircle     var1, var2, var3              aper_rectellipse
+marguerite	not supported			-
+rectellipse	var1, var2, var3, var4		aper_rectellipse
+racetrack	var1, var2, var3, var4		aper_rectellipse
+octagon        var1, var2, var3, var4         -
+polygon	       file			     aper_rectellipse
+
+PTC: Se_status.f90, CHECK_APERTURE_R, line 509
+
+type			kind
+----			----
+ellipse+circle		1
+rectangle		2
+rectangle+ellipse	3  (include rectcircle and lhcscreen as coded in mad_ptc_module.f90)
+marguerite		4
+racetrack		5
+octagon                6
+polygon			7	not supported

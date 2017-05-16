@@ -1,0 +1,148 @@
+option, warn,info;
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.2/ slhc";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/runII/2015 db5";
+
+
+mylhcbeam=1; ! For Beam 1
+!mylhcbeam=4; ! For Beam 4
+
+!is_thin=0; ! For thick optics
+is_thin=1; ! For thin optics
+
+fixcrabs=1; ! Install crabs in fc.2
+
+Option, -echo,-warn,-info;
+call,file="slhc/toolkit/macro.madx";
+if (mylhcbeam<3){ call,file="db5/lhc_as-built.seq";};
+if (mylhcbeam>3){ call,file="db5/lhcb4_as-built.seq";};
+
+
+Option, -echo,-warn,-info;
+
+!!Install HL-LHC
+call,file="slhc/hllhc_sequence.madx";
+
+!Install MBH
+mbh_rm_mcs=0; mbh_rm_mcdo=0; !=1 to remove spools
+mbh_ir2q8=0;mbh_ir2q10=0;  !=1 to install TCL and 11T dipoles
+mbh_ir7q8=1;mbh_ir7q10=1;
+mbh_ir1q8=0;mbh_ir1q9=0;mbh_ir1q10=0;
+mbh_ir5q8=0;mbh_ir5q9=0;mbh_ir5q10=0;
+call,file="db5/toolkit/install_mbh.madx";
+
+if (is_thin==0){ call,file="slhc/opt_round.madx"; };
+
+if (is_thin==1){ 
+
+exec, myslice; 
+call,file="slhc/opt_round_thin.madx"; 
+
+};
+
+
+exec,mk_beam(7000);
+exec,crossing_enable;
+
+if (mylhcbeam==1){ exec,check_ip(b1); survey,file="survey_lhcb1.tfs";};
+if (mylhcbeam==4){ exec,check_ip(b2); survey,file="survey_lhcb4.tfs";};
+
+set,    format="12.6f";
+
+if (mylhcbeam<3){
+
+ seqedit, sequence=lhcb1;
+   flatten;
+   cycle, start=LHCB1$START;
+ endedit;
+
+ if (fixcrabs == 1){
+   PRINT, TEXT="";
+   PRINT, TEXT="Installing Crab Cavity markers...";
+   !Note: Have to call them ip(something) or mt_(something) if they are to be exported to fort.2
+   ! Also have to create them as MARKER, since CRABCAVITY or RFMULTIPOLE does not work properly...
+   
+   !Element definitions:
+   ip.ACFCA.AR1.B1 : MARKER;
+   CC.ACFCA.AR1.B1 : CRABCAVITY, L=0.0, VOLT=2.9, LAG=0, FREQ=400.79; !Broken #1
+   ip.ACFCA.BR1.B1 : MARKER;
+   CC.ACFCA.BR1.B1 : RFMULTIPOLE, VOLT=2.9,LAG=0.0,FREQ=400.79,KNL={1.0}; !Broken #2
+   ip.ACFCA.CR1.B1 : MARKER;
+   ip.ACFCA.DR1.B1 : MARKER;
+   
+   ip.ACFCA.DL5.B1 : MARKER;
+   ip.ACFCA.CL5.B1 : MARKER;
+   ip.ACFCA.BL5.B1 : MARKER;
+   ip.ACFCA.AL5.B1 : MARKER;
+   
+   ip.ACFCA.AR5.B1 : MARKER;
+   ip.ACFCA.BR5.B1 : MARKER;
+   ip.ACFCA.CR5.B1 : MARKER;
+   ip.ACFCA.DR5.B1 : MARKER;
+   
+   ip.ACFCA.DL1.B1 : MARKER;
+   ip.ACFCA.CL1.B1 : MARKER;
+   ip.ACFCA.BL1.B1 : MARKER;
+   ip.ACFCA.AL1.B1 : MARKER;
+   seqedit, sequence=lhcb1;
+     !REPLACE, ELEMENT=ACFCA.AR1.B1, BY=ip.ACFCA.AR1.B1;   !<--- Just install a MARKER
+     REPLACE, ELEMENT=ACFCA.AR1.B1, BY=CC.ACFCA.AR1.B1;   !<--- Uncomment me to insert a CRABCAVITY
+     
+     !REPLACE, ELEMENT=ACFCA.BR1.B1, BY=ip.ACFCA.BR1.B1;   !<--- Just install a MARKER
+     !REPLACE, ELEMENT=ACFCA.BR1.B1, BY=CC.ACFCA.BR1.B1;   !<--- Uncomment me to insert a RFMULTIPOLE
+
+     REPLACE, ELEMENT=ACFCA.CR1.B1, BY=ip.ACFCA.CR1.B1;
+     REPLACE, ELEMENT=ACFCA.DR1.B1, BY=ip.ACFCA.DR1.B1;
+     
+     REPLACE, ELEMENT=ACFCA.DL5.B1, BY=ip.ACFCA.DL5.B1;
+     REPLACE, ELEMENT=ACFCA.CL5.B1, BY=ip.ACFCA.CL5.B1;
+     REPLACE, ELEMENT=ACFCA.BL5.B1, BY=ip.ACFCA.BL5.B1;
+     REPLACE, ELEMENT=ACFCA.AL5.B1, BY=ip.ACFCA.AL5.B1;
+     
+     REPLACE, ELEMENT=ACFCA.AR5.B1, BY=ip.ACFCA.AR5.B1;
+     REPLACE, ELEMENT=ACFCA.BR5.B1, BY=ip.ACFCA.BR5.B1;
+     REPLACE, ELEMENT=ACFCA.CR5.B1, BY=ip.ACFCA.CR5.B1;
+     REPLACE, ELEMENT=ACFCA.DR5.B1, BY=ip.ACFCA.DR5.B1;
+     
+     REPLACE, ELEMENT=ACFCA.DL1.B1, BY=ip.ACFCA.DL1.B1;
+     REPLACE, ELEMENT=ACFCA.CL1.B1, BY=ip.ACFCA.CL1.B1;
+     REPLACE, ELEMENT=ACFCA.BL1.B1, BY=ip.ACFCA.BL1.B1;
+     REPLACE, ELEMENT=ACFCA.AL1.B1, BY=ip.ACFCA.AL1.B1;
+   endedit;
+   PRINT, TEXT="Markers complete.";
+   PRINT, TEXT="";
+ };
+ 
+ use,sequence=lhcb1;
+ select, flag=twiss, clear;
+ select, flag=twiss, column=KEYWORD,NAME,S,L,X,Y,BETX,BETY,ALFX,ALFY,MUX,MUY,DX,DY,DPX,DPY,PX,PY;
+ twiss,  sequence=lhcb1, file=twiss_hllhc_b1.tfs; save;
+};
+
+
+if (mylhcbeam>3){
+
+ seqedit, sequence=lhcb2;
+   flatten;
+   cycle, start=LHCB2$START;
+ endedit;
+
+use,sequence=lhcb2;
+ select, flag=twiss, clear;
+ select, flag=twiss, column=KEYWORD,NAME,S,L,X,Y,BETX,BETY,ALFX,ALFY,MUX,MUY,DX,DY,DPX,DPY,PX,PY;
+twiss,  sequence=lhcb2, file=twiss_hllhc_b2.tfs; save;
+
+};
+
+if (is_thin==1){ sixtrack, radius=17E-03; };
+
+if (mylhcbeam<3 && fixcrabs==1){
+ print, text="Setting up crab cavities for fc.2...";
+ assign, echo="crabvoltages.txt",truncate;
+ exec,print_vcrab();
+ assign, echo=terminal;
+ !system, "./setupCCs.py";
+ print, text="Crab voltage fixing completed.";
+};
+
+
+system, "rm db5 slhc";

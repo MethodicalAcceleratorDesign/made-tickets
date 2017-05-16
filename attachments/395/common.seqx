@@ -1,0 +1,198 @@
+!#MADX
+!
+! Common variables, definitions, conventions.
+!
+! davide.gamba@cern.ch
+! 
+
+! DAVIDEG conventions:
+! 
+! All the lines start with a drift from last element of previous line
+!  and end with the last element of line (wherever it is possible)
+!
+! names are mainly like:
+!  <TWO LETTERS FOR LINE>.(|I|K|KD)<DEVICE NAME>(|scale)
+!
+! current values are always  
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!! CONSTANTS USED
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!! different kind of correctors have different kick response depending on energy of the beam
+!KC.CORRCALIB := 0.049  ; 
+KC.CORRCALIB := 0.049 *1.42 ; 
+
+!KD.CORRCALIB = 299.8*0.224*0.0098/7.;!=0.094   !Thory from A.Ghigo communication Io=7A Bo=9.8*10^-3T  Lo=0.224m
+!KD.CORRCALIB = 0.094*0.75;
+kd.corrcalib := 0.0705    ;
+
+ke.corrcalib := 0.07*0.49 ;
+
+!KF.CORRCALIB := 0.3244/3.335641 ; !TODO: verify which is correct
+kf.corrcalib := 0.091     ;
+
+
+
+
+!!!!!!!
+!! value used for the edge quadrupolar effects of main dipoles (where is used)
+!!
+
+bhe.hgap = 0.0225; !theory 
+bhe.fint = 0.561*1.8; !until 2016 default
+bhe.fint = 0.561*1.0; !
+bhe.fint = 0.561*1.2; !
+!
+ct.bhe.fint = 0.4; ! Piotr - July2016: it was like default 0.561*1.8
+
+bhf.hgap = 0.0225; !theory. 
+!bhf.hgap = 0.029; !fitted to TL1 data 2008, no quad scaling, bhscale=1
+!bhf.fint = 0.5;  !fitted to CR data to hgap 0.0225
+!bhf.fint = 1.05; !fits CR
+!bhf.fint = 0.65; !fits TL1
+!bhf.fint = 0.557;! G. Suberlucq, PS/PSR/Note 86-6 (1986) for a 500 MeV ?
+bhf.fint = 0.561*1.7; !until 2016 default
+bhf.fint = 0.561*1.6; !fits well PHSpPaint TL1 until wiggler
+! 
+cr.bhf.fint = 0.561*1.6; !fits well PHSpPaint TL1 until wiggler
+
+
+
+!!!!!!!
+!! different quadrupoles have different length
+
+! type 5.3 of EPA list
+! K max (350 MeV) = 5.0 - 5.8 @300
+cr.lqcr1 =   0.380;
+
+! type 4.8.1 of EPA list
+! K max (350 MeV) = 1.3
+cr.lqcr2 =   0.3585;
+
+! type 4.8.2 of EPA list
+! K max (350 MeV) = 3.1 - 3.6 @300
+cr.lqcr3 =   0.380;
+
+!type LURE ACO-S
+! quad J
+cr.lqj = 0.40;
+
+!type thin BINP
+! quad G
+cr.lqg = 0.30;
+
+!type linac LIL QN
+! quad F
+cr.lqf = 0.328;
+
+!type linac
+! quad H
+cr.lqh = 0.38;
+
+! tl2 type quads
+CC.LQL = 0.295;
+CC.LQH = 0.38;
+
+
+!!!!!!!
+!! different kind of quadrupoles have different k1 coefficients, depending on EN
+!!
+! ECQA = 0.2506 ! simona CTF3-Note-XXX
+! ECQAL = 0.126
+ECQA    := 0.25;             ! excitation constant dB/dx/I = 0.25 T/Am
+FQA     := CLIGHT*1E-6*ECQA; ! for old QS type, now QXA
+
+! ECQB = 0.2506 ! simona CTF3-Note-XXX
+! ECQBL = 0.224
+ECQB    := 0.25;             ! excitation constant dB/dx/I = 0.25 T/Am
+FQB     := CLIGHT*1E-6*ECQB; ! for old QL1 type, now QXB, air cooled
+
+! ECQC = 0.0555 ! simona CTF3-Note-XXX
+! ECQCL = 0.224
+ECQC    := 0.056;            ! excitation constant dB/dx/I = 0.056 T/Am
+FQC     := CLIGHT*1E-6*ECQC; ! for old QL2 type, now QXC, water cooled
+
+! ECQD = 0.056 ! simona CTF3-Note-XXX
+! ECQDL = 0.226
+ECQD    := 0.056;            ! excitation constant dB/dx/I = 0.056 T/Am
+FQD     := CLIGHT*1E-6*ECQD; ! for new QL3 type, QXD, water cooled
+
+!ECQE    := 0.0268;! 0.51 [T] /  50.[A] / 0.38 [m] 
+                  ! 0.38 is l used in the model, magn length is 0.357
+                  ! Corrected for the lengh from the EDMS doc no. 857744
+                  ! https://edms.cern.ch/file/857744/1/PS-PSR-Note_85-18_Mesures_magnetiques_du_quadripole_EPA_type_N_no.1.pdf
+                  ! Old value ECQE    := 0.03095;          ! 
+                  !
+! ECQE = 0.031 ! simona CTF3-Note-XXX
+! ECQEL = 0.380
+ECQE    := 0.03095;
+FQE     := CLIGHT*1E-6*ECQE; ! Large EPA
+
+! ECQF = 0.016 ! simona CTF3-Note-XXX
+! ECQFL = 0.328
+ECQF    := 0.016;            ! 
+FQF     := CLIGHT*1E-6*ECQF; ! QN ! Jun2016 0.975
+
+! ECQG = 0.041 ! simona CTF3-Note-XXX
+! ECQGL = 0.293
+ECQG    := 2.4/0.300/200;    ! GL[T]/L[m]/I[A]  From note AT-MTM-IN-2006-018
+FQG     := CLIGHT*1E-6*ECQG; ! New Slim
+
+! ECQH = 0.0359 ! simona CTF3-Note-XXX
+! ECQHL = 0.380
+ECQH    := 2.049/0.380/150;  ! GL[T]/L[m]/I[A]
+FQH     := CLIGHT*1E-6*ECQH; ! Wide EPA Terwilliger
+
+! ECQI = 0.0101 ! simona CTF3-Note-XXX
+! ECQIL = 0.3585
+ECQI    := 0.55/0.359/55;    ! GL[T]/L[m]/I[A]  !!! to be verified !!!
+FQI     := CLIGHT*1E-6*ECQI; ! Normal EPA
+
+! ECQJ = ? ! simona CTF3-Note-XXX
+! ECQJL = ?
+!  The length we use in the model is 0.4
+ECQJ    := (0.431/0.4) * 1.5957/0.431/200; ! GL[T]/L[m]/I[A]  From note AT-MTM-IN-2007-001  ; old values 3.2/0.400/450;
+FQJ     := CLIGHT*1E-6*ECQJ; ! S-ACO I
+
+
+!!!!!!!!!!
+! ECQL = ? ! simona CTF3-Note-XXX
+! ECQLL = ?
+! there is an issue with L type quadrupole that Piotr an Jack are trying to fix
+matchFQLFactor = 1.071; !skowron 1.06 - 1.07 fits 265 data
+ECQL    := 0.106;
+! Celcius  http://norma-db.web.cern.ch/cern_norma/magnet/idcard/?id=1863 ! Jack changed from 1*CLIGHT*1E-6*ECQL;
+FQL     :=  matchFQLFactor*CLIGHT*1E-6*ECQL; ! Large EPA
+!!!!!!!!!!
+
+
+!Sint = 6.556 T/m at 100A / EDMS no 555319  AT-MTM-IN-2005-004
+ECXA = 6.556 / 0.1 / 100;!
+FXA     := CLIGHT * 1E-6 *  ECXA;
+
+! Sint = 6.568 T/m at 100A /EDMS no 754421/ AT-MTM-IN-2006-032
+! Lmodel =0.1
+ECXI = 6.568 / 0.1 / 100;!== 0.658
+FXB     := CLIGHT * 1E-6 *  ECXI;
+
+ECXC = 0 / 1 / 1;!
+FXC     := CLIGHT * 1E-6 *  ECXC;!
+
+
+! maximum current of different quads?
+IAMAX:=10;
+IBMAX:=10;
+ICMAX:=100;
+IDMAX:=200;
+IEMAX:=150;
+IFMAX:=250;
+
+
+! useful constans used in the codes
+deg2rad   :=  0.0174532925;
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!! END OF CONSTANTS
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

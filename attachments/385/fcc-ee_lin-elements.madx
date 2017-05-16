@@ -1,0 +1,218 @@
+! ====================================================================
+! ELEMENT DEFINITIONS (V17a, linear lattice)
+! --------------------------------------------------------------------
+!  Definiton of basic lengths
+! --------------------------------------------------------------------
+    LB        = 10.0;
+    LQ        =  1.5;
+    LQIR1     =  0.75;
+    LQIR2     =  0.1;
+!    LS        =  0.5;
+    LCAV      =  1.0;
+!   LCOR      =  0.0;
+!   LBPM      =  0.2;
+! --------------------------------------------------------------------
+!  RF and Beam Instrumentation
+! --------------------------------------------------------------------
+	CAV1      :  RFCAVITY,   L:=LCAV,    VOLT:=VRF1,  HARMON=201000, LAG:=LGRF1;
+	CAV2      :  RFCAVITY,   L:=LCAV,    VOLT:=VRF2,  HARMON=201000, LAG:=LGRF2;
+    CAV3      :  RFCAVITY,   L:=LCAV,    VOLT:=VRF3,  HARMON=201000, LAG:=LGRF3;
+	CAVIR     :  RFCAVITY,   L:=LCAV,    VOLT:=VRFIR, HARMON=201000, LAG:=LGRFIR;
+!	BBPMH     :  HMONITOR,   L:=LBPM;
+!	BBPMV     :  VMONITOR,   L:=LBPM;
+!	MCH       :  HKICKER,    L:=LCOR;
+!	MCV       :  VKICKER,    L:=LCOR;
+! --------------------------------------------------------------------
+!  Bending magnets
+! --------------------------------------------------------------------
+	MB        :  SBEND,      L:=LB,      ANGLE:=THB;
+	MBDS11    :  SBEND,      L:=LB,      ANGLE:=THBDS11;
+	MBDS12    :  SBEND,      L:=LB,      ANGLE:=THBDS12;
+    MBDS21    :  SBEND,      L:=LB,      ANGLE:=THBDS21;
+    MBDS22    :  SBEND,      L:=LB,      ANGLE:=THBDS22;
+! --------------------------------------------------------------------
+!  Quadrupoles
+! --------------------------------------------------------------------
+! FODO cells
+    MQF1      :  QUADRUPOLE, L:=LQ/2,    K1:=K1QF1;
+    MQD1      :  QUADRUPOLE, L:=LQ/2,    K1:=K1QD1;
+    MQF2      :  QUADRUPOLE, L:=LQ/2,    K1:=K1QF2;
+    MQD2      :  QUADRUPOLE, L:=LQ/2,    K1:=K1QD2;
+    MQFSC1    :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFSC1;
+    MQDSC1    :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDSC1;
+    MQFSC2    :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFSC2;
+    MQDSC2    :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDSC2;
+    MQFSC3    :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFSC3;
+    MQDSC3    :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDSC3;
+    MQFSCIR   :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFSCIR;
+    MQDSCIR   :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDSCIR;
+! --------------------------------------------------------------------
+! Dispersion suppressor 1 (SARCs)
+    MQFDSL11  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFDSL11;
+    MQFDSL12  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFDSL12;
+    MQFDSR11  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFDSR11;
+    MQFDSR12  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFDSR12;
+    MQDDSL11  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDDSL11;
+    MQDDSL12  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDDSL12;
+    MQDDSR11  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDDSR11;
+    MQDDSR12  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDDSR12;
+! --------------------------------------------------------------------
+! Dispersion suppressor 2 (LARCs)
+    MQFDSL21  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFDSL21;
+    MQFDSL22  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFDSL22;
+    MQFDSR21  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFDSR21;
+    MQFDSR22  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFDSR22;
+    MQDDSL21  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDDSL21;
+    MQDDSL22  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDDSL22;
+    MQDDSR21  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDDSR21;
+    MQDDSR22  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDDSR22;
+! --------------------------------------------------------------------
+! Matching section 1 (LSS 2+5)
+    MQFMSL11  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSL11;
+    MQFMSL12  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSL12;
+    MQFMSL13  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSL13;
+    MQFMSR11  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSR11;
+    MQFMSR12  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSR12;
+    MQFMSR13  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSR13;
+    MQDMSL11  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSL11;
+    MQDMSL12  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSL12;
+    MQDMSL13  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSL13;
+    MQDMSR11  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSR11;
+    MQDMSR12  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSR12;
+    MQDMSR13  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSR13;
+! --------------------------------------------------------------------
+! Matching section 2 (ESS 1+2, tuning of the working point)
+    MQFMSL21  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSL21;
+    MQFMSL22  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSL22;
+    MQFMSL23  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSL23;
+    MQFMSR21  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSR21;
+    MQFMSR22  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSR22;
+    MQFMSR23  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSR23;
+    MQDMSL21  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSL21;
+    MQDMSL22  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSL22;
+    MQDMSL23  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSL23;
+    MQDMSR21  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSR21;
+    MQDMSR22  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSR22;
+    MQDMSR23  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSR23;
+! --------------------------------------------------------------------
+! Matching section 3 (LSS 3+6, anti-symmetric to MS 1!)
+    MQFMSL31  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSL31;
+    MQFMSL32  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSL32;
+    MQFMSL33  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSL33;
+    MQFMSR31  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSR31;
+    MQFMSR32  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSR32;
+    MQFMSR33  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSR33;
+    MQDMSL31  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSL31;
+    MQDMSL32  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSL32;
+    MQDMSL33  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSL33;
+    MQDMSR31  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSR31;
+    MQDMSR32  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSR32;
+    MQDMSR33  :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSR33;
+! --------------------------------------------------------------------
+! Matching section for LSS with interaction region
+    MQFMSLIR1 :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSLIR1;
+    MQFMSLIR2 :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSLIR2;
+    MQFMSLIR3 :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSLIR3;
+    MQDMSLIR1 :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSLIR1;
+    MQDMSLIR2 :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSLIR2;
+    MQDMSLIR3 :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSLIR3;
+    MQFMSRIR1 :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSRIR1;
+    MQFMSRIR2 :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSRIR2;
+    MQFMSRIR3 :  QUADRUPOLE, L:=LQ/2,    K1:=K1QFMSRIR3;
+    MQDMSRIR1 :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSRIR1;
+    MQDMSRIR2 :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSRIR2;
+    MQDMSRIR3 :  QUADRUPOLE, L:=LQ/2,    K1:=K1QDMSRIR3;
+! --------------------------------------------------------------------
+! Interaction region 1 (LEP-like mini-beta insertion)
+    MQFIRL11  :  QUADRUPOLE, L:=LQIR1/2, K1:=K1QFIRL11;
+    MQFIRL12  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QFIRL12;
+    MQFIRL13  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QFIRL13;
+    MQDIRL11  :  QUADRUPOLE, L:=LQIR1/2, K1:=K1QDIRL11;
+    MQDIRL12  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QDIRL12;
+    MQDIRL13  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QDIRL13;
+    MQFIRR11  :  QUADRUPOLE, L:=LQIR1/2, K1:=K1QFIRR11;
+    MQFIRR12  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QFIRR12;
+    MQFIRR13  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QFIRR13;
+    MQDIRR11  :  QUADRUPOLE, L:=LQIR1/2, K1:=K1QDIRR11;
+    MQDIRR12  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QDIRR12;
+    MQDIRR13  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QDIRR13;
+! --------------------------------------------------------------------
+! Interaction region 2 (LEP-like mini-beta insertion)
+    MQFIRL21  :  QUADRUPOLE, L:=LQIR1/2, K1:=K1QFIRL21;
+    MQFIRL22  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QFIRL22;
+    MQFIRL23  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QFIRL23;
+    MQDIRL21  :  QUADRUPOLE, L:=LQIR1/2, K1:=K1QDIRL21;
+    MQDIRL22  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QDIRL22;
+    MQDIRL23  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QDIRL23;
+    MQFIRR21  :  QUADRUPOLE, L:=LQIR1/2, K1:=K1QFIRR21;
+    MQFIRR22  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QFIRR22;
+    MQFIRR23  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QFIRR23;
+    MQDIRR21  :  QUADRUPOLE, L:=LQIR1/2, K1:=K1QDIRR21;
+    MQDIRR22  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QDIRR22;
+    MQDIRR23  :  QUADRUPOLE, L:=LQIR2,   K1:=K1QDIRR23;
+! --------------------------------------------------------------------
+!  Markers
+! --------------------------------------------------------------------
+    IP1L               :   marker;
+    IP1R               :   marker;
+    IP2L               :   marker;
+    IP2R               :   marker;
+    markQFLIR1         :   marker;
+    markQDLIR1         :   marker;
+    markQDRIR1         :   marker;
+    markQFRIR1         :   marker;
+    markQFLIR2         :   marker;
+    markQDLIR2         :   marker;
+    markQDRIR2         :   marker;
+    markQFRIR2         :   marker;
+! --------------------------------------------------------------------
+    Arc1               :   marker;
+    Arc23              :   marker;
+    Arc45              :   marker;
+    Arc6               :   marker;
+    Arc7               :   marker;
+    Arc89              :   marker;
+    Arc1011            :   marker;
+    Arc12              :   marker;
+    LSS1               :   marker;
+    LSS2               :   marker;
+    LSS3               :   marker;
+    LSS4               :   marker;
+    LSS5               :   marker;
+    LSS6               :   marker;
+    ESS1               :   marker;
+    ESS2               :   marker;
+! --------------------------------------------------------------------
+    Arc1.startfodos    :   marker;
+    Arc23.startfodos   :   marker;
+    Arc45.startfodos   :   marker;
+    Arc6.startfodos    :   marker;
+    Arc7.startfodos    :   marker;
+    Arc89.startfodos   :   marker;
+    Arc1011.startfodos :   marker;
+    Arc12.startfodos   :   marker;
+    Arc1.endfodos      :   marker;
+    Arc23.endfodos     :   marker;
+    Arc45.endfodos     :   marker;
+    Arc6.endfodos      :   marker;
+    Arc7.endfodos      :   marker;
+    Arc89.endfodos     :   marker;
+    Arc1011.endfodos   :   marker;
+    Arc12.endfodos     :   marker;
+    LSS1.startfodos    :   marker;
+    LSS2.startfodos    :   marker;
+    LSS3.startfodos    :   marker;
+    LSS4.startfodos    :   marker;
+    LSS5.startfodos    :   marker;
+    LSS6.startfodos    :   marker;
+    ESS1.startfodos    :   marker;
+    ESS2.startfodos    :   marker;
+    LSS1.endfodos      :   marker;
+    LSS2.endfodos      :   marker;
+    LSS3.endfodos      :   marker;
+    LSS4.endfodos      :   marker;
+    LSS5.endfodos      :   marker;
+    LSS6.endfodos      :   marker;
+    ESS1.endfodos      :   marker;
+    ESS2.endfodos      :   marker;
+! ====================================================================

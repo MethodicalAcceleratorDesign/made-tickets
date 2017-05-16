@@ -1,0 +1,15 @@
+! this file is to demonstrate the missing output in stren.out after running
+! a correct-command. To see this open a MAD-session and do call, file="job.madx";
+! and without closing the session open "stren.out". The output will be truncated.
+! The rest of the output appears after closing the MAD-session.
+
+call, file="/afs/cern.ch/eng/lhc/optics/V6.503/V6.5.seq";
+call, file="/afs/cern.ch/eng/lhc/optics/V6.503/V6.5.inj.str";
+
+beam, sequence=lhcb1, particle=proton, energy=450, kbunch=1, npart=1.15e11, bv=+1;
+use, sequence=lhcb1;
+
+twiss, table=my_twiss;
+
+correct, flag=ring, mode=svd, plane=x, orbit=my_twiss, resout=1;
+

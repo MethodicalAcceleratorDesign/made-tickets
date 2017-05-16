@@ -1,0 +1,8 @@
+use,period=super_cell_seq;
+seqedit, sequence=super_cell_seq;	flatten;	endedit;
+use,period=super_cell_seq;
+
+seqedit, sequence=super_cell_seq;
+	install,element=SY1,class=SSY1, at := Q3->L/2+0.2+SY1->L/2    , from=Q3[1];
+	install,element=SY5,class=SSY1, at := Q3->L/2+0.2+SY1->L/2    , from=Q3[5];
+endedit;

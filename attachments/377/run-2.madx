@@ -1,0 +1,37 @@
+option,echo,info,warn; !,-no_fatal_stop;
+call,file="cell.madx";
+
+beam,particle=positron,energy=175,radiate=false;
+
+set,format="22.15g";
+select,flag=twiss,clear;
+select,flag=twiss,COLUMN=S,NAME,keyword,L,BETX,BETY,ALFX,ALFY,MUX,MUY,DX,DPX,ANGLE,E1,E2,K1L;
+
+use,sequence=cell_seq;
+tb=1e-3;
+twiss,file="twiss-1.tfs";
+value,tb;
+value,M.B1->ANGLE,M.B1->E1,M.B1->E2;
+value,B1->ANGLE,B1->E1,B1->E2;
+show, b1, m.b1;
+PLOT, TABLE=TWISS,TITLE="Cell", HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,COLOUR=100;
+
+use,sequence=cell_seq;
+tb=2e-3;
+twiss,file="twiss-2.tfs";
+value,tb;
+value,M.B1->ANGLE,M.B1->E1,M.B1->E2;
+value,B1->ANGLE,B1->E1,B1->E2;
+show, b1, m.b1;
+PLOT, TABLE=TWISS,TITLE="Cell", HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,COLOUR=100,INTERPOLATE;
+
+use,sequence=cell_seq;
+tb=3e-3;
+twiss,file="twiss-3.tfs";
+value,tb;
+value,M.B1->ANGLE,M.B1->E1,M.B1->E2;
+value,B1->ANGLE,B1->E1,B1->E2;
+show, b1, m.b1;
+PLOT, TABLE=TWISS,TITLE="Cell", HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,COLOUR=100;
+
+stop;

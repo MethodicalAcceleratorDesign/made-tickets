@@ -1,0 +1,14 @@
+OPTION, -ECHO, -WARN, INFO;
+CALL, FILE="/afs/cern.ch/eng/lhc/optics/V6.503/V6.5.seq";
+CALL, FILE="/afs/cern.ch/eng/lhc/optics/V6.503/V6.5.inj.str";
+OPTION, ECHO, -WARN, -INFO, -VERIFY;
+
+BEAM, SEQUENCE=LHCB1, PARTICLE=PROTON, PC=450;
+
+use, SEQUENCE=LHCB1;
+
+! segfaults:
+seterr;
+
+STOP;
+

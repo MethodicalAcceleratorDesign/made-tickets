@@ -1,0 +1,41 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with MadX
+!   Derived from aug15h.txt 
+amu:=0.931494320;
+beam,particle=ion,mass=12*amu,charge=6,pc=11.42;
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20,
+        post=1,font=-4,lwidth=5;
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=20,
+        post=2,font=-4,lwidth=10;
+
+!-- Define  lattice for scanner
+HANG:=0.05;
+VANG:=0.1;
+BH1: SBEND, L=0.4, ANGLE:=HANG;
+BH2: SBEND, L=0.4, ANGLE:=-HANG;
+BV1: SBEND, L=0.4, TILT=PI/2, ANGLE:=VANG;
+BV2: SBEND, L=0.4, TILT=PI/2, ANGLE:=-VANG;
+D1: DRIFT, L=1.25;
+SCAN: LINE=(BH1,BV1,BH2,BV2,D1);
+ALFX := 0.0;
+ALFY := 0.0;
+BETX := 2;
+BETY := 1;
+
+!-- Survey scanner
+title,"Lattice for scanner - oct05h";
+use,period=scan;
+survey,file="oct05h.srv";
+
+!-- Calculate and plot orbit functions
+use,period=scan;
+select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,x,px, 
+bety,alfy,muy,dy,dpy,y,py,t,pt,alfa; 
+system,"erase oct05h_twiss.lis"; 
+system,"erase twiss.lis";
+twiss,rmatrix,betx=betx,bety=bety,table,file="twiss.lis"; 
+plot,file="oct05h",haxis=s,vaxis1=betx,bety,vaxis2=dx,dy,colour=100,interpolate, 
+noversion;
+system,"copy twiss.lis oct05h.lis";
+
+stop;

@@ -1,0 +1,113 @@
+/***********************************************************
+ * test_sbend.madx
+ *
+ * Call this program by: >madx < test_sbend.madx
+ *
+ ***********************************************************/
+
+
+/***********************************************************
+ * Element definitions
+ ***********************************************************/
+ option, RBARC=FALSE;  ! the length of a rectangular magnet
+                       ! is the distance between the polefaces
+                       ! and not the arc length
+angle = 0.1;
+!dipole  : SBEND,     L=2, ANGLE=1, K1=0.04, FINT=0.6, HGAP=.09, E1=-0.1, E2=-0.1;
+!dipole  : SBEND,     L=2, ANGLE=1, K1=0.04;
+ dipole  : SBEND,     L=1, ANGLE=angle, E1=angle/2, E2=angle/2; ! TILT=pi/2,
+
+/***********************************************************
+ * sequence definition
+ ***********************************************************/
+ seq    : SEQUENCE   , L  =  10.0;
+ dipole              , at =   5.0;
+ ENDSEQUENCE;
+
+
+/***********************************************************
+ * Initial parameters
+ ***********************************************************/
+
+BETX0  :=  1.0;
+ALFX0  :=  0.0;
+MUX0   :=  0.0;
+BETY0  :=  1.0;
+ALFY0  :=  0.0;
+MUY0   :=  0.0;
+X0     :=  0.0;
+PX0    :=  0.0;
+Y0     :=  0.0;
+PY0    :=  0.0;
+T0     :=  0.0;
+PT0    :=  0.0;
+DX0    :=  0.0;
+DPX0   :=  0.0;
+DY0    :=  0.0;
+DPY0   :=  0.0;
+
+
+
+/***********************************************************
+ * Twiss
+ ***********************************************************/
+beam; use, sequence=seq;
+
+set,  format="9.5f"; ! the format of numbers in the twiss output file
+
+select, flag=twiss, clear;
+select, flag=twiss,column=name, s, l, x, px, alfx, betx, dx, y, py, alfy, bety, dy;
+twiss , centre ,
+      , BETX   = BETX0,    ALFX = ALFX0,   MUX  = MUX0
+      , X      = X0   ,    PX   = PX0
+      , DX     = DX0  ,    DPX  = DPX0
+      , BETY   = BETY0,    ALFY = ALFY0,   MUY  = MUY0
+      , Y      = Y0   ,    PY   = PY0
+      , DY     = DY0  ,    DPY  = DPY0
+      , DELTAP = PSHIFT
+      , file=optics.out;
+
+
+
+/***********************************************************
+ ***********************************************************
+ * survey
+ ***********************************************************
+ ***********************************************************/
+ a1=0;
+ sur1 : macro={
+        use, sequence=seq;
+        select, flag=survey,clear;
+        select, flag=survey, column=name,s,l,z,x,y;
+        survey, z0=0, x0=0, y0=0
+              , theta0:=a1
+              , file="survey_L_1.sur";
+              }
+ exec, sur1; ! NB: The result of the survey is in the file: "survey_L_1.sur"
+
+
+
+/***********************************************************
+ * Element definitions
+ ***********************************************************/
+ dipole  : SBEND,     L=1, ANGLE=0.1;
+
+
+/***********************************************************
+ ***********************************************************
+ * survey
+ ***********************************************************
+ ***********************************************************/
+ a1=0;
+ sur7 : macro={
+        use, sequence=seq;
+        select, flag=survey,clear;
+        select, flag=survey, column=name,s,l,z,x,y;
+        survey, z0=0, x0=0, y0=0
+              , theta0:=a1
+              , file="survey_L_7.sur";
+              }
+ exec, sur7; ! NB: The result of the survey is in the file: "survey_L_7.sur"
+
+
+STOP;

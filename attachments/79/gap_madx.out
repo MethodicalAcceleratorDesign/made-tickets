@@ -1,0 +1,54 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %09s "TEST_LINE"
+@ PARTICLE         %06s "PROTON"
+@ MASS             %le      0.938272
+@ CHARGE           %le      1.000000
+@ ENERGY           %le      0.941000
+@ PC               %le      0.071600
+@ GAMMA            %le      1.002907
+@ KBUNCH           %le      1.000000
+@ BCURRENT         %le      0.000000
+@ SIGE             %le      0.000000
+@ SIGT             %le      0.000000
+@ NPART            %le      0.000000
+@ EX               %le      1.000000
+@ EY               %le      1.000000
+@ ET               %le      1.000000
+@ LENGTH           %le      0.300670
+@ ALFA             %le      0.000000
+@ ORBIT5           %le     -0.000000
+@ GAMMATR          %le      0.000000
+@ Q1               %le      0.043476
+@ Q2               %le      0.044876
+@ DQ1              %le      0.000000
+@ DQ2              %le      0.000000
+@ DXMAX            %le      4.222535
+@ DYMAX            %le      0.000000
+@ XCOMAX           %le      0.000000
+@ YCOMAX           %le      0.000000
+@ BETXMAX          %le      1.302615
+@ BETYMAX          %le      1.144525
+@ XCORMS           %le      0.000000
+@ YCORMS           %le      0.000000
+@ DXRMS            %le      2.437881
+@ DYRMS            %le      0.000000
+@ DELTAP           %le      0.000000
+@ SYNCH_1          %le      0.000000
+@ SYNCH_2          %le      0.000000
+@ SYNCH_3          %le      0.000000
+@ SYNCH_4          %le      0.000000
+@ SYNCH_5          %le      0.000000
+@ TITLE            %08s "no-title"
+@ ORIGIN           %20s "MAD-X 5.00.00 Darwin"
+@ DATE             %08s "17/08/11"
+@ TIME             %08s "16.42.18"
+* NAME                          S         BETX         ALFX         BETY         ALFY           DX          DPX 
+$ %s                          %le          %le          %le          %le          %le          %le          %le 
+ "TEST_LINE$START"       0.000000     1.000000     0.000000     1.000000     0.000000     0.000000     0.000000
+ "DR0"                   0.100000     1.010000    -0.100000     1.010000    -0.100000     0.000000     0.000000
+ "GAP"                   0.100000     1.010000    -0.605000     1.010000    -0.605000     0.000000     0.000000
+ "DR0"                   0.200000     1.144525    -0.740250     1.144525    -0.740250     0.000000     0.000000
+ "BEND"                  0.300670     1.302615    -0.872804     1.117108     0.990513    -4.222535   -86.168320
+ "TEST_LINE$END"         0.300670     1.302615    -0.872804     1.117108     0.990513    -4.222535   -86.168320
+

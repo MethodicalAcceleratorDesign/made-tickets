@@ -1,0 +1,135 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with MadX
+!   Derived from jun10i.txt in 2006
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20,
+        post=1,font=-4,lwidth=5;
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=20,
+        post=2,font=-4,lwidth=10;
+
+!-- Define triplet lattice for gantry
+option,rbarc=false;
+BF: RBEND, L=0.4, ANGLE:=FANG, K1:=FK1;
+BD: RBEND, L=0.4, ANGLE:=DANG, K1:=DK1;
+RF: RBEND, L=0.4, ANGLE:=-FANG, K1:=FK1;
+RD: RBEND, L=0.4, ANGLE:=-DANG, K1:=DK1;
+DF: RBEND, L=0.4, ANGLE:=FANG/2, K1:=FK1;
+DD: RBEND, L=0.4, ANGLE:=DANG/2, K1:=DK1;
+BF0: QUADRUPOLE, L=0.4, K1:=FK1;
+BD0: QUADRUPOLE, L=0.4, K1:=DK1;
+D1: DRIFT, L=0.06;
+COL: ECOLLIMATOR, XSIZE=0.1, YSIZE=0.1;
+MARK: MARKER;
+QF: QUADRUPOLE, L=0.100000037761, K1:=QFK1;
+QD: QUADRUPOLE, L=0.102870968475, K1:=QDK1;
+D1I: DRIFT, L=0.05;
+D3I: DRIFT, L=0.050009708435;
+D4I: DRIFT, L=0.0;
+MID: MARKER;
+D3: DRIFT, L=4.963444;
+CELL: LINE=(bf,d1,bd,d1);
+RCELL: LINE=(rf,d1,rd,d1);
+DCELL: LINE=(df,d1,dd,d1);
+QCELL: LINE=(bf0,d1,bd0,d1);
+INS: LINE=(D3I,QF,D1I,QD);
+!GANTRY: LINE=(DTRI,D2,DCELL,D2,-DTRI,8*CELL,MID,QTRI,D2,QCELL,D2,-QTRI,18*RCELL,RDTRI,D2,RDCELL,D2,RDTRI);
+GANTRY: LINE=(2*DCELL,3*CELL,2*QCELL,10*RCELL);
+INS2: LINE=(INS,-INS);
+PERIODL := 0.92;
+PERIODN := 24.0;
+FANG := PI/(PERIODN);
+DANG := FANG;
+FK1 := 5;
+DK1 := -5;
+QX := 0.190184157474;
+QY := 0.096976707038;
+QS := 0.0;
+QX' := -0.163247945453;
+QY' := -0.18393605486;
+ALFX := 0.0;
+ALFY := 0.193989082742E-15;
+BETX := 0.734826363803;
+BETY := 0.734826363798;
+X0 := 0.0;
+PX0 := 0.0;
+Y0 := 0.0;
+PY0 := 0.0;
+T0 := 0.0;
+PT0 := 0.0;
+QFK1 := 26.948730866925;
+QDK1 := -21.917714109902;
+BETA := 0.734826363802;
+
+title,"FODO lattice for gantry - jun10m";
+beam,ex=3.6692e-6,ey=3.6692e-6,sige=0.03;
+
+!-- Check geometry
+ring: line=(24*cell);
+use,period=ring;
+survey,file="jun10m.ring.srv.lis";
+use,period=gantry;
+survey,table,file="jun10m.gantry.srv.lis";
+plot,table=survey,file="jun10m",haxis=z,vaxis=x,interpolate,noversion;
+
+stop;
+
+!-- Match CELL
+use,period=cell;
+match,sequence=cell; 
+vary,name=fk1,step=0.001,lower=0,upper=100;
+vary,name=dk1,step=0.001,lower=-100,upper=0;
+constraint,range=#e,mux=0.25,muy=0.25;
+lmdif,calls=100,tolerance=1e-20; 
+endmatch; 
+
+!-- Analyse matching result
+select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,x,px, 
+bety,alfy,muy,dy,dpy,y,py,t,pt,alfa; 
+system,"erase jun10m_cell.lis"; 
+savebeta,label=atc,place=#s,sequence=cell;
+twiss,rmatrix,table,file="jun10m.lis"; 
+title," "; 
+plot,file="jun10m",haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,interpolate, 
+noversion,notitle;
+use,period=gantry;
+twiss,rmatrix,table,file="twiss.lis",
+ betx=atc->betx,bety=atc->bety,alfx=atc->alfx,alfy=atc->alfy; 
+system,"copy /y jun10m.lis+twiss.lis jun10m.lis";
+title," "; 
+plot,file="jun10m",haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,interpolate, 
+noversion,notitle,noline;
+plot,file="jun10m",haxis=s,vaxis=dx,interpolate,noversion,notitle,noline;
+system,"erase twiss.lis";
+use,period=dcell;
+twiss,rmatrix,table,file="twiss.lis"; 
+system,"copy /y jun10m.lis+twiss.lis jun10m.lis";
+title," "; 
+plot,file="jun10m",haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,interpolate, 
+noversion,notitle;
+system,"erase twiss.lis";
+use,period=qcell;
+twiss,rmatrix,table,file="twiss.lis"; 
+system,"copy /y jun10m.lis+twiss.lis jun10m.lis";
+title," "; 
+plot,file="jun10m",haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,interpolate, 
+noversion,notitle;
+
+!-- Compute fields and gradients
+value,fang,dang;
+amu:=0.931494320;
+value,amu;
+beam,particle=ion,mass=12*amu,charge=6,pc=11.42;
+use,period=cell;
+value,beam->energy,beam->mass,beam->charge;               
+kinE:=beam->energy-beam->mass;
+emu:=(beam->energy-beam->mass)*amu/beam->mass;
+brho:=beam->pc*1e9/clight/beam->charge;
+value,kinE,emu,brho;
+fieldD=bd->angle*brho/bd->l;
+fieldF=bf->angle*brho/bf->l;
+gradF=bf->k1*brho;
+gradD=bd->k1*brho;
+value,fieldF,fieldD,gradF,gradD;
+value,beam->beta,beam->gamma,beam->beta*beam->gamma;
+value,bf->k1,bd->k1,d2->l;
+
+stop;

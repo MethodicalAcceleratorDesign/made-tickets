@@ -1,0 +1,41 @@
+bt1: sequence, l = 34.25049868;
+bt1.bvt10, at = 3.00237697;
+bt1.bpm00, at = 3.86469685;
+bt1.dhz10, at = 4.46647097;
+bt1.vvs10, at = 4.72824272;
+bt1.smv10, at = 6.87260278;
+bt2.btv10, at = 7.47311682;
+bt.vpg11, at = 8.15312038;
+bt2.bpm10, at = 8.80312379;
+bt1.qno10, at = 9.37313320;
+bt2.vvs30, at = 10.80424579;
+bt1.qno20, at = 11.37328451;
+bt.vgp21, at = 13.51887255;
+bt.vgr21, at = 13.51887255;
+bt.vpi22, at = 13.51887255;
+bt.vpi22a, at = 13.51887255;
+bt1.kfa10, at = 14.72339768;
+bt.btv20, at = 15.91090721;
+bt2.bvt20, at = 16.62419760;
+bt2.bpm20, at = 17.46500060;
+bt2.dvt40, at = 18.93032995;
+bt.vpi23, at = 20.08440341;
+bt2.smv20, at = 20.88781362;
+bt2.btv30, at = 21.47329124;
+bt2.qno30, at = 22.30428792;
+bt.bpm30, at = 25.76484508;
+bt.bct10, at = 26.32685331;
+bt.dvt50, at = 26.91586193;
+bt.vgp23, at = 27.90807647;
+bt.vpg22, at = 27.90807647;
+bt2.kfa20, at = 29.68439488;
+bt.btv40, at = 30.87189868;
+bt.dvt60, at = 31.23939868;
+bt.qno40, at = 31.72939868;
+bt.bpm40, at = 32.30689868;
+bt.qno50, at = 33.09939868;
+bt1.end, at = 34.25049868;
+endsequence;
+! BT1 sequence, automatically generated from BT1.madx file 
+! Sequence starts at the exit flange of the PSB extraction septum
+! Sequence ends at the entry flange of BT.BHZ10

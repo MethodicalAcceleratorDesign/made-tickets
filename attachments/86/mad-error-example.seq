@@ -1,0 +1,51 @@
+option, -echo;
+
+circum = 1000.0;
+
+nCell = 20;
+lFodo = circum / nCell;
+
+nDipoles = 40;
+
+//  Multipole strengths
+alpha = 2* pi /nDipoles; 
+k1L := 0.03;
+k1F:= +k1L; 
+k1D:= -k1L;
+k2LH := 0.025 / nCell;
+k2LV := -0.025 / nCell;
+
+// Element definitions
+bend: multipole, knl := {alpha};
+qFhalf: multipole, knl := {0, k1F/2};
+qF: multipole, knl := {0, k1F};
+qD: multipole, knl := {0, k1D};
+sexH: multipole, knl:={0, 0, k2LH};
+sexV: multipole, knl:={0, 0, k2LV};
+
+BPM: Monitor, L = 0.1;
+kickH: HKicker, L = 0.1;
+kickV: VKicker, L = 0.1;
+
+Fodo: sequence, refer=centre, l = lFodo;
+    qf: qf, at=0;
+      BPM: BPM, at=1.6, from=qf;
+      kickh: kickh, at=1.7, from=qf;
+      sexH: sexh, at=2.0, from=qf;
+      bend: bend, at:=lFodo/4, from=qf;
+    qD: qD, at= lFodo/2;
+      BPM: BPM, at=1.6, from=qD;
+      kickv: kickv, at=1.7, from=qD;
+      sexH: sexh, at=2.0, from=qD;
+      bend: bend, at:=lFodo/4, from=qD;
+endsequence;
+    
+// Whole Ring, made off nCell Fodo cells
+testring: sequence, refer=centre, l=circum;
+  n = 0;
+  while (n < nCell){
+    Fodo, at=n*lFodo;
+  
+    n = n + 1;
+  }
+endsequence;

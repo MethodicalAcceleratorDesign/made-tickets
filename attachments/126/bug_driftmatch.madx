@@ -1,0 +1,40 @@
+ld=1;
+
+d: drift, l:=ld;
+
+ll: line=(d);
+
+beam;
+use, period=ll;
+
+match, use_macro;
+
+! vary, name=tl.bendangle,  step:=1e-1;
+
+ vary, name=ld,  step:=1e-1, lower=0.2;
+
+ ma1: macro =
+  {
+    use, period=ll;
+    
+    twiss, rmatrix, betx= 1, 
+                    bety= 1, 
+	alfx= 0, 
+	alfy= 0;
+
+	
+    value, ld, table(twiss, ll$end, betx);
+    print, text="=====================";
+    
+
+   };
+
+  constraint, weight=1e6,  expr= ld> 0.21;
+  
+  constraint, weight=1e2, expr=table(twiss, ll$end, betx) = 10;
+  constraint, weight=1e2, expr=table(twiss, ll$end, bety) = 10;
+  
+  lmdif,    tolerance:=1e-24, calls:=100;
+
+
+endmatch;

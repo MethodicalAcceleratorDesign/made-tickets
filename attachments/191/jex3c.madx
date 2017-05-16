@@ -1,0 +1,63 @@
+TITLE, 'JUAS2008 third example';
+
+circum=1000.0;
+ncell = 20; // Number of cells
+lcell = circum/ncell;
+lq = 3.00; // Length of a quadrupole
+
+// element definitions;
+
+// define bending magnet as multipole
+// we have 4 bending magnets per cell
+mb: multipole,knl={2.0*pi/(4*ncell)};
+
+kqf0 =  0.30e-2*lq;
+kqd0 = -0.30e-2*lq;
+kqf =  kqf0;       
+kqd =  kqd0;       
+// define quadrupoles as multipoles
+qf: multipole,knl:={0,kqf};
+qd: multipole,knl:={0,kqd};
+
+// sequence declaration;
+cascell1: sequence, refer=centre, l=circum;
+start_machine: marker, at = 0;
+!
+   n = 1;
+   while (n < ncell+1) {
+   qf: qf,   at=(n-1)*lcell;                   
+   mb: mb,   at=(n-1)*lcell+0.15*lcell;
+   mb: mb,   at=(n-1)*lcell+0.35*lcell;
+   qd: qd,   at=(n-1)*lcell+0.50*lcell;
+   mb: mb,   at=(n-1)*lcell+0.65*lcell;
+   mb: mb,   at=(n-1)*lcell+0.85*lcell;
+!
+   n = n + 1;
+}
+end_machine: marker at=circum;            
+endsequence;
+option,warn,-thin_foc;
+
+Beam, particle = proton, sequence=cascell1, energy =  20.0;
+
+use, sequence=cascell1;
+select,flag=twiss,column=name,s,x,y,mux,betx,muy,bety,dx,dy;
+
+mvar1 := sqrt((table(twiss,betx)*table(twiss,betx)) + (table(twiss,bety)*table(twiss,bety)));
+select,flag=twiss,clear;
+select,flag=twiss,column=name,s,betx,muy,bety,dx,dy,mvar1;
+twiss,save,centre,deltap=0.0,file=twiss1.out;
+plot, haxis=s, vaxis=betx,bety,mvar1, colour=100;
+
+match, sequence=cascell1;
+   vary,name=kqf, step=0.00001;
+   vary,name=kqd, step=0.00001;
+   constraint,sequence=cascell1, range=qf, mvar1<100;
+   constraint,sequence=cascell1, range=qd, mvar1<100;
+   Lmdif, calls=100, tolerance=1.0e-21;
+endmatch;
+
+select,flag=twiss,column=name,s,betx,muy,bety,dx,dy;
+twiss,save,centre,deltap=0.0,file=twiss2.out;
+plot, haxis=s, vaxis=betx,bety, colour=100;
+

@@ -1,0 +1,233 @@
+// Elettra nominal Optics 
+
+circum=259.2; // define the total length
+ncell = 12; // define number of cells 
+lcell = circum/ncell;
+
+
+//circum=lcell;
+
+
+//  magnets strengths
+kqf =  2.23;
+kqd = -1.43;
+kq1 =  -1.943;
+kq2 =  2.22279;
+kq3 =  -1.26178;
+
+ksf = 0; //8.65;
+ksd = 0;//-7.72;
+ks1 = 0;// 2.4;
+
+// magnets lengths
+
+lbe=1.44;
+l13=0.26;
+l2=0.498;
+lqd=0.26;
+lqf=0.409;
+ls1=0.116;
+lsfd=0.23;
+lcv=0.2;
+
+lbe1=0.525;
+lbs =0.39 ;
+lbe2=0.525;
+
+
+// low alpha
+/*
+  kq1=  0.;
+  kq2=  1.614;
+  kq3= -1.1912; 
+  kqf=  0.95;
+  kqd=  1.695;
+*/
+/*1.72 gets negative momentum compaction in this case 
+              LAG deve essere negative to be long. stable and so to get  an emittance 
+*/
+
+
+kb1=-0.4;
+kb2=-0.65;
+
+
+// element definition  
+nbslices=2;
+// beter to slice in many bends for precise emittance calculation
+b : rbend, l:=lbe/nbslices, angle=2.0*pi/(2*ncell*nbslices),  k1=-0.42969037; // for double bend structures
+// make sbend for thinslices?
+
+// insertion for super bend  sb che fara 3 tesla angolo 10 gradi invece gli altri avrano 0.55 T but more quadrupole 
+
+b1: rbend,l=lbe1/nbslices,angle=2.5*pi/(180*nbslices),k1:=kb1;
+bs: rbend,l=lbs/nbslices, angle=10*pi/(180*nbslices),k1=0;
+b2: rbend,l=lbe2/nbslices,angle=2.5*pi/(180*nbslices),K1:=kb2;
+
+
+
+
+q1:quadrupole,  k1:=kq1, l:=l13;
+q2:quadrupole,  k1:=kq2, l:=l2 ;
+q3:quadrupole,  k1:=kq3, l:=l13;
+qf:quadrupole,  k1:=kqf, l:=lqf;
+qd:quadrupole,  k1:=kqd, l:=lqd;
+
+SF: sextupole,  k2:=ksf, l:=lsfd; 
+SD: sextupole,  k2:=ksd, l:=lsfd;
+S1: sextupole,  k2:=ks1, l:=ls1;
+
+d1:drift;
+
+  m1: marker;
+  m2: marker;
+  m3: marker;
+
+// RFC: RFCAVITY,L=0.3, VOLT=2.6, HARMON=432, Lag=0.3;
+RFC: marker;
+
+  bpm:monitor;
+  chv:kicker,l:=lcv;
+
+
+
+// sequence declaration;
+elettra: sequence,refer=centre, l=circum;
+   n = 1;
+
+   m1 : m1,  at=(n-1)*lcell; 
+   chv:chv,  at=(n-1)*lcell+1.722+lcv/2;
+   bpm: bpm, at=(n-1)*lcell+2.292;                   
+   q1: q1,   at=(n-1)*lcell+2.361+l13/2;                 
+   s1: s1,   at=(n-1)*lcell+2.844+ls1/2;                    
+   q2: q2,   at=(n-1)*lcell+3.243+l2/2;
+  bpm: bpm,  at=(n-1)*lcell+3.857;
+   q3: q3,   at=(n-1)*lcell+3.992+l13/2;
+  bpm: bpm,  at=(n-1)*lcell+4.367;
+  chv:chv,   at=(n-1)*lcell+4.422+lcv/2;
+
+i=1;
+while(i<=nbslices)
+{
+    b:b,     at=(n-1)*lcell+4.759 +(2*i-1)*lbe/(2*nbslices);
+i=i+1;
+} 
+  
+   qf: qf,   at=(n-1)*lcell+6.687+lqf/2;
+  bpm: bpm,  at=(n-1)*lcell+7.211;
+   sf: sf,   at=(n-1)*lcell+7.356+lsfd/2;
+  chv:chv,   at=(n-1)*lcell+7.726+lcv/2;
+  chv:chv,   at=(n-1)*lcell+9.1+lcv/2;
+   sd: sd,   at=(n-1)*lcell+9.43+lsfd/2;
+   qd: qd,    at=(n-1)*lcell+9.915+lqd/2;
+  bpm: bpm,  at=(n-1)*lcell+10.29;
+   sd: sd,   at=(n-1)*lcell+10.43+lsfd/2;
+
+  RFC:rfc,   at=(n-1)*lcell+11.3;
+
+  chv:chv,   at=(n-1)*lcell+12.164+lcv/2;
+   sf: sf,   at=(n-1)*lcell+12.504+lsfd/2;
+  bpm: bpm,  at=(n-1)*lcell+12.879;
+   qf: qf,   at=(n-1)*lcell+12.995+lqf/2;
+  chv:chv,   at=(n-1)*lcell+13.514+lcv/2;
+
+i=1;
+while(i<=nbslices)
+{
+    b:b,     at=(n-1)*lcell+13.876 +(2*i-1)*lbe/(2*nbslices);
+i=i+1;
+}
+
+/*
+
+i=1;
+while(i<=nbslices)
+{
+    b1:b1,     at=(n-1)*lcell+13.876 +(2*i-1)*lbe1/(2*nbslices);
+i=i+1;
+}
+
+i=1;
+while(i<=nbslices)
+{
+    bs:bs,     at=(n-1)*lcell+14.401 +(2*i-1)*lbs/(2*nbslices);
+i=i+1;
+}
+
+i=1;
+while(i<=nbslices)
+{
+    b2:b2,     at=(n-1)*lcell+14.791 +(2*i-1)*lbe2/(2*nbslices);
+i=i+1;
+}
+*/
+
+   q3: q3,   at=(n-1)*lcell+15.839+l13/2;
+  bpm: bpm,  at=(n-1)*lcell+16.234;
+   q2: q2,   at=(n-1)*lcell+16.35+l2/2;
+   s1: s1,   at=(n-1)*lcell+17.131+ls1/2;
+   q1: q1,   at=(n-1)*lcell+17.47+l13/2;
+  bpm: bpm,  at=(n-1)*lcell+17.85;
+  chv:chv,   at=(n-1)*lcell+18.22+lcv/2; 
+
+ 
+ 
+ n = n + 1;
+ 
+
+
+  while (n <= ncell) 
+{
+   m1 : m1,  at=(n-1)*lcell; 
+   chv:chv,  at=(n-1)*lcell+1.722+lcv/2;
+   bpm: bpm, at=(n-1)*lcell+2.292;                   
+   q1: q1,   at=(n-1)*lcell+2.361+l13/2;                 
+   s1: s1,   at=(n-1)*lcell+2.844+ls1/2;                    
+   q2: q2,   at=(n-1)*lcell+3.243+l2/2;
+  bpm: bpm,  at=(n-1)*lcell+3.857;
+   q3: q3,   at=(n-1)*lcell+3.992+l13/2;
+  bpm: bpm,  at=(n-1)*lcell+4.367;
+  chv:chv,   at=(n-1)*lcell+4.422+lcv/2;
+i=1;
+while(i<=nbslices)
+{
+    b:b,     at=(n-1)*lcell+4.759 +(2*i-1)*lbe/(2*nbslices);
+i=i+1;
+} 
+  
+   qf: qf,   at=(n-1)*lcell+6.687+lqf/2;
+  bpm: bpm,  at=(n-1)*lcell+7.211;
+   sf: sf,   at=(n-1)*lcell+7.356+lsfd/2;
+  chv:chv,   at=(n-1)*lcell+7.726+lcv/2;
+  chv:chv,   at=(n-1)*lcell+9.1+lcv/2;
+   sd: sd,   at=(n-1)*lcell+9.43+lsfd/2;
+   qd: qd,    at=(n-1)*lcell+9.915+lqd/2;
+  bpm: bpm,  at=(n-1)*lcell+10.29;
+   sd: sd,   at=(n-1)*lcell+10.43+lsfd/2;
+  chv:chv,   at=(n-1)*lcell+12.164+lcv/2;
+   sf: sf,   at=(n-1)*lcell+12.504+lsfd/2;
+  bpm: bpm,  at=(n-1)*lcell+12.879;
+   qf: qf,   at=(n-1)*lcell+12.995+lqf/2;
+  chv:chv,   at=(n-1)*lcell+13.514+lcv/2;
+i=1;
+while(i<=nbslices)
+{
+    b:b,     at=(n-1)*lcell+13.876 +(2*i-1)*lbe/(2*nbslices);
+i=i+1;
+}
+   q3: q3,   at=(n-1)*lcell+15.839+l13/2;
+  bpm: bpm,  at=(n-1)*lcell+16.234;
+   q2: q2,   at=(n-1)*lcell+16.35+l2/2;
+   s1: s1,   at=(n-1)*lcell+17.131+ls1/2;
+   q1: q1,   at=(n-1)*lcell+17.47+l13/2;
+  bpm: bpm,  at=(n-1)*lcell+17.85;
+  chv:chv,   at=(n-1)*lcell+18.22+lcv/2; 
+      
+  n = n + 1;
+       }
+
+
+
+
+endsequence;
+

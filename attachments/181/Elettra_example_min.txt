@@ -1,0 +1,90 @@
+TITLE, s='MAD-X test';
+
+option, echo=true, warn,info, no_fatal_stop;
+assign,echo=echo_elettra.txt;
+
+
+Beam, sequence=Elettra,particle = electron, energy = 2.0,radiate=true, ET=0.002,
+     sige= 7e-4,sigt=0.0053, Ex=7e-9 , Ey=7e-11;
+
+option, RBARC=FALSE;
+
+// Read input file with machine description
+call file="Elettra_lattice_min.txt";
+
+// Define the beam for the machine etc
+
+
+
+use, period=Elettra; 
+select, flag=makethin, class=quadrupole, slice=5; 
+select, flag=makethin, class=rbend, slice=10; 
+select, flag=makethin, class=sextupole, slice=5;
+
+makethin,sequence=Elettra;
+
+
+
+// Use the sequence with the name: elettra
+use, period=Elettra; 
+
+
+
+select,flag=twiss,column=name,s,x,y,mux,betx,muy,bety,dx,dy;
+
+twiss,save,centre,file=twiss_out.txt;
+
+
+EMIT,DELTAP=0.0;
+
+
+match,sequence=Elettra;
+GLOBAL,sequence=elettra,Q1=14.3,Q2=8.2,dq1=0.,dq2=0.;
+vary,name=kq2,step=5.0e-3;
+vary,name=kq1,step=5.0e-3;
+vary, name=ksf, step=0.1;
+vary, name=ksd, step=0.1;
+lmdif,calls=5000,tolerance=1.e-10;
+endmatch;
+
+
+// Execute the Twiss command to calculate the Twiss parameters
+// Compute at the centre of the element and write to: twiss1.out
+
+//use,period=Elettra;
+
+twiss,save,centre,file=twiss1_out.txt;
+EMIT,DELTAP=0.0;
+
+
+track,onepass,deltap=0.0,dump,damp ;
+
+
+start,x=0.00010,y=-0.00010,pt=0.0002;
+dynap,fastune,turns=1024,lyapunov=1.e-7;
+
+endtrack;
+
+! print out results 
+
+value,table(dynaptune,tunx),table(dynaptune,tuny),table(dynaptune,dtune);
+value,table(dynap,dynapfrac),table(dynap,lyapunov),table(dynap,smear);
+
+
+
+write,table=dynap,file=dynap0_elettra.txt;
+write,table=dynaptune,file=dynaptune0_elettra.txt;
+
+
+! ********** Plot 
+
+// Plot the horizontal and vertical beta function between the
+// 1th and 2th occurence of a defocussing quadrupole
+plot, haxis=s, vaxis=x, betx, bety,colour=100,
+     range=m1[1]/m1[6];
+plot, haxis=s, vaxis=dx, colour=100,
+      range=m1[1]/m1[6];
+
+
+
+return;

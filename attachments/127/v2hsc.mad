@@ -1,0 +1,19 @@
+TITLE "V2hsc";
+
+BEAM;
+
+betyin := 3.0; 
+
+call, file = elements.def;
+call, file = t2.str;
+call, file = x22.def;
+call, file = x2hsc.seq;
+call, file = v2.str;  //this also changes the required quads of V2 
+//call, file = v2-twiss.mad;  //this also changes the required quads of V2 
+USE, sequence = v2hsc;
+SELECT, flag = twiss,clear;
+SELECT, flag = twiss, column = name, keyword, s, l, betx, bety, alfx, alfy, dx, dpx,mux, muy, dy, dpy, k1l, k2l;
+TWISS, save, file = "v2hs.twiss", betx = 3, alfx = 0, dx = 0, dpx = 0, bety = 3., alfy = 0, dy = 0, dpy = 0;
+//stop;
+
+

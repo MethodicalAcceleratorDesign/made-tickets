@@ -1,0 +1,35 @@
+! test file for debugging the calculation of chromatic functions.
+
+
+Title, "test for chromatic functions";
+
+IP: MARKER;
+D1: DRIFT, L=1;
+D2: DRIFT, L=2;
+QD1: QUADRUPOLE, L=1, K1=-.7;
+QF1: QUADRUPOLE, L=1, K1=.5;
+SF1: SEXTUPOLE, L=.5, K2=0.001;
+SD1: SEXTUPOLE, L=.5, K2=-.001;
+
+TST1: LINE=(IP, D2, QD1, SD1, D1, QF1, SF1, D2);
+
+Beam, particle=positron, energy=1.; 
+
+Use, sequence=TST1;
+
+Select, flag=twiss, column=name, s, betx, bety, alfx, alfy, mux, muy, wx, wy, phix, phiy;
+
+Twiss, betx=1, alfx=0, bety=1, alfy=0, chrom, deltap=0., file=twiss1;
+
+Plot, table=twiss, haxis=s, vaxis1=betx,bety, vaxis2=wx, wy, 
+      colour=100, noversion, interpolate;
+
+Twiss, betx=1, alfx=0, bety=1, alfy=0, chrom, deltap=1.e-6, file=twiss2;
+
+Plot, table=twiss, haxis=s, vaxis1=betx,bety, vaxis2=wx, wy, 
+      colour=100, noversion, interpolate;
+
+stop;
+
+
+

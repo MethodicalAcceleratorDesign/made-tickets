@@ -1,0 +1,268 @@
+!-- This job should be run with madX
+!   July 5, 2011 It is a translation of the PTC file for the GANTRY 
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20, 
+        post=1,font=-4,lwidth=5;
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=16, 
+        post=1,font=-4,lwidth=10;
+
+!-- Define lattice for the gantry
+title,"Gantry for the Carbon/Proton Therapy July-2011";
+ beam;  
+ periodN:=30;
+
+ BRHO=5.2893118512; ! THIS IS TO ACCOMODATE dp/p= +25% -10%
+
+ 	LBD= 0.08;
+ 	LBF = 0.17;
+	RATIO=0.18;
+
+! TRIPLET LENGTHS:
+
+	LQTR1=0.30;
+	LQTR2=0.50;
+	LQTR3=0.20;
+
+	LQTR1H=LQTR1/2.0;
+	LQTR2H=LQTR2/2.0;
+	LQTR3H=LQTR3/2.0;
+
+! 72 Degrees one module:
+	dang=(2.0*PI/5.0)/(8.0*(2.0+RATIO));  
+	fang=dang*RATIO;
+
+!	TRIPLET ANGLES:
+	ANGTR1=(2.0*PI/20.0)/(2.0+RATIO);
+	ANGTR2=ANGDTR*RATIO;
+        ANGTR3=ANGTR1;
+
+	ANGTR1H=ANGTR1/2.0;	
+	ANGTR2H=ANGTR2/2.0;	
+	ANGTR3H=ANGTR3/2.0;
+
+
+!	Bending Field in the triplets:
+	BYTR1 = ANGTR1*BRHO/LQTR1;
+	BYTR2 = ANGTR2*BRHO/LQTR2;
+	BYTR3 = ANGTR3*BRHO/LQTR3;
+
+	R1=LBD/dang;
+!			WRITE(6,*) "BYTR1=  ",BYTR1
+!			WRITE(6,*) "BYTR2=  ",BYTR2
+
+!	Bending fileds for the gantry magnets:
+
+		BYD=dang*BRHO/LBD;
+		BYF=fang*BRHO/LBF;
+
+!	K's IN THE GANTRY CELLS:
+
+	KBF=215.473159520434/BRHO;
+ 	KBD=-171.542146650333/BRHO;
+
+ 	KBF1=212.73315/BRHO;
+ 	KBD1=-179.26001/BRHO;
+ 	KBF2=214.65003/BRHO;
+ 	KBD2=-173.54338/BRHO;
+ 	KBF3=216.80477/BRHO;
+ 	KBD3=-171.04239/BRHO;
+ 	KBF4=220.02993/BRHO;
+ 	KBD4=-178.47697/BRHO;
+ 	KBD5=-182.89069/BRHO;
+
+!	TRIPLET GRADIENTS K1
+
+	KFP1=13.541438/BRHO;		
+	KDP2=-6.0640541/BRHO;		
+	KFP3=10.922330/BRHO;
+	
+	D1:	DRIFT, l=0.080;
+	D2:	DRIFT, l=0.080;
+	D3:	DRIFT, l=0.050; !This is actually 10 cm as there are two
+	D5:     DRIFT, l=0.290;
+
+	D44: DRIFT, l=0.68394584;	
+	D33: DRIFT, l=0.40868132;
+	D22: DRIFT, l=0.28463501;
+	D32: DRIFT, l=0.10;
+
+	BSC1: KICKER, L=0.2,HKICK=-0.00001;
+	BSC2: KICKER, L=0.2,HKICK=0.000001;
+
+!       TRIPLETs above the patient (if it is used):
+
+	QP1_ENT: SBEND, l=LQTR1H,ANGLE=ANGTR1/2.0,K1=KFP1;
+	QP1_EXI: SBEND, l=LQTR1H,ANGLE=ANGTR1/2.0,K1=KFP1;
+
+	QP2_ENT: SBEND, l=LQTR2H,ANGLE=ANGTR2/2.0, K1=KDP2;
+	QP2_EXI: SBEND, l=LQTR2H,ANGLE=ANGTR2/2.0, K1=KDP2;
+
+	QP3_ENT: SBEND, l=LQTR3H,ANGLE=ANGTR2/2.0, K1=KFP3;
+	QP3_EXI: SBEND, l=LQTR3H,ANGLE=ANGTR3/2.0, K1=KFP3;
+
+! All defocusing combined function magnets in the cell
+
+	BD: SBEND,      l=LBD,     ANGLE=dang,     k1=KBD;
+
+	BD1_ENT: SBEND, l=LBD/2.0D0,ANGLE=dang/2.0,k1=KBD1;
+	BD1_EXI: SBEND, l=LBD/2.0D0,ANGLE=dang/2.0,k1=KBD1;
+
+	BED1_ENT: SBEND,l=LBD/2.0D0,ANGLE=-dang/2.0,k1=KBD1;
+	BED1_EXI: SBEND,l=LBD/2.0D0,ANGLE=-dang/2.0,k1=KBD1;
+
+	BD2_ENT: SBEND, l=LBD/2.0,ANGLE=dang/2.0, k1=KBD2;
+	BD2_EXI: SBEND, l=LBD/2.0,ANGLE=dang/2.0, k1=KBD2;
+
+	BED2_ENT: SBEND,l=LBD/2.0,ANGLE=-dang/2.0, k1=KBD2;
+	BED2_EXI: SBEND,l=LBD/2.0,ANGLE=-dang/2.0, k1=KBD2;
+
+	BD3_ENT: SBEND, l=LBD/2.0,ANGLE=dang/2.0, k1=KBD3;
+	BD3_EXI: SBEND, l=LBD/2.0,ANGLE=dang/2.0, k1=KBD3;
+
+	BED3_ENT: SBEND,l=LBD/2.0,ANGLE=-dang/2.0, k1=KBD3;
+	BED3_EXI: SBEND,l=LBD/2.0,ANGLE=-dang/2.0, k1=KBD3;
+
+	BD4_ENT: SBEND, l=LBD/2.0,ANGLE=dang/2.0, k1=KBD4;
+	BD4_EXI: SBEND, l=LBD/2.0,ANGLE=dang/2.0, k1=KBD4;
+
+	BED4_ENT: SBEND,l=LBD/2.0,ANGLE=-dang/2.0, k1=KBD4;
+	BED4_EXI: SBEND,l=LBD/2.0,ANGLE=-dang/2.0, k1=KBD4;
+
+	BD5_ENT: SBEND, l=LBD/2.0,ANGLE=dang/2.0, k1=KBD5;
+	BD5_EXI: SBEND, l=LBD/2.0,ANGLE=dang/2.0, k1=KBD5;
+
+	BED5_ENT: SBEND,l=LBD/2.0,ANGLE=-dang/2.0, k1=KBD5;
+	BED5_EXI: SBEND,l=LBD/2.0,ANGLE=-dang/2.0, k1=KBD5;
+
+
+! ALl focusing combined function mangnets in the cells:
+
+	BF: SBEND,      l=LBF,     ANGLE=fang,     k1=KBF;
+
+	BF1_ENT: SBEND, l=LBF/2.0, ANGLE=fang/2.0, k1=KBF1;
+	BF1_EXI: SBEND, l=LBF/2.0, ANGLE=fang/2.0, k1=KBF1;
+
+	BEF1_ENT: SBEND, l=LBF/2.0, ANGLE=-fang/2.0, k1=KBF1;
+	BEF1_EXI: SBEND, l=LBF/2.0, ANGLE=-fang/2.0, k1=KBF1;
+
+	BF2_ENT: SBEND, l=LBF/2.0, ANGLE=fang/2.0, k1=KBF2;
+	BF2_EXI: SBEND, l=LBF/2.0, ANGLE=fang/2.0, k1=KBF2;
+
+	BEF2_ENT: SBEND, l=LBF/2.0, ANGLE=-fang/2.0, k1=KBF2;
+	BEF2_EXI: SBEND, l=LBF/2.0, ANGLE=-fang/2.0, k1=KBF2;
+
+	BF3_ENT: SBEND, l=LBF/2.0, ANGLE=fang/2.0, k1=KBF3;
+	BF3_EXI: SBEND, l=LBF/2.0, ANGLE=fang/2.0, k1=KBF3;
+
+	BEF3_ENT: SBEND, l=LBF/2.0, ANGLE=-fang/2.0, k1=KBF3;
+	BEF3_EXI: SBEND, l=LBF/2.0, ANGLE=-fang/2.0, k1=KBF3;
+
+	BF4_ENT: SBEND, l=LBF/2.0, ANGLE=fang/2.0, k1=KBF4;
+	BF4_EXI: SBEND, l=LBF/2.0, ANGLE=fang/2.0, k1=KBF4;
+
+	BEF4_ENT: SBEND, l=LBF/2.0, ANGLE=-fang/2.0, k1=KBF4;
+	BEF4_EXI: SBEND, l=LBF/2.0, ANGLE=-fang/2.0, k1=KBF4;
+
+ 
+     CELLH:	LINE=(D3,BD1_ENT,BD1_EXI,D2,BF1_ENT,BF1_EXI,D2,BD2_ENT,BD2_EXI,D3,&
+        D3,BD2_ENT,BD2_EXI,D2,BF2_ENT,BF2_EXI,D2,BD3_ENT,BD3_EXI,D3,&
+        D3,BD3_ENT,BD3_EXI,D2,BF3_ENT,BF3_EXI,D2,BD4_ENT,BD4_EXI,D3,&
+	D3,BD4_ENT,BD4_EXI,D2,BF4_ENT,BF4_EXI,D2,BD5_ENT,BD5_EXI,D3,&
+	D3,BD5_ENT,BD5_EXI,D2,BF4_ENT,BF4_EXI,D2,BD4_ENT,BD4_EXI,D3,&
+	D3,BD4_ENT,BD4_EXI,D2,BF3_ENT,BF3_EXI,D2,BD3_ENT,BD3_EXI,D3,&
+        D3,BD3_ENT,BD3_EXI,D2,BF2_ENT,BF2_EXI,D2,BD2_ENT,BD2_EXI,D3,&
+        D3,BD2_ENT,BD2_EXI,D2,BF1_ENT,BF1_EXI,D2,BD1_ENT,BD1_EXI,D3);
+
+	 CELLA:	LINE=(D3,BED1_ENT,BED1_EXI,D2,BEF1_ENT,BEF1_EXI,D2,BED2_ENT,BED2_EXI,D3,&
+        D3,BED2_ENT,BED2_EXI,D2,BEF2_ENT,BEF2_EXI,D2,BED3_ENT,BED3_EXI,D3,&
+        D3,BED3_ENT,BED3_EXI,D2,BEF3_ENT,BEF3_EXI,D2,BED4_ENT,BED4_EXI,D3,&
+	D3,BED4_ENT,BED4_EXI,D2,BEF4_ENT,BEF4_EXI,D2,BED5_ENT,BED5_EXI,D3,&
+	D3,BED5_ENT,BED5_EXI,D2,BEF4_ENT,BEF4_EXI,D2,BED4_ENT,BED4_EXI,D3,&
+	D3,BED4_ENT,BED4_EXI,D2,BEF3_ENT,BEF3_EXI,D2,BED3_ENT,BED3_EXI,D3,&
+        D3,BED3_ENT,BED3_EXI,D2,BEF2_ENT,BEF2_EXI,D2,BED2_ENT,BED2_EXI,D3,&
+        D3,BED2_ENT,BED2_EXI,D2,BEF1_ENT,BEF1_EXI,D2,BED1_ENT,BED1_EXI,D3);
+
+
+	CELLP:	LINE=(D3,BSC1,D32,QP1_ENT,QP1_EXI,D22,QP2_ENT,QP2_EXI,D33,QP3_ENT,QP3_EXI,D44);
+
+	CELL:	LINE=(CELLH,CELLH,CELLP);
+
+	use,PERIOD=CELL;
+
+	BX0=0.210862;
+        BY0=0.948304;
+	DX0=0.0160;
+
+	INITIAL:BETA0, BETX=BX0,ALFX=0.0,MUX=0.0,BETY=BY0,ALFY=0.0,DX=DX0,DPX=0.0;
+
+stop;
+
+	system,"erase Gantry_July5-6p10pm_twiss.lis";
+	system,"erase July5_2011_ptc.lis";
+	system,"erase madx.ps";
+	select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,x,px,bety,alfy,muy,dy,dpy,y,py,t,pt;
+      twiss,table,BETX=BX0,BETY=BY0,DX=DX0,file="Gantry_July5-11p0pm_twiss.lis";
+	plot,file="July5_2011",table=twiss,haxis=s,vaxis1=rbetx,rbety,vaxis2=dx,colour=100,interpolate,noversion;
+	survey,file="July5_2011-SURVEY.lis";
+	plot,table=survey,haxis=x,vaxis=z,interpolate,noversion;
+
+	system,"erase tmp.lis";
+	twiss,table,BETX=BX0,BETY=BY0,DX=DX0,deltap=-0.10:0.25:0.05,file="tmp.lis";
+	plot,table=summ,haxis=deltap,vaxis=q1,q2,colour=100,interpolate,noversion;
+	plot,table=summ,haxis=deltap,vaxis1=betxmax,betymax,vaxis2=dxmax,colour=100,
+	interpolate,noversion;
+	plot,table=summ,haxis=deltap,vaxis=xcomax,colour=100,interpolate,noversion;
+	system,"type tmp.lis >> July5_2011_twiss.lis";
+	system,"del "summ.lis";
+	write,table=summ,file="July5_2011_summ.lis";
+
+!-- Use twiss to get tables for all values of dpp
+	dpp=-0.10;
+	while(dpp<=0.25)
+{
+	system,"del tmp.lis";
+	twiss,table,BETX=BX0,BETY=BY0,DX=DX0,deltap=dpp,file="tmp.lis";
+	system,"type tmp.lis >> July5_2011_twiss.lis";
+	!plot,table=twiss,haxis=s,vaxis=x,noversion;
+	!plot,table=twiss,haxis=s,vaxis=x,noversion,interpolate;
+	dpp=dpp+0.05;
+}
+
+!-- Use ptc_twiss
+	system,"erase July5_2011_ptc.lis";
+	ptc_create_universe; 
+	ptc_create_layout,model=2,method=6,nst=30,exact; 
+	select,flag=ptc_twiss,column=name,s,beta11,alfa11,mu1,disp1,
+	beta22,alfa22,mu2,disp2,x,px,y,py,t,pt; 
+	ptc_twiss,BETX=BX0,BETY=BY0,DX=DX0,icase=5,file="July5_2011_ptc.lis"; 
+	ptc_end;
+
+	dpp=-0.10;
+	while(dpp <= 0.25)
+{
+	system,"del ptc.lis";
+	ptc_create_universe; 
+	ptc_create_layout,model=2,method=6,nst=30,exact; 
+	select,flag=ptc_twiss,column=name,s,beta11,alfa11,mu1,disp1,
+ 	beta22,alfa12,mu2,disp2,x,px,y,py,t,pt; 
+	ptc_twiss,BETX=BX0,BETY=BY0,DX=DX0,icase=5,deltap=dpp,file="ptc.lis"; 
+	ptc_end;
+	system,"copy /y July5_2011_ptc.lis+ptc.lis July5_2011_ptc.lis"; 
+	dpp=dpp+0.05;
+}
+
+!-- Compute fields and gradients
+	beam,particle=proton,pc=0.76133984484;
+	use,period=cell;
+	kinE:=beam->energy-beam->mass;
+	emu:=(beam->energy-beam->mass)*amu/beam->mass;
+	brho:=beam->pc*1e9/clight/beam->charge;
+	fieldBF:=bf->angle*brho/bf->l;
+	fieldBD:=bd->angle*brho/bd->l;
+
+	value,beam->energy,beam->mass,beam->charge;               
+	value,kinE,emu,brho;
+	value,fieldBF,fieldBD;
+	value,beam->beta,beam->gamma,beam->beta*beam->gamma;
+	value,brho/fieldBF,brho/fieldBD;
+
+stop;

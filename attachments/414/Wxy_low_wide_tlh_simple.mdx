@@ -1,0 +1,111 @@
+// file:  WXY_low_wide_tlh_simple.MDX
+// MADX test:  apochromatic corrections using (WX, WY) functions
+// Authors:  John Acosta and Terry Hart
+// Date:  Jan. 12, 2017
+
+//
+// At Windows command prompt, run this program with
+// > madx-win32-gnu.exe < wxy_low_wide_tlh_simple.mdx 
+//
+
+// positive muon, p in GeV/c, pc in GeV
+BEAM,PARTICLE=POSMUON,PC=0.400;
+
+lQ0=0.07;
+lQ1=0.049;
+lQ2=0.045;
+lD=0.024;
+lD1=0.024;
+lRF=0.157;
+lQca=0.056;
+
+d0=lQca/2+lRF;                  //CQa
+d1=d0+lQca/2+lRF+lQca/2;        //CQb
+d2=d1+lQca/2+lRF+lQ0/2;         //Q0
+d3=d2+lQ0/2+lD+lQ1/2;           //Q1
+d4=d3+lQ1/2+lD1+lQ2/2;          //Q2
+d5=d4+lQ2/2+0.021;              //centre
+d6=d5+lQ2/2+0.021;              //Q2
+d7=d6+lQ2/2+lD1+lQ1/2;          //Q1
+d8=d7+lQ1/2+lD+lQ0/2;           //Q0
+d9=d8+lQ0/2+lRF+lQca/2;         //CQb
+d10=d9+lQca/2+lRF+lQca/2;       //CQa
+d11=d10+lQca/2+lRF;             //end
+
+pcm=400; // pc in MeV
+
+CQa: RBEND,L=lQca,ANGLE=0.02669*(299.792458/pcm),K1=-11.9621*(299.792458/pcm); // 17.7195*(299.792458/pcm);
+CQb: RBEND,L=lQca,ANGLE=-0.02669*(299.792458/pcm),K1=-65.1181*(299.792458/pcm); // -88.8950*(299.792458/pcm);
+
+Q0: QUADRUPOLE,L=lQ0,K1=222.3498*(299.792458/pcm); //224.479*(299.792458/pcm);
+Q1: RBEND,L=lQ1,ANGLE=0.080055*(299.792458/pcm),K1=-391.6670*(299.792458/pcm); // -463.892*(299.792458/pcm);
+Q2: QUADRUPOLE,L=lQ2,K1=42.5800*(299.792458/pcm); // 0.1*319.129*(299.792458/pcm);
+
+BEGINNING:   MARKER,AT=0;
+MIDDLEa:  MARKER,AT=d5-0.015;
+MIDDLE:   MARKER,AT=d5;
+MIDDLEb:  MARKER,AT=d5+0.015;
+END:     MARKER,AT=d11;
+
+FULL_CELL: SEQUENCE,REFER=ENRTY,L=d11;
+   BEGINNING,   AT=0;
+   CQa:  CQa, AT=d0;
+   CQb:  CQb, AT=d1;
+   Q0:  Q0, AT=d2;
+   Q1:  Q1, AT=d3;
+   Q2:  Q2, AT=d4;
+   MIDDLEa,   AT=d5-0.015;
+   MIDDLE,   AT=d5;
+   MIDDLEb,   AT=d5+0.015;
+   Q2:  Q2, AT=d6;
+   Q1:  Q1, AT=d7;
+   Q0:  Q0, AT=d8;
+   CQb:  CQb, AT=d9;
+   CQa:  CQa, AT=d10;
+   END,   AT=d11;
+ENDSEQUENCE;  
+
+USE, PERIOD=FULL_CELL;
+SURVEY, FILE=survey.test;
+
+TWISS,CHROM,SAVE,BETX=0.4300415154,BETY=1.853596478,ALFX=0,ALFY=0,WX=20.29475625,WY=4.412233508,DX=0.005292590412;
+
+PLOT, NOVERSION=true, HAXIS=S, HMIN=d5-0.015, HMAX=d5+0.015, VAXIS1=BETX,BETY, VMIN=0.0,-0.01 VMAX=0.10,0.01, VAXIS2=DX, COLOUR=100, INTERPOLATE=TRUE,SYMBOL=2, TITLE="unmatched beta functions";
+PLOT, NOVERSION=true, HAXIS=S, HMIN=0.0, HMAX=d11, VAXIS1=BETX,BETY, VMIN=0.0,-0.02 VMAX=5.0,0.02, VAXIS2=DX, COLOUR=100, INTERPOLATE=TRUE, TITLE="unmatched beta functions";
+PLOT, NOVERSION=true, HAXIS=S, HMIN=0, HMAX=d11, VAXIS1=WX,WY, VMIN=-25.0, VMAX=25.0, COLOUR=100, INTERPOLATE=TRUE, TITLE="WX, WY, unmatched lattice";
+PLOT, NOVERSION=true, HAXIS=S, HMIN=0, HMAX=d11, VAXIS1=MUX,MUY, VMIN=0.0, VMAX=1.0, COLOUR=100, INTERPOLATE=TRUE, TITLE="MUX, MUY, unmatched lattice";
+
+MATCH,CHROM,SEQUENCE=FULL_CELL;  // need CHROM for chromatic functions (WX, WY, PHIX, PHIY, ...)
+
+  VARY,NAME=Q0->K1,STEP=0.0001;
+  VARY,NAME=Q1->K1,STEP=0.0001;
+  VARY,NAME=Q2->K1,STEP=0.1;
+  VARY,NAME=CQa->K1,STEP=0.0001;
+  VARY,NAME=CQb->K1,STEP=0.0001;
+  VARY,NAME=Q1->ANGLE,STEP=0.0001;
+  VARY,NAME=CQa->ANGLE,STEP=0.0001;
+  VARY,NAME=CQb->ANGLE,STEP=0.0001;
+  
+  CONSTRAINT,SEQUENCE=FULL_CELL,RANGE=MIDDLE,BETX<0.5; // constrain at cell center MIDDLE
+  CONSTRAINT,SEQUENCE=FULL_CELL,RANGE=MIDDLE,BETY<2.0;  // constrain at cell center MIDDLE
+  CONSTRAINT,SEQUENCE=FULL_CELL,RANGE=MIDDLE,DX=0.006; // constrain at cell center MIDDLE
+  CONSTRAINT,SEQUENCE=FULL_CELL,RANGE=BEGINNING,DX<0.010; // constrain at cell start LIH_0
+  CONSTRAINT,SEQUENCE=FULL_CELL,RANGE=BEGINNING,WX<20;    // constrain at cell start LIH_0
+  CONSTRAINT,SEQUENCE=FULL_CELL,RANGE=BEGINNING,WY<5;     // constrain at cell start LIH_0
+  CONSTRAINT,SEQUENCE=FULL_CELL,RANGE=MIDDLE,WX<2;     // constrain at cell center MIDDLE   
+  CONSTRAINT,SEQUENCE=FULL_CELL,RANGE=MIDDLE,WY<4;     // constrain at cell center MIDDLE
+
+  LMDIF,CALLS=200000,TOLERANCE=1E-15; //LMDIF is default.
+ENDMATCH;
+
+//SELECT,FLAG=SECTORMAP,clear;
+SELECT,FLAG=TWISS,column=name,s,betx,bety,alfx,alfy,wx,wy,dx,phix,phiy;
+TWISS,CHROM,file=optics.dat;
+
+SETPLOT,FONT=-5,LWIDTH=12.,XSIZE=1.4;
+
+PLOT, NOVERSION=true, HAXIS=S, HMIN=0.0, HMAX=d11, VAXIS1=BETX,BETY, VMIN=0.0,-0.02 VMAX=5.0,0.02, VAXIS2=DX, COLOUR=100, INTERPOLATE=TRUE, TITLE="matched beta functions";
+PLOT, NOVERSION=true, HAXIS=S, HMIN=d5-0.015, HMAX=d5+0.015, VAXIS1=BETX,BETY, VMIN=0.0,-0.01 VMAX=0.05,0.01, VAXIS2=DX, COLOUR=100, INTERPOLATE=TRUE,SYMBOL=2, TITLE="matched beta functions";
+PLOT, NOVERSION=true, HAXIS=S, HMIN=0, HMAX=d11, VAXIS1=WX,WY, VMIN=-25.0, VMAX=25.0, COLOUR=100, INTERPOLATE=TRUE, TITLE="Plot WX, WY, matched lattice";
+PLOT, NOVERSION=true, HAXIS=S, HMIN=0, HMAX=d11, VAXIS1=PHIX,PHIY, VMIN=0.0, VMAX=2.0, COLOUR=100, INTERPOLATE=TRUE, TITLE="Plot PHIX, PHIY, matched lattice";
+PLOT, NOVERSION=true, HAXIS=S, HMIN=0, HMAX=d11, VAXIS1=MUX,MUY, VMIN=0.0, VMAX=1.0, COLOUR=100, INTERPOLATE=TRUE, TITLE="Plot MUX, MUY, matched lattice";

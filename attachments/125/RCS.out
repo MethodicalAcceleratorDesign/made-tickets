@@ -1,0 +1,54 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +         MAD-X 5.00.11 (32 bit)          +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 12.01.2012      +
+  + Execution Time Stamp: 01.02.12 11.39.19 +
+  +++++++++++++++++++++++++++++++++++++++++++
+OPTION,ECHO;
+
+++++++++++++++ unknown command 'option', skipped in parser version! <Temporary file created by runMAD at: {2011, 5, 11, 22, 8, 33.030573}> ;
+
+OPTION,ECHO;
+
+++++++++++++++ unknown command 'option', skipped in parser version! <Element Definition FODO cell> ;
+
+MK: MARKER,L=0;
+
+MKB: MARKER,L=0;
+
+MQF: QUADRUPOLE,L=0.3, K1:=KQF;
+
+MQD: QUADRUPOLE,L=0.3, K1:=KQD;
+
+MB: SBEND,L=1.5, ANGLE=0.20943951023931953, E1=0.10471975511965977, E2=0.10471975511965977;
+
+MBH: SBEND,L=1.5, ANGLE=0.10471975511965977, E1=0.05235987755982988, E2=0.05235987755982988;
+
+
+
+ kqf = 0.8618840001;
+
+ kqd = -0.714253;
+
+ OPTION,ECHO;
+
+++++++++++++++ unknown command 'option', skipped in parser version! </Element Definition FODO cell> ;
+
+OPTION,ECHO;
+
+++++++++++++++ unknown command 'option', skipped in parser version! <Initial values scaled> ;
+
+!CALL, FILE=RCSquad.str;
+
+OPTION,ECHO;
+
+++++++++++++++ unknown command 'option', skipped in parser version! </Initial values scaled> ;
+
+BEAM,SEQUENCE=RCS,PARTICLE=PROTON,ENERGY=2.93827;
+
+++++++++++++++ unknown command 'beam', skipped in parser version!CALL, FILE=RCSf.seq;
+
+call, file = RCSf.seq;
+
++=+=+= fatal: cannot open input file: rcsf.seq

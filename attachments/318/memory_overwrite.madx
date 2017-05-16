@@ -1,0 +1,625 @@
+
+/*******************************************************************************
+ *******************************************************************************
+ * MADX file for TT2/TT10 optics calculations
+ * This file is for LHC Ions with a momentum per nucleon of 6.75 GeV/c/u
+ *
+ * The ions extracted from the PS have a charge state 54+
+ * and have the same magnetic rigidity as a proton beam at 26 GeV/c
+ * The ions are stripped in TT2 to 82+
+ *
+ *
+ * Execute with:  >madx < fe_pb_strip.madx
+ *
+ *
+ * This MADX file compute the optics for the ions, by dividing the TT2-TT10 line in two parts.
+ *  1) Twiss computation from the beginning of TT2 to the stripper (STRN : marker;).
+ *  2) The Coulomb scattering at the stripping foil and its effect on the Twiss parameter
+ *     are taken into account. The modified Twiss parameters (after the stripping foil) are used
+ *     as initial conditions for the second part of the line, from STRN to the end of TT10.
+ * (G.Arduini, E.Benedetto, Oct 2007)
+ *******************************************************************************
+ *******************************************************************************/
+
+
+ option, echo;
+!option, double;
+ option, RBARC=FALSE;
+!assign, echo="echo.prt";
+
+
+
+/*******************************************************************************
+ * TITLE
+ *******************************************************************************/
+ title, 'TT2/TT10 optics. LHC Ion beam 54+/82+, 6.75 GeV/c/u ~ 26 GeV/c proton beam';
+
+
+
+/*******************************************************************************
+ * TT2
+ * NB! The order of the .ele .str and .seq files matter.
+ *     The reason is a >feature< of MADX
+ *******************************************************************************/
+ option, -echo;
+ call, file = '../elements/tt2.ele';
+ call, file = '../strength/tt2_fe_26.str';
+ call, file = '../sequence/tt2.seq';
+ call, file = '../aperture/tt2.dbx';
+ option, echo;
+
+
+
+/*******************************************************************************
+ * TT10
+ * NB! The order of the .ele .str and .seq files matter.
+ *     The reason is a >feature< of MADX
+ *******************************************************************************/
+ option, -echo;
+ call, file = '../elements/tt10.ele';
+ call, file = '../strength/tt10_fe_26_Q20.str';
+ call, file = '../sequence/tt10.seq';
+ call, file = '../aperture/tt10.dbx';
+ option, echo;
+
+
+
+
+/*******************************************************************************
+ * SPS
+ *******************************************************************************/
+
+ option, -echo;
+ call, file = '/afs/cern.ch/eng/sps/2014
+               /elements/sps.ele';
+ call, file = '/afs/cern.ch/eng/sps/2014
+               /aperture/aperturedb_1.dbx';
+ call, file = '/afs/cern.ch/eng/sps/2014
+               /aperture/aperturedb_2.dbx';
+ call, file = '/afs/cern.ch/eng/sps/2014
+               /sequence/sps.seq';
+ call, file = '/afs/cern.ch/eng/sps/2014
+               /aperture/aperturedb_3.dbx';
+ call, file = '/afs/cern.ch/eng/sps/2014
+               /strength/ft_noqs_ext.str';
+ call, file = '/afs/cern.ch/eng/sps/2014
+               /strength/elements.str';
+ option, echo;
+
+
+
+/*******************************************************************************
+ * Junction between TT10 and SPS
+ *******************************************************************************/
+
+ SEQEDIT, SEQUENCE=SPS;
+ ENDTT10 : MARKER;
+ install, element = ENDTT10, at = -0.1375, from = BPH.12008;
+ ENDEDIT;
+
+ SEQEDIT, SEQUENCE=SPS;
+ ENDVKNV : MARKER;
+ install, element = ENDVKNV, at = 10.3015+0.1755, from = BPCE.11833;
+ ENDEDIT;
+
+ SEQEDIT, SEQUENCE=SPS;
+ flatten ; cycle, start=  ENDVKNV;
+ ENDEDIT;
+
+
+
+/*******************************************************************************
+ * Build up the geometry of the beam lines and select a line
+ *******************************************************************************/
+
+tt2:        sequence, refer=ENTRY, l = 304.6954;
+           tt2a                  , at =        0;
+           tt2b                  , at = 136.3114;
+           tt2c                  , at = 249.9449;
+endsequence;
+
+tt2tt10:    sequence, refer=ENTRY, l = 1164.8409;
+           tt2a                  , at =         0;
+           tt2b                  , at =  136.3114;
+           tt2c                  , at =  249.9449;
+           tt10                  , at =  304.6954;
+endsequence;
+
+tt2tt10sps: sequence, refer=ENTRY, l = 8076.3447;
+           tt2a                  , at =         0;
+           tt2b                  , at =  136.3114;
+           tt2c                  , at =  249.9449;
+           tt10                  , at =  304.6954;
+           sps                   , at = 1164.8409;
+endsequence;
+
+
+
+/*******************************************************************************
+ * Set initial twiss parameters. Start of TT2
+ *******************************************************************************/
+ call, file = '../inp/tt2_fe_26.inp';
+
+
+/*******************************************************************************
+ * set initial position and angle (x,px)
+ * E.g. :
+ * x0 := 0.0;
+ * px0:= 0.0;
+ *******************************************************************************/
+
+
+
+/*******************************************************************************
+ * store initial parameters in memory block
+ *******************************************************************************/
+INITBETA0: BETA0,
+  BETX=BETX0,
+  ALFX=ALFX0,
+  MUX=MUX0,
+  BETY=BETY0,
+  ALFY=ALFY0,
+  MUY=MUY0,
+  X=X0,
+  PX=PX0,
+  Y=Y0,
+  PY=PY0,
+  T=T0,
+  PT=PT0,
+  DX=DX0,
+  DPX=DPX0,
+  DY=DY0,
+  DPY=DPY0;
+
+
+
+/*******************************************************************************
+ * save a sequence
+ *******************************************************************************/
+ !save, sequence=tt2, file=tt2.save;
+
+
+
+/*******************************************************************************
+ * maketwiss macro
+ *******************************************************************************/
+ maketwiss : macro={
+!                   select,flag=ptc_twiss, column = name,keyword, s,y,py;
+                    ptc_create_universe;
+                    ptc_create_layout,model=2,method=6,nst=5,time=true,exact;
+                    ptc_twiss,table=ptc_twiss,BETA0=INITBETA0,DELTAP=0,icase=5,no=1; ! , file="twiss"
+                    ptc_end;
+
+                    value,  KQDE163, KQDE207, KQFO165, KQDE180, KQFO205, KQDE210, KQDE213, KQFO215, KQDE217;
+                   }
+
+
+
+/*******************************************************************************
+ *******************************************************************************
+ *
+ * MATCHING  before the stripper
+ *
+ *******************************************************************************
+ *******************************************************************************/
+
+ Beam, particle=PROTON,pc=26,exn=3.0E-6*4.0,eyn=3.0E-6*4.0;
+ use, period=tt2, range=#s/strn;
+
+
+
+/***************************************************
+ * TWISS PTC. Start of TT2
+ ***************************************************/
+ exec, maketwiss;
+
+
+/***************************************************
+ * MATCHING  before the stripper
+ ***************************************************/
+ match,use_macro;
+    vary, name=KQDE163, step = 0.0001;
+    vary, name=KQDE207, step = 0.0001;
+    vary, name=KQFO165, step = 0.0001;
+    vary, name=KQDE180, step = 0.0001;
+    vary, name=KQFO205, step = 0.0001;
+
+    use_macro,name=maketwiss;
+    constraint, expr=table(ptc_twiss, STRN, beta11)    = 40   ;
+    constraint, expr=table(ptc_twiss, STRN, beta22)    = 40   ;
+    constraint, expr=table(ptc_twiss, STRN, alfa11)*10 =  0*10;
+    constraint, expr=table(ptc_twiss, STRN, alfa22)*10 =  0*10;
+
+    constraint, expr=KQDE163*10000 < 0;
+    constraint, expr=KQDE207*10000 < 0;
+    constraint, expr=KQFO165*10000 > 0;
+    constraint, expr=KQDE180*10000 < 0;
+    constraint, expr=KQFO205*10000 > 0;
+
+
+
+!   lmdif, calls = 500, tolerance = 1.0E-21;
+!   simplex, calls = 1000, tolerance = 1.0E-25;
+    lmdif, calls = 50, tolerance = 1.0E-21;
+    simplex, calls = 10, tolerance = 1.0E-25;
+ endmatch;
+
+
+
+
+
+
+/*******************************************************************************
+ *******************************************************************************
+ *
+ * Evaluation of the beam parameters after the stripper.
+ *
+ *******************************************************************************
+ *******************************************************************************/
+
+!   In order to estimate the emittance after the stripper, we need to evaluate:
+!    1) the blow-up due to the stripper
+!    2) the twiss parameters at the start of the stripper
+
+exnbefstripper  = beam->exn/4;
+eynbefstripper  = beam->eyn/4;
+
+exbefstripper = exnbefstripper/(beam->beta*beam->gamma);  ! emittance before the stripper - HOR
+eybefstripper = eynbefstripper/(beam->beta*beam->gamma);  ! emittance before the stripper - VER
+
+dpp    = 5.5e-4; ! energy spread
+ZSCAT  = 1;
+L      = 0.8e-3; ! stripper thickness [m]
+csi0   = 8.9e-2; ! X0 = Radiation length of aluminium (89mm)
+thetascatt_rms = 13.6 * ZSCAT/(beam->beta*beam->pc*1000) * sqrt(L/csi0) * (1+0.038*log(L/csi0));
+
+value, thetascatt_rms;! Scattering angle, caused by the stripper
+value, beam->beta, beam->pc, sqrt(L/csi0);
+
+delta_epsx     = 0.5*table(ptc_twiss, STRN, beta11)*thetascatt_rms^2; ! emittance blow-up- HOR
+delta_epsy     = 0.5*table(ptc_twiss, STRN, beta22)*thetascatt_rms^2; ! emittance blow-up- VER
+
+exnafterstripper = exnbefstripper+delta_epsx*beam->beta*beam->gamma; ! norm. emittance after stripper - HOR
+eynafterstripper = eynbefstripper+delta_epsy*beam->beta*beam->gamma; ! norm. emittance after stripper - VER
+
+exafterstripper = exnafterstripper/(beam->beta*beam->gamma);  ! emittance after the stripper - HOR
+eyafterstripper = eynafterstripper/(beam->beta*beam->gamma);  ! emittance after the stripper - VER
+
+
+value, exnbefstripper   ,
+       eynbefstripper   ;
+value, exbefstripper    ,
+       eybefstripper    ;
+value, exnafterstripper ,
+       eynafterstripper ;
+value, exafterstripper  ,
+       eyafterstripper  ;
+
+
+
+/***************************************************
+ * store optical parameters @ STRN in memory block: BEGTT2
+ ***************************************************/
+BEGTT2: BETA0,
+  BETX=table(ptc_twiss,BEGTT2A,beta11),
+  ALFX=table(ptc_twiss,BEGTT2A,alfa11),
+  MUX=table(ptc_twiss,BEGTT2A,mu1),
+  BETY=table(ptc_twiss,BEGTT2A,beta22),
+  ALFY=table(ptc_twiss,BEGTT2A,alfa22),
+  MUY=table(ptc_twiss,BEGTT2A,mu2),
+  X=table(ptc_twiss,BEGTT2A,x),
+  PX=table(ptc_twiss,BEGTT2A,px),
+  Y=table(ptc_twiss,BEGTT2A,y),
+  PY=table(ptc_twiss,BEGTT2A,py),
+  T=0,
+  PT=0,
+  DX=table(ptc_twiss,BEGTT2A,disp1),
+  DPX=table(ptc_twiss,BEGTT2A,disp2),
+  DY=table(ptc_twiss,BEGTT2A,disp3),
+  DPY=table(ptc_twiss,BEGTT2A,disp4);
+
+
+/***************************************************
+ * store optical parameters @ STRN in memory block: STRIPPEREXIT
+ ***************************************************/
+STRIPPEREXIT: BETA0,
+  BETX=(table(ptc_twiss,STRN,beta11)*exbefstripper+L^2/3*thetascatt_rms^2)/(exbefstripper+delta_epsx),
+  ALFX=(table(ptc_twiss,STRN,alfa11)*exbefstripper-0.5*L*thetascatt_rms^2)/(exbefstripper+delta_epsx),
+  MUX=table(ptc_twiss,STRN,mu1),
+  BETY=(table(ptc_twiss,STRN,beta22)*eybefstripper+L^2/3*thetascatt_rms^2)/(eybefstripper+delta_epsy),
+  ALFY=(table(ptc_twiss,STRN,alfa22)*eybefstripper-0.5*L*thetascatt_rms^2)/(eybefstripper+delta_epsy),
+  MUY=table(ptc_twiss,STRN,mu2),
+  X=table(ptc_twiss,STRN,x),
+  PX=table(ptc_twiss,STRN,px),
+  Y=table(ptc_twiss,STRN,y),
+  PY=table(ptc_twiss,STRN,py),
+  T=0,
+  PT=0,
+  DX=table(ptc_twiss,STRN,disp1),
+  DPX=table(ptc_twiss,STRN,disp2),
+  DY=table(ptc_twiss,STRN,disp3),
+  DPY=table(ptc_twiss,STRN,disp4);
+
+value, STRIPPEREXIT->DX, STRIPPEREXIT->DPX;
+value, STRIPPEREXIT->X, STRIPPEREXIT->PX;
+!show, STRIPPEREXIT;
+
+
+
+
+
+/*******************************************************************************
+ *******************************************************************************
+ *
+ * MATCHING  after the stripper
+ *
+ *******************************************************************************
+ *******************************************************************************/
+
+/***************************************************
+ * Set up beam parameters after the stripper
+ ***************************************************/
+ Beam, particle=PROTON,pc=26,exn=exnafterstripper*4,eyn=eynafterstripper*4;
+ use, period=tt2, range=strn/#e;
+
+
+
+/***************************************************
+ * Set initial twiss parameters. After the stripper in TT2
+ ***************************************************/
+ BETX0         = STRIPPEREXIT->betx;
+ BETY0         = STRIPPEREXIT->bety;
+ ALFX0         = STRIPPEREXIT->alfx;
+ ALFY0         = STRIPPEREXIT->alfy;
+ DX0           = STRIPPEREXIT->dx;
+ DPX0          = STRIPPEREXIT->dpx;
+ DY0           = STRIPPEREXIT->dy;
+ DPY0          = STRIPPEREXIT->dpy;
+
+ value, betx0,bety0,alfx0,alfy0,dx0,dy0,dpx0,dpy0,exbefstripper,eybefstripper,beam->ex,beam->ey;
+ show, stripperexit;
+ show, beam;
+ show, begtt2;
+
+
+
+/***************************************************
+ * store initial parameters in memory block
+ ***************************************************/
+INITBETA0: BETA0,
+  BETX=BETX0,
+  ALFX=ALFX0,
+  MUX=MUX0,
+  BETY=BETY0,
+  ALFY=ALFY0,
+  MUY=MUY0,
+  X=X0,
+  PX=PX0,
+  Y=Y0,
+  PY=PY0,
+  T=T0,
+  PT=PT0,
+  DX=DX0,
+  DPX=DPX0,
+  DY=DY0,
+  DPY=DPY0;
+
+
+
+
+/***************************************************
+ * TWISS PTC. STRN to END
+ ***************************************************/
+ exec, maketwiss;
+
+/****************************************************
+ * MATCHING  after the stripper
+ ****************************************************/
+
+ match,use_macro;
+    vary, name=KQDE210, step = 0.0001;
+    vary, name=KQDE213, step = 0.0001;
+    vary, name=KQFO215, step = 0.0001;
+    vary, name=KQDE217, step = 0.0001;
+
+    use_macro,name=maketwiss;
+    constraint, expr=table(ptc_twiss, TT2C$END, beta11)    = 36.61221   ;
+    constraint, expr=table(ptc_twiss, TT2C$END, beta22)    = 15.81735   ;
+    constraint, expr=table(ptc_twiss, TT2C$END, alfa11)*10 =  2.24340*10;
+    constraint, expr=table(ptc_twiss, TT2C$END, alfa22)*10 = -0.93339*10;
+
+    constraint, expr=KQDE210*10000 < 0;
+    constraint, expr=KQDE213*10000 < 0;
+    constraint, expr=KQFO215*10000 > 0;
+    constraint, expr=KQDE217*10000 < 0;
+
+
+!   lmdif, calls = 500, tolerance = 1.0E-21;
+!   simplex, calls = 1000, tolerance = 1.0E-25;
+    lmdif, calls = 500, tolerance = 1.0E-21;
+    simplex, calls = 100, tolerance = 1.0E-25;
+ endmatch;
+
+
+
+
+
+/*******************************************************************************
+ *******************************************************************************
+ **  TT2[#S] - TT2[STRN]
+ **  From the start of TT2 to the stripper
+ *******************************************************************************
+ *******************************************************************************/
+ Beam, particle=PROTON,pc=26,exn=3.0E-6*4.0,eyn=3.0E-6*4.0;
+ show, beam;
+
+
+/***************************************************
+ * Set initial twiss parameters. Start of TT2
+ ***************************************************/
+ BETX0         = BEGTT2->betx;
+ BETY0         = BEGTT2->bety;
+ ALFX0         = BEGTT2->alfx;
+ ALFY0         = BEGTT2->alfy;
+ DX0           = BEGTT2->dx;
+ DPX0          = BEGTT2->dpx;
+ DY0           = BEGTT2->dy;
+ DPY0          = BEGTT2->dpy;
+
+ show, begtt2;
+
+
+
+/***************************************************
+ * store initial parameters in memory block
+ ***************************************************/
+ INITBETA0: BETA0,
+   BETX=BETX0,
+   ALFX=ALFX0,
+   MUX=MUX0,
+   BETY=BETY0,
+   ALFY=ALFY0,
+   MUY=MUY0,
+   X=X0,
+   PX=PX0,
+   Y=Y0,
+   PY=PY0,
+   T=T0,
+   PT=PT0,
+   DX=DX0,
+   DPX=DPX0,
+   DY=DY0,
+   DPY=DPY0;
+
+
+
+/***************************************************
+ * TWISS @ From start of TT2
+ ***************************************************/
+
+ use, period=tt2, range=#s/strn;
+ exec, maketwiss;
+
+!------------------------ write ptc_twiss table -----------------
+ set,  format="10.5f"; ! the format of numbers in the twiss output file
+
+ select,flag=ptc_twiss, clear;
+ select,flag=ptc_twiss, range=#S/#E;
+ select,flag=ptc_twiss, column = name,s,x,px,disp1,alfa11,beta11,mu1,y,py,disp3,alfa22,beta22,mu2;
+
+ write,table=ptc_twiss, file="optics_LHC_Q20_strip1.out";
+!----------------------------------------------------------------
+
+!write,table=ptc_twiss;
+
+
+
+
+
+ /*******************************************************************************
+ *******************************************************************************
+ **  TT2[STRN] - TT10
+ **  From the the stripper in TT2 to SPS
+ *******************************************************************************
+ *******************************************************************************/
+
+/*******************************************************************************
+ * Set up beam parameters after the stripper
+ *******************************************************************************/
+ exnafterstripper =    3.904276875e-06 ;
+ eynafterstripper =    3.903431033e-06 ;
+ value, exnafterstripper, eynafterstripper;
+
+ Beam, particle=PROTON,pc=26,exn=exnafterstripper*4,eyn=eynafterstripper*4;
+ use, period=tt2tt10sps, range=strn/#e;
+
+
+
+/*******************************************************************************
+ * Set initial twiss parameters. At the stripper in TT2
+ *******************************************************************************/
+
+ BETX0         = STRIPPEREXIT->betx;
+ BETY0         = STRIPPEREXIT->bety;
+ ALFX0         = STRIPPEREXIT->alfx;
+ ALFY0         = STRIPPEREXIT->alfy;
+ DX0           = STRIPPEREXIT->dx;
+ DPX0          = STRIPPEREXIT->dpx;
+ DY0           = STRIPPEREXIT->dy;
+ DPY0          = STRIPPEREXIT->dpy;
+
+
+ value, betx0,bety0,alfx0,alfy0,dx0,dy0,dpx0,dpy0,exbefstripper,eybefstripper,beam->ex,beam->ey;
+ show, stripperexit;
+ show, beam;
+ show, begtt2;
+
+
+
+/*******************************************************************************
+ * store initial parameters in memory block
+ *******************************************************************************/
+INITBETA0: BETA0,
+  BETX=BETX0,
+  ALFX=ALFX0,
+  MUX=MUX0,
+  BETY=BETY0,
+  ALFY=ALFY0,
+  MUY=MUY0,
+  X=X0,
+  PX=PX0,
+  Y=Y0,
+  PY=PY0,
+  T=T0,
+  PT=PT0,
+  DX=DX0,
+  DPX=DPX0,
+  DY=DY0,
+  DPY=DPY0;
+
+
+
+
+
+
+/*******************************************************************************
+ * TWISS @ From the stripper in TT2 to SPS
+ *******************************************************************************/
+ use, period=tt2tt10sps, range=strn/#e;
+ exec, maketwiss;
+
+
+!------------------------ write ptc_twiss table -----------------
+
+ set,  format="10.5f"; ! the format of numbers in the twiss output file
+
+ select,flag=ptc_twiss, clear;
+ select,flag=ptc_twiss, range=#S/#E;
+ select,flag=ptc_twiss, column = name,s,x,px,disp1,alfa11,beta11,mu1,y,py,disp3,alfa22,beta22,mu2;
+
+ write,table=ptc_twiss, file="optics_LHC_Q20_strip2.out";
+!----------------------------------------------------------------
+
+!write,table=ptc_twiss;
+
+
+
+
+
+
+/*******************************************************************************
+ * Comments
+ *******************************************************************************/
+print, text="The file: echo.prt is on echo.prt";
+
+
+value, exnbefstripper ,
+       eynbefstripper ;
+value, exbefstripper ,
+       eybefstripper ;
+value, exnafterstripper ,
+       eynafterstripper ;
+value, exafterstripper ,
+       eyafterstripper ;
+ stop;
+

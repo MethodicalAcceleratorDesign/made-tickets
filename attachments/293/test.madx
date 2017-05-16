@@ -1,0 +1,19 @@
+
+create, table=test, column=a,b;
+value, table(test,tablelength);
+
+// testing fill
+
+a=9;    b=9;        fill, table=test; // row=0 is default and adds a row to the table
+value, table(test,tablelength);
+a=9;    b=9;        fill, table=test, row=0; 
+value, table(test,tablelength);
+a=5.32; b=-3.2;     fill, table=test, row=0;
+value, table(test,tablelength);
+
+a=2;    b=4;        fill, table=test, row=2; // filling again an already existing row
+value, table(test,tablelength);
+a=1;    b=2;        fill, table=test, row=-3; // negative row number
+value, table(test,tablelength);
+
+exit;

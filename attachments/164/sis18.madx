@@ -1,0 +1,81 @@
+TITLE, " -- SIS18 with a sextupole -- ";
+
+
+
+   !---------------------  DRIFT SPACES DEFINITION  ---------------------
+   DR1: DRIFT, TYPE=DRIF, L=0.6450000;
+   DR2: DRIFT, TYPE=DRIF, L=0.9700000;
+   DR3: DRIFT, TYPE=DRIF, L=6.8390117;
+   DR4: DRIFT, TYPE=DRIF, L=0.6000000;
+   DR5: DRIFT, TYPE=DRIF, L=0.7098000;
+   DR6: DRIFT, TYPE=DRIF, L=0.4998000;
+
+
+
+   !--------------------------  BENDING MAGNET ---------------------------
+   ALPHA  := 15  * RADDEG;
+   LL     := 150 * RADDEG;
+   PFR    := 7.3 * RADDEG;
+   RB: SBEND,TYPE=B1,L= LL,ANGLE= ALPHA,E1= PFR,E2=PFR,HGAP= 0.035 ;
+
+
+
+   ! ------------------- horizontal quadrupole ----------------------------
+   QS1F:  QUADRUPOLE, TYPE= QD1, L= 1.0400000,  K1=  0.311872401;
+   QS2D:  QUADRUPOLE, TYPE= QD2, L= 1.0400000,  K1= -0.496504354;
+   QS3T:  QUADRUPOLE, TYPE= QD3, L= 0.4804000,  K1=  0.62221964 ;
+
+
+
+
+   ! ------------------- normal sextupole ---------------------------------
+   S:     MULTIPOLE, knl:={0, 0, 0.2};
+!   S:     MULTIPOLE, knl:={0, 0,};
+
+
+
+   ! ------------------- cayity ---------------------------------
+!  CAV:     RFCAVITY, VOLT=0.016,lag=0.5,harmon=2;
+! qs = 6.6e-5 h=2
+!  CAV:     RFCAVITY, VOLT=0.000356703430428402,lag=0.5,harmon=2;
+! qs = 1e-3  h=2
+!  CAV:     RFCAVITY, VOLT=0.0818878398595964,lag=0.5,harmon=2;
+! qs = 6.6e-5 h=1
+!  CAV:     RFCAVITY, VOLT=0.000713407395772366,lag=0.5,harmon=1;
+!  CAV:     RFCAVITY, VOLT=6.6421315889039e-07,lag=0,harmon=1;
+! qs = 1e-3  h=1
+!   CAV:     RFCAVITY, VOLT=8.40661490635247e-05,lag=-0.5,harmon=1;
+!   CAV:     RFCAVITY, VOLT=0.004,lag=0,harmon=1;
+   CAV:     RFCAVITY, VOLT=0.000152469798074011,lag=0,harmon=1;
+!   CAV:     drift;
+! test 4kV; Harmon = 4
+!   CAV:     RFCAVITY, VOLT=0.004,lag=0,harmon=4;
+
+
+
+
+   ! ---------------------------  LINE DEFINITION -------------------------
+   CELL:  LINE=(DR1,RB,DR2,RB,DR3,QS1F,DR4,QS2D,DR5,QS3T,DR6);
+   CELLCAV:  LINE=(DR1,RB,DR2,RB,CAV,DR3,QS1F,DR4,QS2D,DR5,QS3T,DR6);
+
+
+   MACHINE: LINE=(CELL, S, 5*CELL CELLCAV, 5*CELL);
+
+   beam,gamma=1.0122,particle=proton;
+   USE, period=MACHINE;
+
+!   PRINT,FULL;
+SELECT,FLAG=TWISS,clear;
+SELECT,FLAG=TWISS,column=name,s,betx,bety,alfx,alfy,mux,muy;
+   TWISS,file=sis18.twiss;
+emit;
+!stop;
+ptc_create_universe;
+ptc_create_layout, time=true, model=2, exact=true, method=6, nst=10;
+!! Reference Twiss
+!! Useful to generate a matched beam distribution
+SELECT,FLAG=TWISS,clear;
+SELECT,FLAG=TWISS,column=name,s,beta11,beta22,alfa11,alfa22,mu1,mu2,mu3,beta12;
+ptc_twiss, icase=4,no=2,file="output1e-3", table="twiss";
+plot, table=twiss, vaxis=x,beta11, haxis=s, title="PTC TWISS", file="output1e-3";
+ptc_end;

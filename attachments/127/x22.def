@@ -1,0 +1,72 @@
+// t2
+
+rfl : rfp;
+ex02000rfp : rfp;
+ex02001rfp : rfp;
+rflsfx : rfp;
+rf3sfx  :rfp;
+ex02001sfx : sfx;
+ex02005MQF : mqze;
+ex02006MQD : mqze, K1 := EX02006MQDk1;
+ex03000MBH : mbhe;
+
+t200000vvg : vvgr;;
+t200000MQF : mqze, K1 := t200000MQFk1;
+t200000SFX : sfx;
+t200001MQD : mqze, K1 := t200001MQDk1;
+t200000mch : mche;
+t200001mcv : mcve;
+t200002MQF : mqze, K1 := t200000MQFk1;
+t200000BST : bst;
+t201000MBH : mbhe;
+t201000MQD : mqze, K1 := EX02006MQDk1;
+
+t201000wal : wal;
+t201001wal : wal;
+
+rf3sfx  :rfp;
+t201000sfx2 : sfx2;
+t201001sfx2 : sfx2;
+t201000sfx : sfx;
+t201001mqd : mqze, K1 := t201001mqdk1;
+t201000mch : mche;
+t201001mcv : mcve;
+t201002mqf : mqze, K1 := t201002mqfk1;
+t202000mbv : mbhe, TILT = Pi/2;
+
+// H2
+h200000mch : mche;
+h200001mcv : mcve;
+h200000vvg : vvgr;
+h200000mqf : mqze, K1 := h200000mqfk1;
+h200001mqd : mqze, K1 := h200001mqdk1;
+h200000sfx : sfx;
+h200000msv : msve;
+h200001msh : msve;
+h200001sfx : sfx;
+h200000rhe : rhe;
+
+rf4 : rfp;
+h200000rfp : rfp;
+
+// V2
+
+rf3: rfp;
+v200000mbv : mbhe, TILT = Pi/2;
+v200000mch : mche;
+v200001mcv : mcve;
+v200000mqd : mqze, K1  :=  v200000mqdk1;
+v200000vvg : vvgr;
+v200001mqf : mqze, K1  :=  v200001mqfk1;
+v200002mqd : mqze, K1  :=  v200002mqdk1;
+v201000mbv : mbhe, TILT = -Pi/2;
+v201001mbv : mbhe, TILT = -Pi/2;
+v201000mqd : mqze, K1  :=  v201000mqdk1;
+v201001mqf : mqze, K1  :=  v201001mqfk1;
+v201000sfx : sfx;
+v201002mqd : mqze, K1  :=  v201002mqdk1;
+v201000msv : msve, vkick  :=  v201000msvkick;
+v201001msh : mshe, hkick  :=  v201001mshkick;
+v202000mbv : mbvf;
+v202000rhe :rhe;
+v202000rfp :rfp;

@@ -1,0 +1,83 @@
+TITLE, 'Tutorial 5';
+!option, warn=false, info=false, echo=false;
+
+// Main machine parameters
+circum=1000.0; // define the total lengthof the ring
+ncell = 8; // define number of FODO cells 
+
+////// Magnets definition ///////
+
+// Dipoles (we consider thin lenses by considering all magnets as multipoles)
+dipangl= 2*pi/(4*ncell); // bending angle [rad]
+dip: multipole, knl={dipangl}; // knl defines the strength of the thin multipoles: First term is for dipoles (therefore it is non-zero for dipoles), second term is for quadrupoles, third term is for sextupoles, etc.
+
+// Quadrupoles (we consider thin lenses by considering all magnets as multipoles)
+quadkl = 8.9e-3;  // Thin quadrupole strength [m^-2]
+quadf: multipole, knl:={0.0, quadkl}; // knl defines the strength of the thin multipoles: First term is for dipoles (=0 for pure quadrupoles!), second term is for quadrupoles, third term is for sextupoles, etc.
+quadd: multipole, knl:={0.0,-quadkl}; // knl defines the strength of the thin multipoles: First term is for dipoles (=0 for pure quadrupoles!), second term is for quadrupoles, third term is for sextupoles, etc.
+
+////// Definition of the sequence  (we put all elements in the right order)  ///////////
+
+lcell = circum/ncell;
+
+fodo: sequence, refer=entry, L=lcell;    // This line gives the name of the sequence, the reference point of the element for placing it and the length of the sequence
+  q1: quadf, at=0;
+  d1: dip, at=lcell/6;
+  d2: dip, at=lcell/3;
+  q2: quadd, at=lcell/2;
+  d3: dip, at=2*lcell/3;
+  d4: dip, at=5*lcell/6;
+endsequence;
+
+n = 0;
+seqfodo: sequence, refer=entry, L=circum;
+  while(n < ncell)
+  {
+    fodo, at= n*lcell;
+    n = n + 1;
+  }    
+endsequence;
+
+// Define the beam for the machine
+Beam, particle = proton, energy = 100;
+
+// Use the sequence with the name: seqfodo
+use, sequence=seqfodo;   
+ 
+//*************************************************//
+select, flag = twiss, clear;
+select, flag=twiss, column=name,s,betx,bety,alfx,alfy,mux,muy,dx,dy;
+twiss, table=twiss, centre, chrom, file=twiss.out;
+//*************************************************//
+
+ini_track_macro(zz): macro = {
+    start, x=zz*100e-3, px=zz*1e-3, y=0, py=0, t=0, pt=0;
+
+};
+
+Nparticles = 3 ;
+Nturns = 3;
+
+TRACK, onetable=true, onepass,  recloss, aperture,
+ file = "track_out_";      
+
+    j = 0;
+    while(j < Nparticles)
+    {
+        value,j;
+
+        exec, ini_track_macro($j);
+
+        j=j+1;
+
+    };
+
+
+    !observe, place = ap.up.zs21633;
+    run, turns = Nturns;
+
+ENDTRACK;
+
+write, table = trackloss, file = "losses.tfs";
+
+stop;

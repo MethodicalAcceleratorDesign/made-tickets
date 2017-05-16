@@ -1,0 +1,5 @@
+beam, particle=PROTON, pc=0.355246, DELTAP=-0.002; ! for the 65MeV beam while shaving
+
+show, beam;
+
+stop;

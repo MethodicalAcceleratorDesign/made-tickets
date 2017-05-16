@@ -1,0 +1,19 @@
+
+Hi,
+
+After discussion with Piotr and some testing it turns out that:
+
+a) Obviously EMIT does the absolute correct thing! It goes to 2D when
+either VOLT=0 or the lag is wrong. This is the case here: the lag
+should be 0.5 but is 0. Therefore EMIT goes 2D which ptc_twiss must do
+as well, of course!
+
+B) The former version (4860 and earlier) did recognize either that
+the voltage is zero or that the lag was not set properly, i.e. the cavity
+is not active in MAD_X. Therefore PTC_TWISS downgraded the user
+specified "icase=6" to "icase=56" and all worked fine.
+
+b) as of  version 4920 it does not check the lag anymore and considers
+wrongly that the motion in 3D would be stable causing a DA failure.
+
+Cheers, FS

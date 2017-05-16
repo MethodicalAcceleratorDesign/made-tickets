@@ -1,0 +1,22 @@
+...
+exec, plotJob();
+
+
+ GXPLOT-X11  1.50 initialized
+
+forrtl: severe (66): output statement overflows record, unit -5, file Internal Formatted Write
+Image              PC        Routine            Line        Source             
+madx-dev-linux32   086778CD  Unknown               Unknown  Unknown
+madx-dev-linux32   086766C5  Unknown               Unknown  Unknown
+madx-dev-linux32   0864802F  Unknown               Unknown  Unknown
+madx-dev-linux32   085FD6D7  Unknown               Unknown  Unknown
+madx-dev-linux32   085FD05B  Unknown               Unknown  Unknown
+madx-dev-linux32   0862E6C5  Unknown               Unknown  Unknown
+madx-dev-linux32   0862C828  Unknown               Unknown  Unknown
+madx-dev-linux32   08135BFE  Unknown               Unknown  Unknown
+madx-dev-linux32   08138C63  Unknown               Unknown  Unknown
+madx-dev-linux32   082CBEAA  Unknown               Unknown  Unknown
+madx-dev-linux32   08097EDF  Unknown               Unknown  Unknown
+madx-dev-linux32   080645D3  Unknown               Unknown  Unknown
+
+Stack trace terminated abnormally.

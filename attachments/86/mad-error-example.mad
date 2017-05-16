@@ -1,0 +1,80 @@
+TITLE, 'Exercise 1';
+
+// Read input file with machine description
+call file="ex1.seq";
+option,-echo,-thin_foc;
+
+// Define the beam for the machine
+!Beam, particle = proton, sequence=fodoerror, energy = 20.0;
+Beam, particle = proton, sequence=testRing, energy = 20.0;
+
+// Use the sequence with the name: testRing
+!seqedit, sequence=testRing;
+seqedit, sequence=fodoerror;
+flatten;
+endedit;
+!use, sequence=fodoerror;   
+use, sequence=testRing;   
+survey,file=survey.cas;
+
+// Define the type and amount of output
+select,flag=twiss,column=name,s,betx, dx,bety, dy;
+
+// Execute the Twiss command to calculate the Twiss parameters
+// Compute at the centre of the element and write to: twiss.out
+twiss,save,centre,file=twiss.out;
+
+!// Play with match command
+!match, sequence=testRing;
+!global, sequence=testRing, q1=2.3;
+!global, sequence=testRing, q2=2.45;
+!vary,name=k1F,step=0.00001;
+!vary,name=k1D,step=0.00001;
+!LMDIF, calls = 1000, tolerance=1E-12;
+!endmatch;
+
+
+//Match Sextupoles to correct croma
+!// Theoretisch dq=0. Bei LHC ca. 1 to avoid head tail instability
+!match, sequence=testRing;
+!global, sequence=testRing, dq1=1;
+!global, sequence=testRing, dq2=1;
+!vary,name=k2HorL,step=0.00001;
+!vary,name=k2VertL,step=0.00001;
+!LMDIF, calls = 1000, tolerance=1E-12;
+!endmatch;
+twiss, centre;
+
+// Assign Errors to all Quads (1mm)
+// See page 14 Lattice design 1 on how to calculate!
+
+!! When dealing with missalignments AND thin lenses,
+!! do not use the 'centre' parameter for twiss!
+!! Otherwise, it will add the missalignement to the position
+!! at the location of the lens, leading to spikes in the plot.
+
+!select, flag=error, pattern="q.*";
+select, flag=error, pattern="qd";
+Ealign, dx:=tgauss(1.0)*1.00e-4, dy:=tgauss(1.0)*1.0e-4;
+twiss,save,file=twiss-errors.out;
+plot, haxis=s, vaxis=x,y,colour=100, interpolate;
+
+// Correct Quad Errors
+!twiss;
+Correct, mode=MICADO, flag=ring, plane=x,
+	clist="c.tab", mlist="m.tab";
+Correct, mode=MICADO,flag=ring,  plane=y,
+	clist="c.tab", mlist="m.tab";
+twiss,save,file=twiss-corr.out;
+!plot, haxis=s, vaxis=x,y,colour=100, interpolate;
+
+
+
+
+// Make some plots
+!plot, haxis=s, vaxis=betx, bety,colour=100,range=qd[10]/qd[16];
+plot, haxis=s, vaxis=betx, bety,colour=100;
+!plot, haxis=s, vaxis=dx, colour=100;
+
+
+stop;

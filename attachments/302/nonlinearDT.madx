@@ -1,0 +1,55 @@
+beam, energy=100;
+
+cps:sequence, l=16, refer=entry;
+q1: quadrupole, l=0.5, k1=2, at=1;
+b1: rbend, angle=pi/5, l=0.5, at=2.5;
+q2: quadrupole, l=0.5, k1=-1, at=4;
+b2: rbend, angle=pi/5, l=0.5, at=5.5;
+q3: quadrupole, l=0.5, k1=1.5, at=7;
+b3: rbend, angle=pi/5, l=0.5, at=8.5;
+q4: quadrupole, l=0.5, k1=-1, at=10;
+b4: rbend, angle=pi/5, l=0.5, at=11.5;
+q5: quadrupole, l=0.5, k1=1, at=13;
+b5: rbend, angle=pi/5, l=0.5, at=14.5;
+endsequence;
+
+use, sequence=cps;
+SELECT,FLAG=TWISS,column=name,s,betx,x, angle, bety;
+
+! just to check that everything is fine
+!twiss,betx=1,bety=1;
+!write, table=twiss;
+!stop;
+
+! create custom tables
+create,table=mytabpt,column=initpt,myx,mybetx;
+create,table=mytabdeltap,column=initdeltap,myx,mybetx;
+myx:=table(twiss, cps$end, x);
+mybetx:=table(twiss, cps$end, betx);
+
+! cycle
+n = 0;
+while ( n < 101)
+{
+  initpt = 1.e-3*(n-50);
+  initdeltap = initpt;
+  
+  twiss, BETX=1, BETY=1,
+    PT=initpt;
+  fill,table=mytabpt;
+  
+  twiss, BETX=1, BETY=1,
+    deltap=initdeltap;
+  fill,table=mytabdeltap;
+
+  n = n + 1;
+}
+! plot
+plot, table=mytabpt, haxis=initpt, vaxis=myx, interpolate, 
+  title='Final x', color=100;
+plot, table=mytabdeltap, haxis=initdeltap, vaxis=myx, interpolate, 
+  title='Final x', color=100;
+
+
+!write, table=mytabpt,file='nonlinearDT.out';
+!write, table=mytabdeltap,file='nonlinearDTdeltap.out';

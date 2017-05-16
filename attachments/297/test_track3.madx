@@ -1,0 +1,129 @@
+
+!##################################################################################
+!# TRACKING FOR ELENA
+!# 0.938372311  GeV   =   13.7 MeV/c
+!# Execute with: >madx < tracking_with_field.madx > /dev/null
+!#
+!# ELENA design report: https://edms.cern.ch/file/1303646/1/ElenaDesign.pdf
+!#
+!##################################################################################
+
+/***********************************************************
+ * INITIALIZATION
+ ***********************************************************/
+ TITLE, "TEST TRACKING";
+ system,"rm track.obs0001.p0* 2> /dev/null"; // Erase all the tracking files: track.obs0001.p<nnnn>
+
+
+/***********************************************************
+ * sequence definition
+ ***********************************************************/
+ ELENA : SEQUENCE    , L  =  10.0;
+ MATHBEGIN : MARKER  , at =   1.0;
+ MATHEND   : MARKER  , at =   4.0;
+ ENDSEQUENCE;
+
+
+
+/***********************************************************
+ * beam and use
+ ***********************************************************/
+ Pc        := 13.7E-3;! GeV/c = 13.7 MeV/c
+ BRHO      := Pc * 3.3356;
+ m0        := 0.938272046;
+ energy = m0 / sqrt(1-beta*beta);
+
+
+ BEAM, PC=pc, PARTICLE=ANTIPROTON;
+ USE, PERIOD=ELENA;
+
+ value, beam->energy;
+ value, beam->beta;
+ value, beam->energy * sqrt(1-beam->beta*beam->beta);
+ value, beam->energy - beam->energy * sqrt(1-beam->beta*beam->beta); ! Kinetic energy
+
+
+
+/***********************************************************
+ * output format
+ ***********************************************************/
+ set,  format="-21s";
+ set,  format="10.6f";
+
+
+
+
+
+/*******************************************************************************
+ *******************************************************************************
+ * PTC. Tracks @ the start of ELENA    HORIZONTAL and VERTICAL 1000 Turns  dp = -0.010
+ *******************************************************************************
+ *******************************************************************************/
+ system,"/usr/sue/bin/kinit -R"; ! Renew Kerberos token, in order to avoid timeout
+
+ system,"rm track.obs0001.p0* "; // Erase all the tracking files: track.obs0001.p<nnnn>
+
+
+
+
+/* PTC tracking from START to SOLENOID **********/
+   USE, SEQUENCE=ELENA, RANGE=#S/MATHBEGIN;
+   ptc_start,  x=  0.001,  px=   0.001,  y=0.001,  py=0.001,  pt= -0.005;
+   ptc_start,  x=  0.002,  px=   0.002,  y=0.002,  py=0.002,  pt= -0.005;
+   ptc_start,  x=  0.003,  px=   0.003,  y=0.003,  py=0.003,  pt= -0.005;
+   ptc_start,  x=  0.004,  px=   0.004,  y=0.004,  py=0.004,  pt= -0.005;
+   ptc_start,  x=  0.005,  px=   0.005,  y=0.005,  py=0.005,  pt= -0.005;
+   ptc_start,  x=  0.006,  px=   0.006,  y=0.006,  py=0.006,  pt= -0.005;
+   ptc_start,  x=  0.007,  px=   0.007,  y=0.007,  py=0.007,  pt= -0.005;
+   ptc_start,  x=  0.008,  px=   0.008,  y=0.008,  py=0.008,  pt= -0.005;
+   ptc_start,  x=  0.009,  px=   0.009,  y=0.009,  py=0.009,  pt= -0.005;
+   ptc_start,  x=  0.010,  px=   0.010,  y=0.010,  py=0.010,  pt= -0.005;
+   system,"rm track.obs0001.p0* "; // Erase all the tracking files: track.obs0001.p<nnnn>
+   option,-warn; ! This removes the warning that comes from TIME=FALSE
+   PTC_CREATE_UNIVERSE;
+   PTC_CREATE_LAYOUT,MODEL=2,METHOD=6,NST=10,TIME=FALSE,EXACT;  ! TIME=FALSE gives correct definition of Chromaticity
+   PTC_TRACK,ICASE=5,DUMP,TURNS=1 ,FFILE=1; //ONETABLE, TURNS=1, NORM_NO=4; NORM_OUT
+   PTC_TRACK_END;
+   PTC_END;
+   option,warn;
+
+
+
+/* PTC tracking from SOLENOID to END ***********/
+   USE, SEQUENCE=ELENA, RANGE=MATHEND/#E;
+   ptc_start,  x=  0.033,  px=   0,  y=0.033,  py=0,  pt= -0.005;
+   system,"rm track.obs0001.p0* "; // Erase all the tracking files: track.obs0001.p<nnnn>
+   option,-warn; ! This removes the warning that comes from TIME=FALSE
+   PTC_CREATE_UNIVERSE;
+   PTC_CREATE_LAYOUT,MODEL=2,METHOD=6,NST=10,TIME=FALSE,EXACT;  ! TIME=FALSE gives correct definition of Chromaticity
+   PTC_TRACK,ICASE=5,DUMP,TURNS=1 ,FFILE=1; //ONETABLE, TURNS=1, NORM_NO=4; NORM_OUT
+   PTC_TRACK_END;
+   PTC_END;
+   option,warn;
+
+
+
+
+
+
+
+
+
+
+/***********************************************************
+ * Save the ELENA sequence file
+ ***********************************************************/
+ option,-warn; ! This removes the warning that comes from saving the sequence file
+ save,sequence=ELENA,file="elena.seq"; ! ,bare;
+ option,warn;
+
+
+
+/***********************************************************
+ * Clean up
+ ***********************************************************/
+ system,"rm Maxwellian_bend_for_ptc.txt";
+
+
+ stop;
+

@@ -1,0 +1,731 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.12  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2016.10.15               +
+  + Execution date: 2017.03.08 10:43:23      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+!--------------------------------------------------------------
+
+! title,"FCC-ee Racetrack,100km";
+
+! 		  
+
+!--------------------------------------------------------------
+
+
+
+option -echo, -info;
+
+enter Twiss module
+  
+iteration:   1 error:   0.000000E+00 deltap:   0.000000E+00
+orbit:   0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    6.969692735e-06        378.7853588 
+
+                q1                dq1            betxmax              dxmax 
+            387.08      0.09294599932        1809.786022       0.5743028765 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209546779                  0                  0        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+    0.001590898458        5220.009239                  0                  0 
+
+            ycomax             ycorms             deltap            synch_1 
+                 0                  0                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+--------------------------------------------
+ASIGN ALIGNMENT ERRORS                      
+--------------------------------------------
+enter Twiss module
+  
+iteration:   1 error:   3.439250E-04 deltap:   0.000000E+00
+orbit:  -1.814794E-11 -1.916856E-11 -3.146236E-07  1.282203E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.233625E-11 deltap:   0.000000E+00
+orbit:  -3.095940E-11  3.145492E-12 -3.146236E-07  1.282203E-03  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    1.015998346e-05        313.7281579 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4438999        1809.786022       0.5742791937 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209543706     1.70989995e-09    1.868397977e-10        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049271        5220.009239        43.69496875        4.108121893 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.004143220755    0.0003293293241                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+enter Twiss module
+  
+iteration:   1 error:   1.377815E-04 deltap:   0.000000E+00
+orbit:  -4.551704E-13 -1.599127E-13 -3.577465E-07  1.093498E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.667799E-13 deltap:   0.000000E+00
+orbit:   6.193566E-14 -1.703032E-14 -3.577465E-07  1.093498E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0     6.96969272e-06        378.7853592 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4438999        1809.786022       0.5743028784 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209546779    3.574652402e-12    3.772213024e-13        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049271        5220.009239    0.0003197314948    6.576427684e-05 
+
+            ycomax             ycorms             deltap            synch_1 
+   6.576529552e-05    8.496528121e-06                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+1 =                  1 ;
+--------------------------------------------
+Increase ALIGNMENT ERRORS                   
+--------------------------------------------
+--------------------------------------------
+ASIGN ALIGNMENT ERRORS                      
+--------------------------------------------
+twiss with increased misalignment
+enter Twiss module
+  
+iteration:   1 error:   2.742680E-03 deltap:   0.000000E+00
+orbit:   2.038702E-10  9.790368E-11  3.006891E-06  4.367283E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   2.123702E-10 deltap:   0.000000E+00
+orbit:  -2.214002E-10  3.731979E-11  3.006891E-06  4.367283E-03  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    5.014029551e-05         141.223365 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4439001        1809.786022       0.5739736022 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209503292    1.668203522e-08    1.855163828e-09        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049272         5220.00924        161.4194729        15.08881164 
+
+            ycomax             ycorms             deltap            synch_1 
+      0.0141105297     0.001247932645                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+twiss with after correction
+enter Twiss module
+  
+iteration:   1 error:   1.134610E-03 deltap:   0.000000E+00
+orbit:  -3.478951E-11 -9.718685E-12  2.944951E-06  2.008372E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.804392E-11 deltap:   0.000000E+00
+orbit:   1.960419E-13 -9.601086E-14  2.944951E-06  2.008372E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    6.969692662e-06        378.7853608 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4438999        1809.786022        0.574302879 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209546779    1.209088151e-11    1.405498544e-12        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049271        5220.009239    0.0007046382481    0.0001351249377 
+
+            ycomax             ycorms             deltap            synch_1 
+   0.0002193227739    1.758561401e-05                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+2 =                  2 ;
+--------------------------------------------
+Increase ALIGNMENT ERRORS                   
+--------------------------------------------
+--------------------------------------------
+ASIGN ALIGNMENT ERRORS                      
+--------------------------------------------
+twiss with increased misalignment
+enter Twiss module
+  
+iteration:   1 error:   4.015072E-03 deltap:   0.000000E+00
+orbit:   3.371312E-10  3.263527E-10  6.309588E-06  4.367374E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.015225E-10 deltap:   0.000000E+00
+orbit:  -2.138072E-10  3.415448E-11  6.309588E-06  4.367374E-03  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    5.014041339e-05         141.223199 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4439001        1809.786022       0.5739725813 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209503288    1.669558367e-08    1.862078626e-09        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049272         5220.00924        161.4199783        15.08882114 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01410981508     0.001248090813                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+twiss with after correction
+enter Twiss module
+  
+iteration:   1 error:   2.406997E-03 deltap:   0.000000E+00
+orbit:  -1.570941E-10 -4.355524E-11  6.247639E-06  2.896424E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   8.121847E-11 deltap:   0.000000E+00
+orbit:   3.785273E-13 -2.312078E-13  6.247639E-06  2.896425E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0     6.96969256e-06        378.7853636 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4438999        1809.786022        0.574302877 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209546779    2.452167089e-11    3.028817154e-12        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049271        5220.009239     0.001341429261    0.0002044752157 
+
+            ycomax             ycorms             deltap            synch_1 
+   0.0004040955275    2.686320022e-05                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+3 =                  3 ;
+--------------------------------------------
+Increase ALIGNMENT ERRORS                   
+--------------------------------------------
+--------------------------------------------
+ASIGN ALIGNMENT ERRORS                      
+--------------------------------------------
+twiss with increased misalignment
+enter Twiss module
+  
+iteration:   1 error:   5.287459E-03 deltap:   0.000000E+00
+orbit:   3.824211E-10  5.305231E-10  9.612276E-06  4.367463E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.452768E-10 deltap:   0.000000E+00
+orbit:  -2.061657E-10  3.093282E-11  9.612276E-06  4.367463E-03  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    5.014047279e-05        141.2231153 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4439001        1809.786022       0.5739715636 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209503284    1.670992671e-08    1.870185087e-09        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049272         5220.00924        161.4203761        15.08882047 
+
+            ycomax             ycorms             deltap            synch_1 
+      0.0141090918     0.001248318308                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+twiss with after correction
+enter Twiss module
+  
+iteration:   1 error:   3.679384E-03 deltap:   0.000000E+00
+orbit:  -3.673689E-10 -1.016696E-10  9.550326E-06  3.784473E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.897904E-10 deltap:   0.000000E+00
+orbit:   6.093958E-13 -4.226209E-13  9.550326E-06  3.784477E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    6.969692412e-06        378.7853676 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4438999        1809.786022       0.5743028818 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209546779    4.086705835e-11     5.26424143e-12        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049271        5220.009239     0.001978225645    0.0002741493849 
+
+            ycomax             ycorms             deltap            synch_1 
+   0.0005888682809    3.618458316e-05                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+4 =                  4 ;
+--------------------------------------------
+Increase ALIGNMENT ERRORS                   
+--------------------------------------------
+--------------------------------------------
+ASIGN ALIGNMENT ERRORS                      
+--------------------------------------------
+twiss with increased misalignment
+enter Twiss module
+  
+iteration:   1 error:   6.559846E-03 deltap:   0.000000E+00
+orbit:   3.397409E-10  7.104157E-10  1.291496E-05  4.367552E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.436337E-10 deltap:   0.000000E+00
+orbit:  -1.984758E-10  2.765494E-11  1.291496E-05  4.367552E-03  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    5.014053214e-05        141.2230317 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4439001        1809.786022       0.5739705487 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209503281    1.672508528e-08    1.879499724e-09        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049272         5220.00924        161.4207738        15.08881979 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01410836851     0.001248615967                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+twiss with after correction
+enter Twiss module
+  
+iteration:   1 error:   4.951771E-03 deltap:   0.000000E+00
+orbit:  -6.656140E-10 -1.840617E-10  1.285301E-05  4.672522E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.437598E-10 deltap:   0.000000E+00
+orbit:   8.886473E-13 -6.702501E-13  1.285301E-05  4.672531E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0     6.96969222e-06        378.7853728 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4438999        1809.786022       0.5743028897 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209546779    6.112704465e-11    8.117010834e-12        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049271        5220.009239     0.002615010523    0.0003439507669 
+
+            ycomax             ycorms             deltap            synch_1 
+   0.0007736410326    4.552286696e-05                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+5 =                  5 ;
+--------------------------------------------
+Increase ALIGNMENT ERRORS                   
+--------------------------------------------
+--------------------------------------------
+ASIGN ALIGNMENT ERRORS                      
+--------------------------------------------
+twiss with increased misalignment
+enter Twiss module
+  
+iteration:   1 error:   7.832232E-03 deltap:   0.000000E+00
+orbit:   2.090904E-10  8.660305E-10  1.621765E-05  4.367641E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   3.559465E-10 deltap:   0.000000E+00
+orbit:  -1.907375E-10  2.432085E-11  1.621765E-05  4.367641E-03  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    5.014059145e-05        141.2229482 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4439001        1809.786022       0.5739695366 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209503277    1.674105939e-08    1.890035362e-09        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049272         5220.00924        161.4211715        15.08881912 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.01410764523      0.00124898374                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+twiss with after correction
+enter Twiss module
+  
+iteration:   1 error:   6.224158E-03 deltap:   0.000000E+00
+orbit:  -1.051829E-09 -2.907316E-10  1.615570E-05  5.560553E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   5.431266E-10 deltap:   0.000000E+00
+orbit:   1.216282E-12 -9.740956E-13  1.615570E-05  5.560571E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    6.969691982e-06        378.7853793 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4438999        1809.786022       0.5743029004 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209546779      8.5301627e-11    1.158919569e-11        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049271        5220.009239     0.003251833671    0.0004138147769 
+
+            ycomax             ycorms             deltap            synch_1 
+   0.0009584137882     5.48694232e-05                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+6 =                  6 ;
+--------------------------------------------
+Increase ALIGNMENT ERRORS                   
+--------------------------------------------
+--------------------------------------------
+ASIGN ALIGNMENT ERRORS                      
+--------------------------------------------
+twiss with increased misalignment
+enter Twiss module
+  
+iteration:   1 error:   9.104619E-03 deltap:   0.000000E+00
+orbit:  -9.530390E-12  9.973676E-10  1.952034E-05  4.367730E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   4.488938E-10 deltap:   0.000000E+00
+orbit:  -1.829508E-10  2.093054E-11  1.952034E-05  4.367730E-03  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map can't be symplified!                                                                                                                     
+++++++ warning: Twiss failed:  MAD-X continues
+twiss with after correction
+enter Twiss module
+  
+iteration:   1 error:   9.104619E-03 deltap:   0.000000E+00
+orbit:  -9.530390E-12  9.973676E-10  1.952034E-05  4.367730E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   4.488938E-10 deltap:   0.000000E+00
+orbit:  -1.829508E-10  2.093054E-11  1.952034E-05  4.367730E-03  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map can't be symplified!                                                                                                                     
+++++++ warning: Twiss failed:  MAD-X continues
+7 =                  7 ;
+--------------------------------------------
+Increase ALIGNMENT ERRORS                   
+--------------------------------------------
+--------------------------------------------
+ASIGN ALIGNMENT ERRORS                      
+--------------------------------------------
+twiss with increased misalignment
+enter Twiss module
+  
+iteration:   1 error:   1.198508E-02 deltap:   0.000000E+00
+orbit:   1.463767E-09  2.532173E-09  2.288498E-05  8.734903E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.399858E-09 deltap:   0.000000E+00
+orbit:  -8.223471E-10  1.158536E-10  2.288498E-05  8.734903E-03  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    0.0001796527601        74.60759714 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4439008        1809.786022        0.572977952 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209373439    6.690833609e-08    7.501413054e-09        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049274        5220.009241        322.8409211        30.17762641 
+
+            ycomax             ycorms             deltap            synch_1 
+     0.02821678113     0.002496714995                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+twiss with after correction
+enter Twiss module
+  
+iteration:   1 error:   8.768938E-03 deltap:   0.000000E+00
+orbit:  -2.088171E-09 -5.769040E-10  2.276109E-05  7.373532E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.078053E-09 deltap:   0.000000E+00
+orbit:   2.016744E-12 -1.750459E-12  2.276109E-05  7.373581E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    6.969691374e-06        378.7853958 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4438999        1809.786022       0.5743029301 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209546779    1.453951056e-10    2.039547994e-11        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049271        5220.009239     0.004437300108    0.0005540439269 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.001327960416    7.357474929e-05                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+8 =                  8 ;
+--------------------------------------------
+Increase ALIGNMENT ERRORS                   
+--------------------------------------------
+--------------------------------------------
+ASIGN ALIGNMENT ERRORS                      
+--------------------------------------------
+twiss with increased misalignment
+enter Twiss module
+  
+iteration:   1 error:   1.164940E-02 deltap:   0.000000E+00
+orbit:  -7.106825E-10  1.187210E-09  2.612573E-05  4.367911E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   6.324935E-10 deltap:   0.000000E+00
+orbit:  -1.672325E-10  1.398144E-11  2.612573E-05  4.367911E-03  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    5.014084945e-05        141.2225849 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4439001        1809.786022       0.5739665162 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209503266    1.679390388e-08    1.929068866e-09        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049272         5220.00924        161.4225128        15.08883109 
+
+            ycomax             ycorms             deltap            synch_1 
+      0.0141054873     0.001250508266                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+twiss with after correction
+enter Twiss module
+  
+iteration:   1 error:   1.004132E-02 deltap:   0.000000E+00
+orbit:  -2.738296E-09 -7.564081E-10  2.606376E-05  8.224674E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.413612E-09 deltap:   0.000000E+00
+orbit:   2.489484E-12 -2.222929E-12  2.606376E-05  8.224748E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    6.969691002e-06        378.7854059 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4438999        1809.786022       0.5743029491 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209546779     1.81312969e-10    2.572988873e-11        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049271        5220.009239     0.005162166114    0.0006235730146 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.001512732049    8.293074891e-05                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+9 =                  9 ;
+--------------------------------------------
+Increase ALIGNMENT ERRORS                   
+--------------------------------------------
+--------------------------------------------
+ASIGN ALIGNMENT ERRORS                      
+--------------------------------------------
+twiss with increased misalignment
+enter Twiss module
+  
+iteration:   1 error:   1.292178E-02 deltap:   0.000000E+00
+orbit:  -1.193214E-09  1.245712E-09  2.942840E-05  4.367996E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   7.231444E-10 deltap:   0.000000E+00
+orbit:  -1.593006E-10  1.042232E-11  2.942840E-05  4.367996E-03  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    5.014082825e-05        141.2226147 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4439001        1809.786022       0.5739655159 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209503263    1.681311118e-08    1.944574017e-09        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049272         5220.00924        161.4227625        15.08881642 
+
+            ycomax             ycorms             deltap            synch_1 
+      0.0141047521      0.00125115456                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+twiss with after correction
+enter Twiss module
+  
+iteration:   1 error:   1.131371E-02 deltap:   0.000000E+00
+orbit:  -3.476393E-09 -9.601892E-10  2.936645E-05  9.112675E-07  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   1.794568E-09 deltap:   0.000000E+00
+orbit:   3.010651E-12 -2.751639E-12  2.936645E-05  9.112781E-07  0.000000E+00  0.000000E+00
+
+++++++ table: summ
+
+            length             orbit5               alfa            gammatr 
+       99983.86459                 -0    6.969690585e-06        378.7854172 
+
+                q1                dq1            betxmax              dxmax 
+            387.08       -503.4438999        1809.786022       0.5743029709 
+
+             dxrms             xcomax             xcorms                 q2 
+      0.1209546779    2.211459439e-10    3.168591712e-11        387.1400001 
+
+               dq2            betymax              dymax              dyrms 
+      -1104.049271        5220.009239     0.005799002152    0.0006935196822 
+
+            ycomax             ycorms             deltap            synch_1 
+    0.001697504801    9.228808484e-05                  0                  0 
+
+           synch_2            synch_3            synch_4            synch_5 
+                 0                  0                  0                  0 
+
+            nflips 
+                 0 
+10 =                 10 ;
+--------------------------------------------
+Increase ALIGNMENT ERRORS                   
+--------------------------------------------
+--------------------------------------------
+ASIGN ALIGNMENT ERRORS                      
+--------------------------------------------
+twiss with increased misalignment
+enter Twiss module
+  
+iteration:   1 error:   1.419417E-02 deltap:   0.000000E+00
+orbit:  -1.763716E-09  1.279938E-09  3.273109E-05  4.368085E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   8.130310E-10 deltap:   0.000000E+00
+orbit:  -1.513204E-10  6.807150E-12  3.273109E-05  4.368085E-03  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map can't be symplified!                                                                                                                     
+++++++ warning: Twiss failed:  MAD-X continues
+twiss with after correction
+enter Twiss module
+  
+iteration:   1 error:   1.419417E-02 deltap:   0.000000E+00
+orbit:  -1.763716E-09  1.279938E-09  3.273109E-05  4.368085E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   8.130310E-10 deltap:   0.000000E+00
+orbit:  -1.513204E-10  6.807150E-12  3.273109E-05  4.368085E-03  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map can't be symplified!                                                                                                                     
+++++++ warning: Twiss failed:  MAD-X continues
+enter Twiss module
+  
+iteration:   1 error:   1.419417E-02 deltap:   0.000000E+00
+orbit:  -1.763716E-09  1.279938E-09  3.273109E-05  4.368085E-03  0.000000E+00  0.000000E+00
+  
+iteration:   2 error:   8.130310E-10 deltap:   0.000000E+00
+orbit:  -1.513204E-10  6.807150E-12  3.273109E-05  4.368085E-03  0.000000E+00  0.000000E+00
+++++++ warning: TWCPIN:  One-turn map can't be symplified!                                                                                                                     
+++++++ warning: Twiss failed:  MAD-X continues
+
+  Number of warnings: 20
+15 in C and 5 in Fortran
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +          MAD-X finished normally         +
+  ++++++++++++++++++++++++++++++++++++++++++++

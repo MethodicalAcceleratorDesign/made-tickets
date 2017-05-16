@@ -1,0 +1,24 @@
+option,-echo,info,warn; !, no_fatal_stop;
+
+CALL,file="test_cell.madx";
+
+beam,particle=carbon,mass=n*nmass,charge=z,energy=en;
+USE,sequence=cellseq;
+
+VALUE, Z,N,T,phi,B;
+VALUE,EN,PC,PC0,h,h0,LT,VDH;
+value, clight*Z*B*0.1/PC*1e-9;
+value, B1S->ANGLE,B1S->L,B1S->e1,B1S->e2;
+
+set,format="22.15g";
+select,flag=twiss,clear;
+select,flag=twiss,COLUMN=S,NAME,BETX,BETY,MUX,MUY,ALFX,ALFY,DX,DPX,K0L,K1L;
+
+twiss,chrom,file="cell.optic",table="twiss",betx=betx0,bety=bety0,alfx=alfx0,alfy=alfy0,mux=0,muy=0,dx=dx0,dpx=dpx0;
+
+PLOT, TABLE=TWISS, HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,
+      COLOUR=100,FILE="cell";
+PLOT, TABLE=TWISS, HAXIS=S,VAXIS1=MUX,VAXIS2=MUY,
+      COLOUR=100,FILE="cell";
+
+STOP;

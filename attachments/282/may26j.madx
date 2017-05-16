@@ -1,0 +1,64 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with madX
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20, 
+        post=1,font=-4,lwidth=5;
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=16, 
+        post=1,font=-4,lwidth=10;
+
+!-- Define EMMA lattice  with dipoles
+title,"EMMA baseline lattice - may26j";
+beam,particle=electron,energy=0.015+beam->mass;
+periodL:=0.394481;
+periodN:=42;
+fang:=-0.05;
+dang:=2*pi/periodN-fang;
+qf: sbend,l=0.058782,k1:=+129.469,angle:=fang,e1:=-fang;
+qd: sbend,l=0.075699,k1:=-90.967,angle:=dang,e2:=dang;
+ld: drift,l=0.21;
+sd: drift,l=0.05;
+cell: line=(ld,qf,sd,qd);
+ring: line=(42*cell);
+
+!-- Adjust fang 
+use,period=cell;
+match,use_macro; 
+vary,name=fang,step=0.01; 
+m1: macro={twiss,rmatrix;}; 
+constraint, expr= table(summ,alfa)=0.001085326514; 
+jacobian,tolerance=1e-20; 
+endmatch; 
+
+!-- Set DELTAP
+dpp:=0;
+
+!-- Launch PTC_TWISS orbit from perfect machine
+use,period=cell;
+!select,flag=ptc_twiss,column=name,s,beta11,alfa11,mu1,disp1, 
+!beta22,alfa22,mu2,disp3,x,px,y,py,t,pt; 
+system,"erase ptc.lis";
+ptc_create_universe; 
+ptc_create_layout,model=2,method=6,nst=30,exact;!
+ptc_twiss,closed_orbit,icase=5,file="ptc.lis",deltap:=dpp,table,maptable,no=2,deltap_dependency; 
+plot,table=ptc_twiss,file="may26j",haxis=s,vaxis=x,colour=100,noversion,noline; 
+plot,table=ptc_twiss,file="may26j",haxis=s,vaxis=beta11,beta22,colour=100,noversion,noline; 
+plot,table=ptc_twiss,file="may26j",haxis=s,vaxis=disp1,colour=100,noversion,noline; 
+ptc_normal,closed_orbit,icase=5,deltap:=dpp,maptable;
+ptc_end; 
+system,"copy /y ptc.lis may26j.lis";
+write,table="map_table",file="may26j.mapfile";
+
+use,period=cell;
+ptc_create_universe; 
+ptc_create_layout,model=2,method=6,nst=30,exact;!
+ptc_twiss,icase=5,file="ptc.lis",no=1,deltap:=dpp,initial_matrix_table,table;
+plot,table=ptc_twiss,file="may26j",haxis=s,vaxis=x,colour=100,noversion,noline,interpolate; 
+plot,table=ptc_twiss,file="may26j",haxis=s,vaxis=beta11,beta22,colour=100,noversion,noline,interpolate; 
+plot,table=ptc_twiss,file="may26j",haxis=s,vaxis=disp1,colour=100,noversion,noline,interpolate; 
+ptc_normal,icase=5,deltap:=dpp,maptable;
+ptc_end;
+system,"copy /y may26j.lis+ptc.lis may26j.lis";
+
+stop; 
+
+
+

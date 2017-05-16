@@ -1,0 +1,82 @@
+
+// returns integer part of number in variable 'intout'
+int(xxrealxx):MACRO = {intout=xxrealxx;};
+
+
+settitle(xxversionxx):MACRO = {
+	TITLE, 'TT66 vxxversionxx';
+};
+
+loadsequence(xxversionxx):MACRO = {
+	CALL,	FILE = "tt66-vxxversionxx.seq";
+};
+
+loadtrajcorrsequence(xxversionxx):MACRO = {
+	CALL,	FILE = "tt66-vxxversionxx-trajcorr.seq";
+};
+
+copytwiss(xxversionxx,xxrxintxx,xxrxrealxx,xxryintxx,xxryrealxx):MACRO = {
+	!SYSTEM, 'if [ ! -d twiss-files ] ; then mkdir twiss-files ;  fi'; 
+	SYSTEM, 'if not exist twiss-files mkdir twiss-files'; 
+	!SYSTEM, 'cp twiss twiss-files/tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.twiss.tfs';
+	SYSTEM, 'copy twiss twiss-files\tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.twiss.tfs';
+};
+
+copyaperture(xxversionxx,xxrxintxx,xxrxrealxx,xxryintxx,xxryrealxx):MACRO = {
+	!SYSTEM, 'if [ ! -d aperture-files ] ; then mkdir aperture-files ;  fi';
+	SYSTEM, 'if not exist aperture-files mkdir aperture-files'; 	
+	!SYSTEM, 'cp aperture aperture-files/tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.aperture.tfs';
+	SYSTEM, 'copy aperture aperture-files\tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.aperture.tfs';
+};
+
+copyaperturen1(xxversionxx,xxrxintxx,xxrxrealxx,xxryintxx,xxryrealxx):MACRO = {
+	!SYSTEM, 'if [ ! -d aperture-files ] ; then mkdir aperture-files ;  fi';
+	SYSTEM, 'if not exist aperture-files mkdir aperture-files'; 
+	!SYSTEM, 'cp aperture-n1 aperture-files/tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.aperture-n1.tfs';
+	SYSTEM, 'copy aperture-n1 aperture-files\tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.aperture-n1.tfs';
+};
+
+copyps(xxversionxx,xxrxintxx,xxrxrealxx,xxryintxx,xxryrealxx):MACRO = {
+	!SYSTEM, 'if [ ! -d ps-files ] ; then mkdir ps-files';
+	SYSTEM, 'if not exist ps-files mkdir ps-files ;  fi';
+	!SYSTEM, 'cp madx.ps ps-files/tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.ps';
+	SYSTEM, 'copy madx.ps ps-files\tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.ps';
+};
+
+copypsfailuretest(xxversionxx,xxrxintxx,xxrxrealxx,xxryintxx,xxryrealxx):MACRO = {
+	!SYSTEM, 'if [ ! -d failure-test ] ; then mkdir failure-test'; 
+	SYSTEM, 'if not exist failure-test mkdir failure-test'; 
+	!SYSTEM, 'cp madx.ps failure-test/tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.ps';
+	SYSTEM, 'copy madx.ps failure-test\tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.ps';
+};
+
+copysurvey(xxversionxx):MACRO = {
+	!SYSTEM, 'cp survey tt66-vxxversionxx.survey.tfs';
+	SYSTEM, 'copy survey tt66-vxxversionxx.survey.tfs';
+};
+
+// loads a strength file
+openstr(xxversionxx,xxrxintxx,xxrxrealxx,xxryintxx,xxryrealxx):MACRO = {
+	CALL,	FILE = "strength-files\out.tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.str";
+};
+
+// opens a file for saving the quadrupole strengths
+// it must be closed afterwards using assign, echo= terminal;
+savestr(xxversionxx,xxrxintxx,xxrxrealxx,xxryintxx,xxryrealxx):MACRO = {
+	!SYSTEM, 'if [ ! -d strength-files ] ; then mkdir strength-files ;  fi'; 
+	SYSTEM, 'if not exist strength-files mkdir strength-files'; 
+	!SYSTEM, 'rm -f strength-files/out.tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.str';
+	SYSTEM, 'del strength-files/out.tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.str';
+	ASSIGN, echo= "strength-files\out.tt66-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.str";
+};
+
+// opens a file for saving the focal point size
+// it must be closed afterwards using assign, echo= terminal;
+savefp(xxversionxx,xxrxintxx,xxrxrealxx,xxryintxx,xxryrealxx):MACRO = {
+	!SYSTEM, 'if [ ! -d focalpoint-files ] ; then mkdir focalpoint-files ;  fi';
+	SYSTEM, 'if not exist focalpoint-files mkdir focalpoint-files'; 
+	!SYSTEM, 'rm -f focalpoint-files/out.tt66-focalpoint-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.txt';
+	SYSTEM, 'del focalpoint-files\out.tt66-focalpoint-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.txt';
+	ASSIGN, echo= "focalpoint-files\out.tt66-focalpoint-vxxversionxx-xxrxintxx_xxrxrealxxmm-xxryintxx_xxryrealxxmm.txt";
+};
+

@@ -1,0 +1,137 @@
+  TITLE, "BasicMatching";  
+
+ ! Working Points :
+ !   Nominal                     : Qh = 1.82 and Qv = 2.72
+ !   Lower working point         : Qh = 1.64 and Qv = 1.57
+ !   Higher WP (accumulation ?)  : Qh = 1.88 and Qv = 1.81
+ !   Higher WP (extraction ?)    : Qh = 1.85 and Qv = 1.82
+  TuneH  =  1.82;
+  TuneV  =  2.72;
+  DisEC  = -0.00;
+  BetHEC =  5.00;
+  BetVEC =  5.00;
+  kEddy  =  0.00;
+
+! Define lattice .... first parameter, then CALL a routine
+
+! LSSH = ((25.-2*4.17)*Pi - .0052)/8. ! To have a circumf. of 25 Pi m
+  LSSH = 6.5422;                      ! From fit to survey data
+  DFD = 0.;  !  Flag, if 1 DFD, if 0 FDF
+  dLSext = 0.005;  ! Mag. length decrease of Quads due to adjacent X-Pole
+  dLBmp  = 0.000;  ! Mag. length decrease of Quads due to adjacent Bumper
+  dLDip  = 0.000;  ! Mag. length decrease of Quads due to adjacent Dipole
+  dLSol  = 0.000;  ! Mag. length decrease of Quads due to adjacent correct. Sol.
+  dLSkew = 0.005;  ! Mag. length decrease of Quads due to adjacent Skew Quad
+  KickEC = 1.;     ! Flag whether kick due to cooler is taken into account (=1) or not (-0)   
+
+!  CALL, FILE = "LEIR_lattice_ORIG.madx";
+
+
+!   CALL, FILE = "LEIR_lattice_myCav.madx";
+
+! Beam properties at injection and lattice selection - ORIGINAL
+!  BEAM, PARTICLE=Pb54, MASS=0.931494*(207.947/208.), CHARGE=54./208., ENERGY=0.931494*(207.947/208.) + .0042; ! Beam properties at injection 
+
+! *************************************************************
+
+   CALL, FILE = "LEIR_lattice_myCavVscaled.madx";
+
+! for CHARGE=1 ... DO NOT forget to SCALE the RF voltage !
+! BEAM, PARTICLE=Pb54, MASS=0.931494*(207.947/208.)/54., CHARGE=1., ENERGY=(0.931494*(207.947/208.) + .0042)/54.; ! Beam properties at injection 
+
+! Michaels Beam
+ BEAM, PARTICLE=PROTON, ENERGY=0.938272+0.0042; ! Beam properties at injection
+value, beam->pc;
+value, beam->energy;
+value, beam->charge;
+
+!stop;
+
+! *************************************************************
+               
+  USE, PERIOD = LEIR;
+
+! Matching of lattice without perturbation (even coupling)
+ CALL, FILE = "MatchNoCoup.madx";
+! STOP;
+
+! Switch on Coupling  (At injection) and correct :
+! ECDH1, KICK = 0;
+! ECDH2, KICK = 0;
+  Msol  = 0.10/((208./54.)*SQRT(2*4.2*931.5 + 4.2*4.2)/299.79);
+  Mkoef = 0.;
+  MsolC =-Msol*(0.18787*0.1059 + 0.48451*0.549 + 0.15578*0.74 + 0.53184*0.9 + 
+                0.110*1.02 + 1.089)/.427; ! (2.15/0.4);
+  kSk1  = 0.;
+  CALL, FILE = "CouplingCorrLocal.madx";   ! Only working point shifted back
+  CALL, FILE = "CouplingCorrGlobal.madx";  ! Complete Rematching of the whole ring 
+
+! Eventually add gradients in bends due to Eddy curents :
+! kEddy =-0.010;
+! CALL, FILE = "CouplingCorrGlobal.madx";
+! kEddy =-0.020;
+! CALL, FILE = "CouplingCorrGlobal.madx";
+! kEddy =-0.025;
+! CALL, FILE = "CouplingCorrGlobal.madx";
+
+  USE, PERIOD = LEIR;
+  SELECT, FLAG=TWISS, COLUMN=NAME, L, S, BETX, ALFX, MUX, BETY, ALFY, MUY, DX, R11, R12;
+
+  TWISS, FILE=Test.Out;
+
+  !emit, deltap=0.0;
+
+! Addition for individual particle tracking, added Sept.28, 2012, m. bodendorfer
+
+!MAKETHIN,SEQUENCE=LEIR;
+!USE,SEQUENCE=LEIR;
+!TRACK;
+!Nparticles = 4;
+!RAD = 100.0E-06;
+!ANGSTP = 2*PI/Nparticles;
+!N = 0;
+!WHILE(N < Nparticles) {
+!ANG = N*ANGSTP;
+!XS = RAD*COS(ANG);
+!XPS = RAD*SIN(ANG);
+!VALUE, XS,XPS;
+!START,X=XS,PX=XPS;
+!N = N + 1;
+!}
+!RUN,TURNS=4;
+!ENDTRACK;
+!STOP;
+
+
+!select, flag=ptc_twiss, column=name,s,beta11,beta12;
+!ptc_create_universe;
+!ptc_create_layout, model=2, nst=10, time=false, method=6;
+!ptc_twiss, icase=6, file=ptctwiss;
+!ptc_end;
+
+!==============
+! GINO                            ! comment out 'gino' to run madx
+
+!ptc_open_gino, command=opengino;
+USE, PERIOD= LEIR; 
+
+ptc_create_universe;
+ptc_create_layout, model=2, method=2, nst=5, exact=true;
+  ! method=6, nst=10, exact=true, closed_layout=true,resplit,xbend;
+           
+! ptc_script, file="thin4.PTC";
+! ptc_script, file="twiss_script.PTC";
+ptc_twiss, icase=6, closed_orbit=true, file=ptctwiss;
+ 
+! GINO interface
+
+!ptc_open_gino, command=mini;
+!
+!ptc_open_gino, command=closegino;
+
+ptc_end;
+
+!STOP;
+
+
+

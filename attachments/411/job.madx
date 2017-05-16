@@ -1,0 +1,120 @@
+!! oblancog First twiss 20161123 
+option,echo,info,warn;
+
+! the beam 
+E0     := 45.000;![GeV]
+npar   := 1.9e10;
+emitx  := 5.73e-9;![m]
+emity  := 5.73e-11;![m] 
+blength:= 3.6e-3;![m]
+bcur   := 240e-3;![A]
+nbunch := 100;
+nparpb := 3.1e11;
+espread:= 1e-3;
+beam, PARTICLE=positron, ENERGY=E0,
+      ex=emitx, ey=emity, et=blength*espread,
+      sigt=blength, sige=espread, kbunch=nbunch,
+      NPART=nparpb, bcurrent=bcur, RADIATE=true;
+
+! The ring 
+call, file = "Pos_45GeV_Ring_8.mad.madx";
+use, sequence=Low_Emit_RING, range=#s/#e;
+SXT_ON := 1;
+
+! The cavity parameters
+RF_ON       := 1.5;! w/o rad 2/3
+RFc->LAG    := 0.426;!w rad n rf=1, 0.378;!w/o rad, 0.5-0.016;
+RFc->FREQ   := 500.117256;
+RFc->HARMON := 10510;
+
+! Beam pipe
+Rpipe = 50e-3;![m]
+AngMax = 1.0; !maximum angle 1[rad]
+
+! arcs twiss parameters definition (from last match in mad)
+KSF2 :=   1.95*sxt_on;
+KS1A :=  -2.17*sxt_on;
+KS1B :=  -1.56*sxt_on;
+KS1D :=  -1.56*sxt_on;
+KS1E :=  -2.17*sxt_on;
+KOF1 := -38.5;
+KDF1 := 150.0;
+KDD1 :=   0.0;
+KQD9 :=  -3.502004E-01;
+KQF8 :=   2.355622E-01;
+KQD7 :=  -3.659796E-01;
+KQF6 :=   2.317365E-01;
+KQD5 :=  -2.041680E-01;
+KQF4 :=   1.784162E-01;
+KQD3 :=  -2.234357E-01;
+KQD2 :=  -3.917201E-01;
+KQD1 :=  -3.801510E-01;
+KQF2 :=   2.048242E-01;
+KQF1 :=   1.977323E-01;
+
+! NO purpose tracking in MAD-X
+!   but checking longitudinal phase space (track cols 7=T=-ct,8=PT=e.spread)
+!   for the mad team
+system, "rm -f track*";
+!makethin lenses
+select,flag=makethin,class=sbend,thick=false,slice=5;!
+select,flag=makethin,class=quadrupole,thick=false,slice=1;
+select,flag=makethin,class=sextupole,thick=false,slice=1;
+makethin, sequence=Low_Emit_RING,makedipedge=true,style=teapot;
+save, sequence=Low_Emit_RING,file="Low_Emit_RING.thin.seq";
+call, file="Low_Emit_RING.thin.seq";
+use, sequence=Low_Emit_RING;
+!set parameters
+!!!! First case 
+! ONE Particle, no damp, no quantum... but it damps !
+track, onepass=true,aperture=true,onetable,recloss,dump,
+       file="track1P_nodamp_noquantum",
+       damp=false,quantum=false;!<-- here madx team
+start, X=0, PX=0, Y=0, PY=0, T=0, PT=-4e-2;
+run,turns=500,maxaper={Rpipe,AngMax,Rpipe,AngMax,1.0,0.1};!run track
+endtrack;
+! TWO Particles, no damp, no quantum... but first one damps !
+track, onepass=true,aperture=true,onetable,recloss,dump,
+       file="track2P_nodamp_noquantum",
+       damp=false,quantum=false;!<-- here madx team
+start, X=0, PX=0, Y=0, PY=0, T=0, PT=0;
+start, X=0, PX=0, Y=0, PY=0, T=0, PT=-4e-2;
+run,turns=500,maxaper={Rpipe,AngMax,Rpipe,AngMax,1.0,0.1};!run track
+endtrack;
+! TWO Particles, no damp, no quantum... but first one damps !
+!   this time swaping them
+track, onepass=true,aperture=true,onetable,recloss,dump,
+       file="track2P_nodamp_noquantum_swap",
+       damp=false,quantum=false;!<-- here madx team
+start, X=0, PX=0, Y=0, PY=0, T=0, PT=-4e-2;
+start, X=0, PX=0, Y=0, PY=0, T=0, PT=0;
+run,turns=500,maxaper={Rpipe,AngMax,Rpipe,AngMax,1.0,0.1};!run track
+endtrack;
+
+!!!! Second case, damp and quantum 
+! ONE Particle, damp, no quantum... looks OK
+track, onepass=true,aperture=true,onetable,recloss,dump,
+       file="track1P_damp_noquantum",
+       damp=true,quantum=false;!<-- here madx team
+start, X=0, PX=0, Y=0, PY=0, T=0, PT=-4e-2;
+run,turns=500,maxaper={Rpipe,AngMax,Rpipe,AngMax,1.0,0.1};!run track
+endtrack;
+! ONE Particle, damp, quantum... here I expected to reach the
+!   equilibrium energy spread of about 1.5e-3. But instead the phase space
+!   never converges and it is displaced.
+track, onepass=true,aperture=true,onetable,recloss,dump,
+       file="track1P_damp_quantum",
+       damp=true,quantum=true;!<-- here madx team
+start, X=0, PX=0, Y=0, PY=0, T=0, PT=-4e-2;
+run,turns=500,maxaper={Rpipe,AngMax,Rpipe,AngMax,1.0,0.1};!run track
+endtrack;
+! ONE Particle, no damp, quantum... for completeness, seems
+!   to be equal to nodamp no quantum
+track, onepass=true,aperture=true,onetable,recloss,dump,
+       file="track1P_nodamp_quantum",
+       damp=false,quantum=true;!<-- here madx team
+start, X=0, PX=0, Y=0, PY=0, T=0, PT=-4e-2;
+run,turns=500,maxaper={Rpipe,AngMax,Rpipe,AngMax,1.0,0.1};!run track
+endtrack;
+!write, table=trackloss, file="trackloss";!write lost particles
+! End of NO purpose tracking in MAD-X

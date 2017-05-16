@@ -1,0 +1,227 @@
+/***********************************************************
+ * solenoid.madx
+ *
+ * Call this program by: >madx < solenoid.madx
+ *
+ ***********************************************************/
+
+
+ option, -info;
+
+
+
+
+/***********************************************************
+ * Element definitions
+ ***********************************************************/
+ BSOL := 0.001; ! 100 Gauss
+ KSOL := BSOL/BRHO;
+ MSOL:  SOLENOID, L=1.0, KS:= KSOL;
+
+
+/***********************************************************
+ * sequence definition:  seq
+ ***********************************************************/
+ seq: SEQUENCE,  refer=entry, L  =  1.0;
+ MSOL                       , at =  0.0;
+ ENDSEQUENCE;
+
+
+
+/***********************************************************
+ * Initial parameters
+ ***********************************************************/
+ BETX0  := 87.09680000;
+ ALFX0  := -3.94194000;
+ MUX0   :=  0.00000000;
+ BETY0  :=  1.00000000;
+ ALFY0  :=  0.00000000;
+ MUY0   :=  0.00000000;
+ X0     :=  0.00000000;
+ PX0    :=  0.00000000;
+ Y0     :=  0.00000000;
+ PY0    :=  0.00000000;
+ T0     :=  0.00000000;
+ PT0    :=  0.00000000;
+ DX0    :=  0.00000000;
+ DPX0   :=  0.00000000;
+ DY0    :=  0.00000000;
+ DPY0   :=  0.00000000;
+
+
+
+/***********************************************************
+ * Store initial parameters in memory block
+ ***********************************************************/
+INITBETA0: BETA0,
+  BETX=BETX0,
+  ALFX=ALFX0,
+  MUX=MUX0,
+  BETY=BETY0,
+  ALFY=ALFY0,
+  MUY=MUY0,
+  X=X0,
+  PX=PX0,
+  Y=Y0,
+  PY=PY0,
+  T=T0,
+  PT=PT0,
+  DX=DX0,
+  DPX=DPX0,
+  DY=DY0,
+  DPY=DPY0;
+
+
+
+/***********************************************************
+ * beam and use
+ ***********************************************************/
+ m0 = 0.938272046; !  [GeV/c^2] ANTIPROTON mass in GeV
+ energy = m0 / sqrt(1-beta*beta);
+ Pc = 13.7/1000; ! 13.7 MeV/c
+ BRHO     := Pc * 3.3356; !momentum in GeV/c
+
+ beam, particle=ANTIPROTON, Pc =Pc;
+ use, sequence=seq;
+
+ value, beam->Pc, beam->beta, BRHO;
+ value, m0 / sqrt(1-beam->beta*beam->beta), beam->energy;  ! energy
+
+
+/***********************************************************
+ * DELTAP
+ ***********************************************************/
+ PSHIFT=0.0;
+
+
+/***********************************************************
+ * output format
+ ***********************************************************/
+ set,  format="12.8f"; ! format twiss output file
+
+
+
+
+/***********************************************************
+ * PTC
+ ***********************************************************/
+ b=beam->beta;
+ value, beam->beta,b;
+ value, 1/b - sqrt((1+PSHIFT)*(1+PSHIFT)+(1-b*b)/(b*b));
+
+ calculatetwiss : macro={
+     select, flag=twiss,clear;
+     select, flag=twiss,column=name, s, l, x, px, y, py;
+
+     ptc_create_universe;
+     ptc_create_layout,model=2,method=6,nst=5,time=true,exact;
+
+     ptc_twiss, table=twiss, icase=5, no=2, BETA0=INITBETA0, X=X0, PX=PX0, Y=Y0, PY=PY0
+              , DELTAP = PSHIFT
+              , file=optics.out;
+
+     ptc_end;
+ }; // End of macro
+
+
+
+
+/**********************************************************************************************************************
+ **********************************************************************************************************************
+ * CALCULATE optics functions with PTC  -  Move around in an ellipse
+ **********************************************************************************************************************
+ **********************************************************************************************************************/
+ exec, calculatetwiss;
+
+
+
+/***********************************************************
+ * INITIALIZATION
+ ***********************************************************/
+ ax=(1+ALFX0^2)/BETX0; ! gamma
+ bx=BETX0;
+ cx=2*ALFX0;
+ fx=-8.0E-6; ! -Emittance
+
+ ay=(1+ALFY0^2)/BETY0; ! gamma
+ by=BETY0;
+ cy=2*ALFY0;
+ fy=-8.0E-6; ! -Emittance
+ value, ax,bx,cx,fx;
+ value, ay,by,cy,fy;
+
+
+ system,"rm END";
+ system,"rm START";
+
+ create, table=START,column=x,px,y,py;
+ create, table=END,  column=x,px,y,py;
+
+
+
+/***********************************************************
+ * CALULATION OF ELLIPSE
+ ***********************************************************/
+ NN=5;
+ n=-(NN-1);
+ while(n<NN)
+ {
+       X0  := Sqrt(abs(fx)*BETX0)*n/NN;
+       Y0  := Sqrt(abs(fy)*BETY0)*n/NN;
+
+
+       PX0 := (-cx*X0 - Sqrt((cx*X0)^2 - 4*bx*(fx + ax*(X0^2))))/(2*bx);
+       PY0 := (-cy*Y0 - Sqrt((cy*Y0)^2 - 4*by*(fy + ay*(Y0^2))))/(2*by);
+       PX0=0;PY0=0; !                       <------    Set the initial angle equal to zero
+
+       value, X0, PX0;
+       value, Y0, PY0;
+
+     ! twiss ---------------------------
+       exec, calculatetwiss;
+
+     ! save ----------------------------
+       x=X0;  px=PX0;
+       y=Y0;  py=PY0;
+       fill, table=START;
+       x=table(twiss,SEQ$END,x);    px=table(twiss,SEQ$END,px);
+       y=table(twiss,SEQ$END,y);    py=table(twiss,SEQ$END,py);
+       fill, table=END;
+       value, x, px;
+       value, y, py;
+
+
+       PX0 := (-cx*X0 + Sqrt((cx*X0)^2 - 4*bx*(fx + ax*(X0^2))))/(2*bx);
+       PY0 := (-cy*Y0 + Sqrt((cy*Y0)^2 - 4*by*(fy + ay*(Y0^2))))/(2*by);
+       PX0=0;PY0=0; !                       <------    Set the initial angle equal to zero
+
+     ! twiss ----------------------
+       exec, calculatetwiss;
+
+     ! save -----------------------
+       x=X0;  px=PX0;
+       y=Y0;  py=PY0;
+       fill, table=START;
+       x=table(twiss,SEQ$END,x);    px=table(twiss,SEQ$END,px);
+       y=table(twiss,SEQ$END,y);    py=table(twiss,SEQ$END,py);
+       fill, table=END;
+       value, x, px;
+       value, y, py;
+
+       n=n+1;
+ }
+
+ write,table=START, file="START.CVS";
+ write,table=END, file="END.CVS";
+
+
+
+/*******************************************************************************
+ * Clean up (remove Maxwellian_bend_for_ptc.txt )
+ *******************************************************************************/
+
+system, "rm Maxwellian_bend_for_ptc.txt";
+system, "rm optics.out";
+
+stop;
+

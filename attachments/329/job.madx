@@ -1,0 +1,17 @@
+! load regular optics
+call, file="/afs/cern.ch/eng/lhc/optics/V6.503/V6.5.seq";
+call, file="/afs/cern.ch/eng/lhc/optics/V6.503/V6.5.inj.str";
+beam, sequence=lhcb1, particle=proton, energy=450;
+use, sequence=lhcb1;
+
+! cut quadrupoles into two thick slices
+select, flag=makethin, class=quadrupole, thick=true, slice=1;
+makethin, sequence=lhcb1;
+use, sequence=lhcb1;
+
+! run twiss
+select, flag=twiss, clear;
+select, flag=twiss, class=quadrupole, column=name,keyword,s;
+select, flag=twiss, class=multipole;
+select, flag=twiss, class=marker;
+twiss, file="twiss.tfs";

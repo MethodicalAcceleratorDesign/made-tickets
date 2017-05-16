@@ -1,0 +1,46 @@
+call, file = v2hsc.mad;
+match, sequence = v2hsc, betx = 3, alfx = 0, dx = 0, dpx = 0, bety = 3, alfy = 0, dy = 0, dpy = 0, use_macro;
+
+  vary, name = t201001mqdk1;
+  vary, name = t201002mqfk1;
+  vary, name = v200000mqdk1;
+  vary, name = v200001mqfk1;
+  vary, name = v200002mqdk1;
+  vary, name = v201000mqdk1;
+  vary, name = v201001mqfk1;
+  vary, name = v201002mqdk1;
+
+  m1: macro = {use,sequence = v2hsc; twiss, betx = 3, alfx = 0, dx = 0, dpx = 0, bety = 3, alfy = 0, dy = 0, dpy = 0;};
+
+ // constraint, expr = table(summ, betxmax)<80;
+ // constraint, expr = table(summ, betymax)<80;
+  constraint, expr = table(twiss, rf4, betx) = 7.2;
+  constraint, expr = table(twiss, rf4, alfx) = 0.0;
+  constraint, expr = table(twiss, rf4, bety) = 3.;
+  constraint, expr = table(twiss, rf4, alfy) = 0.0;
+  constraint, expr = table(twiss, rf4, dy) = 0.0;
+  constraint, expr = table(twiss, rf4, dpy) = 0.0;
+  constraint, expr = table(twiss, rf4, muy) = 1.5;
+  constraint, expr = table(twiss, rf4, mux) = 1.0;  
+  
+  weight, mux=100, muy=100;
+
+
+  Simplex, calls=2000,tolerance = 1E-12;
+ 
+// Jacobian, calls = 200, bisec=6, tolerance = 1E-12;
+endmatch;
+
+value, t201001mqdk1;
+
+select,flag=save,clear;
+select,flag=save,class=value,pattern="$mqf*";
+select,flag=save,class=variable,pattern="$mqd*";
+save,file="v2hscm.str";
+USE, sequence = v2hsc;
+SELECT, flag = twiss, clear;
+SELECT, flag = twiss, column = name, keyword, s, l, betx, bety, alfx, alfy, dx, dpx, mux, muy, dy, dpy, k1l, k2l;
+TWISS, save, file = "v2hscm.twiss", betx = 3, alfx = 0, dx = 0, dpx = 0, bety = 3, alfy = 0, dy = 0, dpy = 0;
+//SURVEY, x0 = -12.25246434, y0 = 1.25, z0 = 55.272828420000003, theta0 = -5.49778714, phi0 = 0.0, psi0 = 0.0, file = "v2.svy", sequence = v2;
+//value,tar;
+RETURN;

@@ -1,0 +1,197 @@
+!#MADX
+!
+!Definition of CT Line: TL1 and TL2, 
+!Starting at girder 15 up to injection to DL, including Frascati Chicane
+!
+
+CTLINE_SEQX = 1; !marker that allows to verify that this file was loaded
+
+ 
+IAMAX:=10;
+IBMAX:=10;
+ICMAX:=100;
+IDMAx:=200;
+IEMAX:=150;
+IFMAX:=250;
+
+ungrado:=pi/180;
+agl:= 0.31416; ! ungrado*18;
+magl:=-agl;
+
+!bhe0210:SBEND, L:=.561, ANGLE:=magl, e1:=magl/2, e2:=magl/2, fint:=fc.fint, hgap := fc.hgap, permfringe=false, kill_ent_fringe=true, kill_exi_fringe=true, bend_fringe=false;
+!bhe0240:SBEND, L:=.561, ANGLE:=agl,  e1:=agl/2,  e2:=agl/2,  fint:=fc.fint, hgap := fc.hgap, permfringe=false, kill_ent_fringe=true, kill_exi_fringe=true, bend_fringe=false;
+!bhe0260:SBEND, L:=.561, ANGLE:=agl,  e1:=agl/2,  e2:=agl/2,  fint:=fc.fint, hgap := fc.hgap, permfringe=false, kill_ent_fringe=true, kill_exi_fringe=true, bend_fringe=false;
+!bhe0290:SBEND, L:=.561, ANGLE:=magl, e1:=magl/2, e2:=magl/2, fint:=fc.fint, hgap := fc.hgap, permfringe=false, kill_ent_fringe=true, kill_exi_fringe=true, bend_fringe=false;
+
+
+aglhalf =  agl/2;
+
+bhe0210:RBEND, L:=.561, ANGLE:=-0.31416, fint:=bhe.fint, fintx:=bhe.fint, hgap := bhe.hgap, ptcrbend=true, truerbend=true;
+bhe0240:RBEND, L:=.561, ANGLE:= 0.31416, fint:=bhe.fint, fintx:=bhe.fint, hgap := bhe.hgap, ptcrbend=true, truerbend=true;
+bhe0260:RBEND, L:=.561, ANGLE:= 0.31416, fint:=bhe.fint, fintx:=bhe.fint, hgap := bhe.hgap, ptcrbend=true, truerbend=true;
+bhe0290:RBEND, L:=.561, ANGLE:=-0.31416, fint:=bhe.fint, fintx:=bhe.fint, hgap := bhe.hgap, ptcrbend=true, truerbend=true;
+
+
+
+angsp:=22.75;
+bhb0450: SBEND, L:=.48, ANGLE:=angsp*ungrado, e1:=angsp*ungrado/2,
+ e2:=angsp*ungrado/2, fint=0.5, permfringe=false, kill_ent_fringe=true, kill_exi_fringe=true, bend_fringe=false;
+
+
+sigdelta:=0.;
+KQDD0110:=-(diQ0110*sigdelta + IQDD0110)*FQD/En;
+
+KQFD0130:= (diQ0130*sigdelta + IQFD0130)*FQD/En;
+KQFD0150:= (diQ0150*sigdelta + IQFD0150)*FQD/En;
+KQDD0220:=-(diQ0220*sigdelta + IQDD0220)*FQD/En;
+KQFE0230:= (diQ0230*sigdelta + IQFE0230)*FQE/En;
+KQDF0245:=-(diQ0245*sigdelta + IQDF0245)*FQF/En;
+KQFE0250:= (diQ0250*sigdelta + IQFE0250)*FQE/En;
+KQFD0310:= (diQ0310*sigdelta + IQFD0310)*FQD/En;
+KQFD0330:= (diQ0330*sigdelta + IQFD0330)*FQD/En;
+KQDD0350:=-(diQ0350*sigdelta + IQDD0350)*FQD/En;
+KQDF0410:=-(diQ0410*sigdelta + IQDF0410)*FQF/En;
+KQFF0420:= (diQ0420*sigdelta + IQFF0420)*FQF/En;
+KQDF0470:=-(diQ0470*sigdelta + IQDF0470)*FQF/En;
+KQFF0480:= (diQ0480*sigdelta + IQFF0480)*FQF/En;
+qdd0110:quadrupole, L:=.22, K1:=kqdd0110;
+qfd0130:quadrupole, L:=.22, K1:=kqfd0130;
+qfd0150:quadrupole, L:=.22, K1:=kqfd0150;
+qdd0220:quadrupole, L:=.22, K1:=kqdd0220;
+qfe0230:quadrupole, L:=.38, K1:=kqfe0230;
+qdf0245:quadrupole, L:=.328, K1:=kqdf0245;
+qfe0250:quadrupole, L:=.38/2., K1:=kqfe0250;
+qdf0255:quadrupole, L:=.328, K1:=kqdf0245;
+qfe0270:quadrupole, L:=.38, K1:=kqfe0230;
+qdd0280:quadrupole, L:=.22, K1:=kqdd0220;
+qdd0350:quadrupole, L:=.22, K1:=kqdd0350;
+qfd0330:quadrupole, L:=.22, K1:=kqfd0330;
+qfd0310:quadrupole, L:=.22, K1:=kqfd0310;
+qdf0410:quadrupole, L:=.328, K1:=kqdf0410;
+qff0420:quadrupole, L:=.328, K1:=kqff0420;
+CT.QDF0470: quadrupole, L:=.328, K1:=kQDF0470;
+CT.QFF0480: quadrupole, L:=.328, K1:=kQFF0480;
+dritto:drift, L:=4.54157;
+!                                correction to get survey files perfect
+DR0100real: DRIFT,  L: = 0.090237;! + 0.000012;!==0.1 - 0.00976700000000434;
+DR0100:DRIFT, L:=1.5;
+DR0109:DRIFT, L:=0.9;
+DR0129:DRIFT, L:=1.2;
+DR0149:DRIFT, L:=0.2;
+DR0151:DRIFT, L:=0.14125+0.0895/2;
+
+DR0209:DRIFT, L:=.50441997+0.0895/2;
+DR0214:DRIFT, L:=.26191106+0.0895/2;
+DR0216:DRIFT, L:=.09776+0.0895/2;
+DR0225:DRIFT, L:=.27;
+DR0235:DRIFT, L:=.629589;
+DR0241:DRIFT, L:=.23881+0.095/2;
+DR0244:DRIFT, L:=.143+0.095/2;
+DR0249:DRIFT, L:=.476;
+DR0283:DRIFT, L:=.14376+0.0895/2;
+DR0287:DRIFT, L:=.21591106+0.0895/2;
+DR0275:DRIFT, L:=.27;
+DR0265:DRIFT, L:=.629589;
+DR0257:DRIFT, L:=.143+0.095/2;
+DR0259:DRIFT, L:=.23881+0.095/2;
+DR0251:DRIFT, L:=.476;
+DR0299:DRIFT, L:=0.7351706;
+DR0315:DRIFT, L:=0.2;
+DR0333:DRIFT, L:=0.14443+0.0895/2;
+DR0338:DRIFT, L:=0.96607+0.0895/2;
+DR0352:DRIFT, L:=0.67318;
+DR0409:DRIFT, L:=1.35082;
+DR0415:DRIFT, L:=.35;
+DR0425:DRIFT, L:=0.21526+0.0895/2;
+DR0432:DRIFT, L:=0.15085+0.0895/2+0.084/2;
+DR0443:DRIFT, L:=0.6636+0.084/2;
+DR0446:DRIFT, L:=0.27;
+DR0451:DRIFT, L:=0.50;
+ldl3:DRIFT, L:=1.85;
+ldl4:DRIFT, L:=0.35;
+lldl5   := 2.145577;
+lldl5_1 := 1.089 - .328/2; ! drift before CT.BPI0487
+ldl5_1: DRIFT, L:= lldl5_1;
+ldl5_2: DRIFT, L:= lldl5 - lldl5_1;
+ldl5:   LINE = (ldl5_1, CT.BPI0487, ldl5_2);
+
+
+
+CT.DHD0160:hkicker, l:=0, kick:= CT.IDHD0160*KD.CORRCALIB / EN;
+
+CT.DHE0255:hkicker, l:=0, kick:=-CT.IDHE0255*KE.CORRCALIB;
+CT.DHD0360:hkicker, l:=0, kick:= CT.IDHD0360*KD.CORRCALIB / EN;
+CT.DHE0420:hkicker, l:=0, kick:=-CT.IDHE0420*KE.CORRCALIB;
+CT.DHE0470:hkicker, l:=0, kick:= CT.IDHE0470*KE.CORRCALIB;
+
+CT.DVD0160:vkicker, l:=0, kick:= CT.IDVD0160*KD.CORRCALIB / EN;
+CT.DVE0245:vkicker, l:=0, kick:= CT.IDVE0245*KE.CORRCALIB;
+CT.DVD0360:vkicker, l:=0, kick:=-CT.IDVD0360*KD.CORRCALIB / EN;
+
+CT.DVE0410:vkicker, l:=0, kick:= CT.IDVE0410*KE.CORRCALIB;
+CT.DVE0480:vkicker, l:=0, kick:= CT.IDVE0480*KE.CORRCALIB;
+
+dr400:drift, l:=0.376/2;
+ctfdh0400:line=(dr400,fdh0400,dr400);
+fdh0400:vkicker, l:=0, kick:=0.000; //,l=0.376,
+CTMTV0435:monitor, l:=0; //l = 0.084
+CTSMTV0455:monitor;
+CT.BPM0155:monitor, l:=0; // = 0.0895
+CT.BPM0215:monitor, l:=0; // = 0.0895
+CT.BPI0242:monitor, l:=0; // = 0.095
+CT.BPI0258:monitor, l:=0; // = 0.095
+CT.BPM0285:monitor, l:=0; // = 0.0895
+CT.BPM0335:monitor, l:=0; // = 0.0895
+CT.BPM0430:monitor, l:=0; // = 0.0895
+CT.BPI0487:monitor, l:=0; // = 0.0895
+WCM0445:monitor, l:=0.1194;
+mc:marker;
+m5:marker;
+msym:marker;
+endstr:marker;
+endline:marker;
+lprest:LINE=(QDD0110,DR0129,QFD0130,
+             DR0149,QFD0150,DR0151,CT.BPM0155,CT.DHD0160,CT.DVD0160);
+lposts:LINE=(DR0352,CT.DHD0360,CT.DVD0360,QDD0350,DR0338,CT.BPM0335,DR0333,QFD0330,
+             DR0315,QFD0310);
+             
+stretcher:LINE=(DR0209,bhe0210,DR0214,CT.BPM0215,DR0216,
+                QDD0220,DR0225,
+                QFE0230,
+                DR0235,bhe0240,DR0241,CT.BPI0242,DR0244,
+                QDF0245,CT.DVE0245,DR0249,
+                QFE0250,mc,QFE0250,DR0251,
+                QDF0255,CT.DHE0255,DR0257,CT.BPI0258,DR0259,bhe0260,DR0265,
+                QFE0270,DR0275,QDD0280,DR0283,CT.BPM0285,DR0287,
+                bhe0290,DR0299);
+                
+spectr:LINE=(BHB0450,DR0451,CTSMTV0455,endline);
+tospect1: line=(ctfdh0400,DR0409,msym);
+tospect2: line=(QDF0410,CT.DVE0410,DR0415,QFF0420,CT.DHE0420,DR0425,
+                        CT.BPM0430,DR0432,CTMTV0435,DR0443,
+                        WCM0445,DR0446);
+tospect: line=(tospect1,tospect2); 
+         !1.479133 0.9
+tl1:line=( DR0100,  DR0109,lprest,stretcher,endstr,-lposts,tospect);!it starts in fact at middle of gird15 (MID15)
+tl1_410:line=(DR0100,DR0109,lprest,stretcher,endstr,-lposts,tospect1);
+tl1spect:line=(tl1,spectr);
+tldr1:line=(DR0100,DR0109,lprest,dritto,mc,dritto,-lposts,tospect);
+tl2:line=(ldl3,CT.QDF0470,CT.DHE0470,ldl4,CT.QFF0480,CT.DVE0480,ldl5,m5);
+
+             !0.090233   
+ctline: line=(DR0100real, !drift that correspods to the real length between the last piece of the linac and first one of ct
+              lprest,stretcher,endstr,-lposts,tospect,!tl1 without the drifts that substitute the last part of linac from mid15 
+              tl2);             
+
+
+print, text="Here we RETURN from ctline.seqx";
+return;
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+!
+!  RRR   EEEE  TTTTT  U   U  RRR   N   N
+!  R  R  E       T    U   U  R  R  NN  N
+!  RRR   EEE     T    U   U  RRR   N N N
+!  R R   E       T    U   U  R R   N  NN
+!  R  R  EEEE    T     UUU   R  R  N   N
+!
+

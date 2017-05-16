@@ -1,0 +1,203 @@
+! Links definitions
+option, warn,info;
+!###################################################################################################################################
+!############################## CREATE SOFT LINKS AND DIRECTORIES ##################################################################
+!###################################################################################################################################
+System,"rm -rf temp";
+System,"mkdir temp";
+System,"mkdir output";
+!######################################################################
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/SLHCV1.0 slhc";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/FiDeL fidel";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/WISE wise";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/runII/2016 optics2016";
+!######################################################################
+system,"ln -fns /afs/cern.ch/work/e/emaclea5/2016_NLmodel home";
+system,"ln -fns %LINKHERE here";
+!######################################################################
+Option, -echo,warn,-info;
+
+!###################################################################################################################################
+!############################## TUNE AND CHROMA ####################################################################################
+!###################################################################################################################################
+qxinit=64.31;
+qyinit=59.32;
+   ptcqxinit=qxinit-64.0;
+   ptcqyinit=qyinit-59.0;
+dqxinit=3.0;
+dqyinit=3.0;
+
+!###################################################################################################################################
+!############################## OPTIONS ############################################################################################
+!###################################################################################################################################
+mylhcbeam=1;
+is_thin=1;
+
+MOpowering=0.0; ! NOMINAL = +9 INJECTION -15 SQUEEZE[END] !!! ROD.A56.B1 ARE WEAK, TAKEN CARE OF LATER...
+targetorbit=0; ! FLAG TO MATCH FINAL ORBIT TO ZERO OR TO TARGET
+orbittol=1e-9; ! Tolerance on orbit matching. 
+
+
+!###################################################################################################################################
+!############################## SET UP LATTICE #####################################################################################
+!###################################################################################################################################
+if(mylhcbeam<3){ call,file="optics2016/lhc_as-built.seq";   };
+if(mylhcbeam>3){ call,file="optics2016/lhcb4_as-built.seq"; };
+if(is_thin==1) { call,file="optics2016/toolkit/slice.madx"; };
+
+!Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
+if(mylhcbeam==1) {seqedit,sequence=lhcb1;flatten;cycle,start=IP3;endedit;}
+if(mylhcbeam>1)  {seqedit,sequence=lhcb2;flatten;cycle,start=IP3;endedit;}
+
+
+
+if(is_thin==0){ call, file="optics2016/opt_inj.madx";
+	       !call, file="optics2016/opt_800_10000_800_3000.madx";
+  	       call, file="optics2016/opt_400_10000_400_3000.madx";
+}
+else {          call, file="optics2016/opt_inj_thin.madx";
+       	       !call, file="optics2016/opt_800_10000_800_3000_thin.madx";
+      	       call, file="optics2016/opt_400_10000_400_3000_thin.madx";
+}
+
+if (mylhcbeam<3){ beam, sequence=lhcb1, bv= 1, energy=NRJ, particle=proton, npart=1.0e10, kbunch=1, ex=7.29767146889e-09,ey=7.29767146889e-09;
+   		  beam, sequence=lhcb2, bv=-1, energy=NRJ, particle=proton, npart=1.0e10, kbunch=1, ex=7.29767146889e-09,ey=7.29767146889e-09;};
+if (mylhcbeam>3){ beam, sequence=lhcb2, bv= 1, energy=NRJ, particle=proton, npart=1.0e10, kbunch=1, ex=7.29767146889e-09,ey=7.29767146889e-09;};
+
+if(mylhcbeam==1) {Use, sequence=lhcb1;}
+if(mylhcbeam>1) {Use, sequence=lhcb2;}
+
+!###################################################################################################################################
+!################################ SETUP FOR ORBIT and ERROR CORRECTIONS ############################################################
+!###################################################################################################################################
+on_x1= 0    ; on_sep1= 0 ; on_o1= 0 ;
+on_x2= 0    ; on_sep2= 0 ; on_o2= 0 ; on_oe2=0; on_a2= 0 ;                                       
+on_x5= 0    ; on_sep5= 0 ; on_o5= 0 ;                                                 
+on_x8= 0    ; on_sep8= 0 ; on_o8= 0 ; on_a8= 0 ;  on_sep8h= 0 ; on_x8v= 0 ;   
+on_alice= 0 ;  
+on_sol_alice=0;                                                                    
+on_lhcb = 0 ;  
+on_sol_atlas=0;
+on_sol_cms=0;
+
+select,flag=twiss,clear;
+if(mylhcbeam==1) {twiss,sequence=lhcb1,table=nominal; };
+if(mylhcbeam>1)  {twiss,sequence=lhcb2,table=nominal; };
+
+beta.ip1=table(twiss,IP1,betx);
+
+! print nominal optics parameter at the MB, MQS and MSS for
+! b2, b3, b4, b5, a2 and a3 correction
+ select, flag=twiss, clear;
+ select, flag=twiss,pattern=MB\.   ,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.14,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.15,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.16,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.17,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.18,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.19,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.20,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,pattern=MQT\.21,class=multipole,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,class=MQS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ select, flag=twiss,class=MSS                      ,column=name,k0L,k1L,betx,bety,dx,mux,muy;
+ twiss,  file='temp/optics0_MB.mad';
+
+! print nominal optics parameter at the D1, MQX and triplet corrector
+! for triplet correction
+ select, flag=twiss, clear;
+ select, flag=twiss, pattern=MQX  , class=multipole, column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MBX  , class=multipole, column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MBRC , class=multipole, column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MQSX                  , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCSX                  , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCTX                  , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCOSX                 , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCOX                  , column=name,betx,bety,x,y;
+ select, flag=twiss, pattern=MCSSX                 , column=name,betx,bety,x,y;
+ twiss,  file='temp/optics0_inser.mad';
+
+if(mylhcbeam==1) {Use, sequence=lhcb1;}
+if(mylhcbeam>1)  {Use, sequence=lhcb2;}
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,x,px,y,py,betx,bety,alfx,alfy;
+twiss, table=zero_orbit;
+
+!################################################################
+!################ tune matchng  #################################
+!################################################################
+if(mylhcbeam==1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b1, step=1.0E-7 ;
+     vary,   name=kqtd.b1, step=1.0E-7 ;
+     vary,   name=ksf.b1, step=1.0E-7 ;
+     vary,   name=ksd.b1, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+if(mylhcbeam>1){
+   match;
+     global, q1=qxinit, q2=qyinit;
+     global, dq1=dqxinit, dq2=dqyinit;
+     vary,   name=kqtf.b2, step=1.0E-7 ;
+     vary,   name=kqtd.b2, step=1.0E-7 ;
+     vary,   name=ksf.b2, step=1.0E-7 ;
+     vary,   name=ksd.b2, step=1.0E-7 ;
+     lmdif,  calls=100, tolerance=1.0E-21;
+   endmatch;
+}
+
+ ptc_create_universe;
+  ptc_create_layout,model=3,method=6,nst=3,resplit,thin=0.0005,xbend=0.0005;
+  ptc_align;
+  select_ptc_normal,  q1=0, q2=0;
+  select_ptc_normal, dq1=1,dq2=1;
+  select_ptc_normal, dq1=2,dq2=2;
+  select_ptc_normal, dq1=3,dq2=3;
+  select_ptc_normal, anhx=1,0,0; ! dQx/dex
+  select_ptc_normal, anhy=0,1,0; ! dQy/dey
+  select_ptc_normal, anhx=0,1,0;
+  select_ptc_normal, anhy=1,0,0;
+  select_ptc_normal, anhx=2,0,0; ! d2Qx/dex^2
+  select_ptc_normal, anhx=1,1,0;
+  select_ptc_normal, anhx=0,2,0;
+  select_ptc_normal, anhy=0,2,0; ! d2Qy/dey^2
+  select_ptc_normal, anhy=1,1,0; ! d2Qy/deydex
+  select_ptc_normal, anhy=2,0,0;
+  ptc_normal,closed_orbit,normal,icase=5,no=5;
+  write, table=normal_results,file="ptc_normal.nooct.dat"; 
+  ptc_end;
+
+kcox3.l1 =    -0.811058394 *1.0 ;
+
+select, flag=twiss, clear;
+select, flag=twiss, pattern="mcox", column=name,s,L,betx,bety,K3L;
+twiss, chrom, sequence=lhcb1,file=twiss.kcox.dat;
+
+stop;
+
+  ptc_create_universe;
+  ptc_create_layout,model=3,method=6,nst=3,resplit,thin=0.0005,xbend=0.0005;
+  ptc_align;
+  select_ptc_normal,  q1=0, q2=0;
+  select_ptc_normal, dq1=1,dq2=1;
+  select_ptc_normal, dq1=2,dq2=2;
+  select_ptc_normal, dq1=3,dq2=3;
+  select_ptc_normal, anhx=1,0,0; ! dQx/dex
+  select_ptc_normal, anhy=0,1,0; ! dQy/dey
+  select_ptc_normal, anhx=0,1,0;
+  select_ptc_normal, anhy=1,0,0;
+  select_ptc_normal, anhx=2,0,0; ! d2Qx/dex^2
+  select_ptc_normal, anhx=1,1,0;
+  select_ptc_normal, anhx=0,2,0;
+  select_ptc_normal, anhy=0,2,0; ! d2Qy/dey^2
+  select_ptc_normal, anhy=1,1,0; ! d2Qy/deydex
+  select_ptc_normal, anhy=2,0,0;
+  ptc_normal,closed_orbit,normal,icase=5,no=5;
+  write, table=normal_results,file="ptc_normal.dat"; 
+  ptc_end;
+
+stop;

@@ -1,0 +1,64 @@
+!TITLE
+!  TEST LATICE
+!     BEAM, PARTICLE=MUON, MASS=0.10565838934, CHARGE=1.0,ENERGY=15, &
+!    EX=2.0E-05,EY=2.0E-05,KBUNCH=6, NPART=1.0E+08, &
+!    KBUNCH=6, NPART=1.0E+08
+
+BRHO= 50.0;
+
+ C= 100.0;
+ RHO:= C/(2*PI);
+ NDIP = 5.0;
+ LDIP := C/5.0;
+ ANG :=  twopi/NDIP;
+ B0   := (ANG * BRHO)/ LDIP;
+
+
+ 
+!COMBINED FUNCTION DIPOLES:
+ n:= 0.5;
+ 
+ GDD1:= -(B0 * n)/RHO;
+
+
+ BD : SBEND, L := LDIP, ANGLE := ANG, K1 := GDD1/BRHO;
+
+
+ CELL: LINE= (BD);
+ RSRT:  LINE = (5*(CELL));
+
+beam;
+   use, period=RSRT;
+
+deltap=-0.4;
+deltape=0.1201;
+deltapp=0.01;
+
+System,"rm tw";
+select, flag=twiss,column=deltap,mux,muy,range=#e;
+while ( deltap <= deltape)
+{
+  System,"rm tw0";
+  TWISS, CHROM,deltap="deltap",file=tw0;
+  System,"echo `tail -n -1 tw0` >> tw";
+  value,deltap;
+  deltap=deltap+deltapp;
+}
+!stop;
+deltap=-0.4;
+System,"rm ptc_tw";
+System,"rm tw0";
+ptc_create_universe;
+ptc_create_layout,model=1,method=6,nst=100,exact;
+while ( deltap <= deltape)
+{
+  select, flag=ptc_twiss,column=deltap,mu1,mu2;
+  ptc_twiss,closed_orbit,icase=5,no=1,deltap=deltap,file="tw0";!,pt=deltap;
+  System,"wc -l tw0";
+  System,"echo `tail -n -1 tw0` >> ptc_tw";
+  value,deltap;
+  deltap=deltap+deltapp;
+}
+ptc_end;
+//ptc,kindi=1,method=6,exact,nst=100,icase=5,no=1,deltap=deltap,ptc_twiss;
+stop;

@@ -1,0 +1,30 @@
+m1: marker;
+m2: marker;
+d: matrix, L=6,
+
+   RM11=1,
+   RM12=6,
+   RM21=0,
+   RM22=1,
+   RM33=1,
+   RM34=6,
+   RM43=0,
+   RM44=1;
+
+ts: sequence, refer=centre, l=10.0;
+m1, at=1;
+d, at=5;
+m2, at=9;
+endsequence;
+
+beam, particle=electron, energy=100;
+use, sequence=ts;
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,betx,bety;
+twiss, sequence=ts,betx=1, alfx=0, bety=1, alfy=0, file='twiss.end.dat';
+
+select, flag=twiss, clear;
+select, flag=twiss, column=name,s,betx,bety;
+twiss, centre, sequence=ts,betx=1, alfx=0, bety=1, alfy=0, file='twiss.centre.dat';
+

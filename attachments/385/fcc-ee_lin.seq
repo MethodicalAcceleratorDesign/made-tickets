@@ -1,0 +1,504 @@
+! ====================================================================
+! SEQUENCE DEFINITIONS (V17a, linear lattice)
+! --------------------------------------------------------------------
+!  Write Arc Cell Modules (DOFO)
+! --------------------------------------------------------------------
+	cellLength = 50;
+!
+FCCeeArcCell1: SEQUENCE, REFER=CENTRE, L=cellLength;
+	MQD1,  				at =  0.375;
+	MB,   				at =  7.175;
+	MB,   				at = 17.825;
+	MQF1, 				at = 24.625;
+	MQF1, 				at = 25.375;
+	MB,   				at = 32.175;
+	MB,					at = 42.825;
+	MQD1,  				at = 49.625;
+ENDSEQUENCE;
+!
+FCCeeArcCell2: SEQUENCE, REFER=CENTRE, L=cellLength;
+	MQD2,  				at =  0.375;
+	MB,   				at =  7.175;
+	MB,   				at = 17.825;
+	MQF2, 				at = 24.625;
+	MQF2, 				at = 25.375;
+	MB,   				at = 32.175;
+	MB,					at = 42.825;
+	MQD2,  				at = 49.625;
+ENDSEQUENCE;
+!
+! --------------------------------------------------------------------
+!  Dispersion Suppressors Left
+! --------------------------------------------------------------------
+	dsLength = 2*cellLength;
+!
+	FCCeeDSL1: SEQUENCE, REFER=CENTRE, L=dsLength;
+		MQDDSL12, 	at =  0.375;
+		MBDS12,	 	at =  7.175;
+		MBDS12,	 	at = 17.825;
+		MQFDSL12, 	at = 24.625;
+		MQFDSL12, 	at = 25.375;
+		MBDS12,	 	at = 32.175;
+		MBDS12,	 	at = 42.825;
+		MQDDSL11, 	at = 49.625;
+!
+		MQDDSL11, 	at = 50.375;
+		MBDS11,	 	at = 57.175;
+		MBDS11,	 	at = 67.825;
+		MQFDSL11, 	at = 74.625;
+		MQFDSL11, 	at = 75.375;
+		MBDS11,	 	at = 82.175;
+		MBDS11,	 	at = 92.825;
+		MQD1,	 	at = 99.625;
+	ENDSEQUENCE;
+!
+	FCCeeDSL2: SEQUENCE, REFER=CENTRE, L=dsLength;
+		MQDDSL22, 	at =  0.375;
+		MBDS22,	 	at =  7.175;
+		MBDS22,	 	at = 17.825;
+		MQFDSL22, 	at = 24.625;
+		MQFDSL22, 	at = 25.375;
+		MBDS22,	 	at = 32.175;
+		MBDS22,	 	at = 42.825;
+		MQDDSL21, 	at = 49.625;
+!
+		MQDDSL21, 	at = 50.375;
+		MBDS21,	 	at = 57.175;
+		MBDS21,	 	at = 67.825;
+		MQFDSL21, 	at = 74.625;
+		MQFDSL21, 	at = 75.375;
+		MBDS21,	 	at = 82.175;
+		MBDS21,	 	at = 92.825;
+		MQD2,	 	at = 99.625;
+	ENDSEQUENCE;
+!
+! --------------------------------------------------------------------
+!  Dispersion Suppressor Right
+! --------------------------------------------------------------------
+!
+	FCCeeDSR1: SEQUENCE, REFER=CENTRE, L=dsLength;
+		MQD1, 	 	at =  0.375;
+		MBDS11,	 	at =  7.175;
+		MBDS11,	 	at = 17.825;
+		MQFDSR11, 	at = 24.625;
+		MQFDSR11, 	at = 25.375;
+		MBDS11,	 	at = 32.175;
+		MBDS11,	 	at = 42.825;
+		MQDDSR11, 	at = 49.625;
+!
+		MQDDSR11, 	at = 50.375;
+		MBDS12,	 	at = 57.175;
+		MBDS12,	 	at = 67.825;
+		MQFDSR12, 	at = 74.625;
+		MQFDSR12, 	at = 75.375;
+		MBDS12,	 	at = 82.175;
+		MBDS12,	 	at = 92.825;
+		MQDDSR12, 	at = 99.625;
+	ENDSEQUENCE;
+!
+	FCCeeDSR2: SEQUENCE, REFER=CENTRE, L=dsLength;
+		MQD2, 	 	at =  0.375;
+		MBDS21,	 	at =  7.175;
+		MBDS21,	 	at = 17.825;
+		MQFDSR21, 	at = 24.625;
+		MQFDSR21, 	at = 25.375;
+		MBDS21,	 	at = 32.175;
+		MBDS21,	 	at = 42.825;
+		MQDDSR21, 	at = 49.625;
+!
+		MQDDSR21, 	at = 50.375;
+		MBDS22,	 	at = 57.175;
+		MBDS22,	 	at = 67.825;
+		MQFDSR22, 	at = 74.625;
+		MQFDSR22, 	at = 75.375;
+		MBDS22,	 	at = 82.175;
+		MBDS22,	 	at = 92.825;
+		MQDDSR22, 	at = 99.625;
+	ENDSEQUENCE;
+!
+! --------------------------------------------------------------------
+!  SARC (Semi-racetrack layout)
+! --------------------------------------------------------------------
+	numberOfArcCellsSarc   = 84;
+	arcLengthSarc   = numberOfArcCellsSarc*cellLength   + 2*dsLength;
+	ii=0;
+!
+	FCCeeSarc: SEQUENCE, REFER=CENTRE, L=arcLengthSarc;
+		FCCeeDSL1, at = 0.5*dsLength;
+!
+		while (ii<numberOfArcCellsSarc)	{
+			FCCeeArcCell1,  at = dsLength + (ii+0.5)*cellLength;
+			ii=ii+1;
+		}
+!
+		FCCeeDSR1, at = numberOfArcCellsSarc*cellLength + 1.5*dsLength;
+	ENDSEQUENCE;
+!
+! --------------------------------------------------------------------
+!  LARC  (Semi-racetrack layout)
+! --------------------------------------------------------------------
+	numberOfArcCellsLarc   = 324;
+	arcLengthLarc = numberOfArcCellsLarc*cellLength + 2*dsLength;
+	iii=0;
+!
+	FCCeeLarc: SEQUENCE, REFER=CENTRE, L=arcLengthLarc;
+		FCCeeDSL2, at = 0.5*dsLength;
+!
+		while (iii<numberOfArcCellsLarc)	{
+			FCCeeArcCell2,  at = dsLength + (iii+0.5)*cellLength;
+			iii=iii+1;
+		}
+!
+		FCCeeDSR2, at = numberOfArcCellsLarc*cellLength + 1.5*dsLength;
+	ENDSEQUENCE;
+!
+! --------------------------------------------------------------------
+!  Straight FODO cell without RF cavities (DOFO)
+! --------------------------------------------------------------------
+!
+writeStraightCell (celltype) : macro {
+	FCCeeStraightCellcelltype: SEQUENCE, REFER=CENTRE, L=cellLength;
+		MQDSCcelltype,  at =  0.375;
+		MQFSCcelltype,  at = 24.625;
+		MQFSCcelltype,  at = 25.375;
+		MQDSCcelltype,  at = 49.625;
+	ENDSEQUENCE;
+}
+!
+	exec, writeStraightCell (1);
+	exec, writeStraightCell (2);
+	exec, writeStraightCell (3);
+	exec, writeStraightCell (IR);
+!
+! --------------------------------------------------------------------
+!  Straight FODO cell with 10 RF cavities (DOFO, 20 MV/m/cavity)
+! --------------------------------------------------------------------
+!
+writeStraightCellRF (celltype) : macro {
+	FCCeeRFblockcelltype: SEQUENCE, REFER=CENTRE, L=7;
+		CAVcelltype, 	at = 0.5;
+		CAVcelltype, 	at = 2.0;
+		CAVcelltype, 	at = 3.5;
+		CAVcelltype, 	at = 5.0;
+		CAVcelltype, 	at = 6.5;
+	ENDSEQUENCE;
+!
+	FCCeeStraightCellRFcelltype: SEQUENCE, REFER=CENTRE, L=cellLength;
+		MQDSCcelltype,  		at =  0.375;
+		FCCeeRFblockcelltype, 	at = 12.5;
+		MQFSCcelltype,  		at = 24.625;
+		MQFSCcelltype,  		at = 25.375;
+		FCCeeRFblockcelltype, 	at = 37.5;
+		MQDSCcelltype,  		at = 49.625;
+	ENDSEQUENCE;
+}
+!
+	exec, writeStraightCellRF (1);
+	exec, writeStraightCellRF (2);
+	exec, writeStraightCellRF (3);
+	exec, writeStraightCellRF (IR);
+!
+! --------------------------------------------------------------------
+!  Straight Matching Sections Left
+! --------------------------------------------------------------------
+	smsLength = 4*cellLength;
+!
+writeStraightMatchingSectionLeft (smstype,arctype) : macro {
+	FCCeeStraightMatchingSectionLeftsmstype: SEQUENCE, REFER=CENTRE, L=smsLength;
+		MQDDSRarctype2, at =   0.375;
+		MQFMSLsmstype1, at =  24.625;
+		MQFMSLsmstype1, at =  25.375;
+		MQDMSLsmstype1, at =  49.625;
+!
+		MQDMSLsmstype1, at =  50.375;
+		MQFMSLsmstype2, at =  74.625;
+		MQFMSLsmstype2, at =  75.375;
+		MQDMSLsmstype2, at =  99.625;
+!
+		MQDMSLsmstype2, at = 100.375;
+		MQFMSLsmstype3, at = 124.625;
+		MQFMSLsmstype3, at = 125.375;
+		MQDMSLsmstype3, at = 149.625;
+!
+		MQDMSLsmstype3, at = 150.375;
+		MQFSCsmstype,   at = 174.625;
+		MQFSCsmstype,   at = 175.375;
+		MQDSCsmstype,   at = 199.625;
+	ENDSEQUENCE;
+}
+!
+	exec, writeStraightMatchingSectionLeft (1,1);
+	exec, writeStraightMatchingSectionLeft (2,2);
+	exec, writeStraightMatchingSectionLeft (3,2);
+	exec, writeStraightMatchingSectionLeft (IR,1);
+!
+! --------------------------------------------------------------------
+!  Straight Matching Sections Right
+! --------------------------------------------------------------------
+writeStraightMatchingSectionRight (smstype2,arctype2) : macro {
+	FCCeeStraightMatchingSectionRightsmstype2: SEQUENCE, REFER=CENTRE, L=smsLength;
+		MQDSCsmstype2, 	 at =   0.375;
+		MQFSCsmstype2,   at =  24.625;
+		MQFSCsmstype2,   at =  25.375;
+		MQDMSRsmstype23, at =  49.625;
+!
+		MQDMSRsmstype23, at =  50.375;
+		MQFMSRsmstype23, at =  74.625;
+		MQFMSRsmstype23, at =  75.375;
+		MQDMSRsmstype22, at =  99.625;
+!
+		MQDMSRsmstype22, at = 100.375;
+		MQFMSRsmstype22, at = 124.625;
+		MQFMSRsmstype22, at = 125.375;
+		MQDMSRsmstype21, at = 149.625;
+!
+		MQDMSRsmstype21, at = 150.375;
+		MQFMSRsmstype21, at = 174.625;
+		MQFMSRsmstype21, at = 175.375;
+		MQDDSLarctype22, at = 199.625;
+	ENDSEQUENCE;
+}
+!
+	exec, writeStraightMatchingSectionRight (1,2);
+	exec, writeStraightMatchingSectionRight (2,2);
+	exec, writeStraightMatchingSectionRight (3,1);
+	exec, writeStraightMatchingSectionRight (IR,1);
+!
+! --------------------------------------------------------------------
+!  LEP-like interaction regions
+! --------------------------------------------------------------------
+	LStar = 2;
+	lepIrLength = 196 + 2*LStar; 
+!
+writeInteractionRegion (irtype) : macro {
+FCCeeLepIRirtype: SEQUENCE, REFER=CENTRE, L=lepIrLength;
+	MQDSCIR, 		 at =  0.375;
+	FCCeeRFblockIR,  at = 10.5125;
+	MQFIRLirtype3,   at = 20.65;
+	FCCeeRFblockIR,  at = 29.7;
+	MQDIRLirtype3,   at = 38.75;
+	FCCeeRFblockIR,  at = 47.8;
+	MQFIRLirtype2,   at = 56.85;
+	FCCeeRFblockIR,  at = 65.4;
+	MQDIRLirtype2,   at = 73.95;
+	MQFIRLirtype1,   at = 89.1875;
+	markQFLIRirtype, at = 89.375;
+	MQFIRLirtype1, 	 at = 89.5625;
+	MQDIRLirtype1,   at = 97.4375;
+	markQDLIRirtype, at = 97.625;
+	MQDIRLirtype1,   at = 97.8125;
+!
+	IPirtypeL,		 at = 98 + LStar;
+	IPirtypeR,		 at = 98 + LStar;
+!
+	MQDIRRirtype1,   at =  98.1875 + 2*LStar;
+	markQDRIRirtype, at =  98.375  + 2*LStar;
+	MQDIRRirtype1,   at =  98.5625 + 2*LStar;
+	MQFIRRirtype1,   at = 106.4375 + 2*LStar;
+	markQFRIRirtype, at = 106.625  + 2*LStar;
+	MQFIRRirtype1,   at = 106.8125 + 2*LStar;
+	MQDIRRirtype2,   at = 122.05   + 2*LStar;
+	FCCeeRFblockIR,  at = 130.6    + 2*LStar;
+	MQFIRRirtype2,   at = 139.15   + 2*LStar;
+	FCCeeRFblockIR,  at = 148.2    + 2*LStar;
+	MQDIRRirtype3,   at = 157.25   + 2*LStar;
+	FCCeeRFblockIR,  at = 166.3    + 2*LStar;
+	MQFIRRirtype3,   at = 175.35   + 2*LStar;
+	FCCeeRFblockIR,  at = 185.4875 + 2*LStar;
+	MQDSCIR, 		 at = 195.625  + 2*LStar;
+ENDSEQUENCE;
+}
+!
+	exec, writeInteractionRegion (1);
+	exec, writeInteractionRegion (2);
+!
+! --------------------------------------------------------------------
+!  Long Straight Section without interaction region and RF (LSS 2+5)
+! --------------------------------------------------------------------
+	numberOfStraightCellsLss = 20;
+	lssLength = numberOfStraightCellsLss*cellLength + 2*smsLength;
+!
+FCCeeLSS: SEQUENCE, REFER=CENTRE, L=lssLength;
+	FCCeeStraightMatchingSectionLeft1, at = 0.5*smsLength;
+!
+	jj = 0;
+	while (jj<numberOfStraightCellsLss) {
+		FCCeeStraightCell1, at = smsLength + 0.5*cellLength + jj*cellLength;
+		jj = jj+1;
+	}
+!
+	FCCeeStraightMatchingSectionRight1, at = 1.5*smsLength + numberOfStraightCellsLss*cellLength;
+ENDSEQUENCE;
+!
+! --------------------------------------------------------------------
+!  2nd Long Straight Section without interaction region and RF (LSS 3+6)
+! --------------------------------------------------------------------
+	numberOfStraightCellsLss = 20;
+	lssLength = numberOfStraightCellsLss*cellLength + 2*smsLength;
+!
+FCCeeLSS2: SEQUENCE, REFER=CENTRE, L=lssLength;
+	FCCeeStraightMatchingSectionLeft3, at = 0.5*smsLength;
+!
+	jjj = 0;
+	while (jjj<numberOfStraightCellsLss) {
+		FCCeeStraightCell3, at = smsLength + 0.5*cellLength + jjj*cellLength;
+		jjj = jjj+1;
+	}
+!
+	FCCeeStraightMatchingSectionRight3, at = 1.5*smsLength + numberOfStraightCellsLss*cellLength;
+ENDSEQUENCE;
+!
+! --------------------------------------------------------------------
+!  Long Straight Section with LEP-like interaction region and RF (LSS 1+4)
+! --------------------------------------------------------------------
+	numberOfStraightCellsLssIR = 16;
+	lssLengthIR = numberOfStraightCellsLssIR*cellLength + 2*smsLength + lepIrLength;
+!
+writeLSSIR (irtype2) : macro {
+FCCeeLSSIRirtype2: SEQUENCE, REFER=CENTRE, L=lssLengthIR;
+	FCCeeStraightMatchingSectionLeftIR, at = 0.5*smsLength;
+!
+	kk = 0;
+	while (kk<(numberOfStraightCellsLssIR)/2) {
+		FCCeeStraightCellRFIR, at = smsLength + 0.5*cellLength + kk*cellLength;
+		kk = kk+1;
+	}
+!	
+	FCCeeLepIRirtype2, at = lssLengthIR/2;
+!
+	while (kk<numberOfStraightCellsLssIR) {
+		FCCeeStraightCellRFIR, at = smsLength + 0.5*cellLength + kk*cellLength + lepIrLength;
+		kk = kk+1;
+	}
+!
+	FCCeeStraightMatchingSectionRightIR, at = 1.5*smsLength + numberOfStraightCellsLssIR*cellLength + lepIrLength ;
+ENDSEQUENCE;
+}
+!
+	exec, writeLSSIR(1);
+	exec, writeLSSIR(2);
+!
+! --------------------------------------------------------------------
+!  Extended Straight Section without interaction region (ESS, semi-racetrack layout)
+! --------------------------------------------------------------------
+	numberOfStraightCellsEss = 76;
+	numberOfRFcellsEss       = 20;
+	essLength = numberOfStraightCellsEss*cellLength + 2*smsLength;
+!
+FCCeeESS: SEQUENCE, REFER=CENTRE, L=essLength;
+	FCCeeStraightMatchingSectionLeft2, at = 0.5*smsLength;
+!
+	kkk = 0;
+	while (kkk<(numberOfStraightCellsEss-numberOfRFcellsEss)/2) {
+		FCCeeStraightCell2, at = smsLength + 0.5*cellLength + kkk*cellLength;
+		kkk = kkk+1;
+	}
+	while (kkk<(numberOfStraightCellsEss+numberOfRFcellsEss)/2) {
+		FCCeeStraightCellRF2, at = smsLength + 0.5*cellLength + kkk*cellLength;
+		kkk = kkk+1;
+	}
+	while (kkk<numberOfStraightCellsEss) {
+		FCCeeStraightCell2, at = smsLength + 0.5*cellLength + kkk*cellLength;
+		kkk = kkk+1;
+	}
+!
+	FCCeeStraightMatchingSectionRight2, at = 1.5*smsLength + numberOfStraightCellsEss*cellLength;
+ENDSEQUENCE;
+!
+! ====================================================================
+
+
+
+! ====================================================================
+!  FCC-EE Lattice (Semi-racetrack, 2 interaction regions)
+! ====================================================================
+	FCCeeRacetrackLength = 2*lssLengthIR + 4*lssLength + 2*essLength + 4*arcLengthLarc + 4*arcLengthSarc;
+!
+	FCCeeRacetrack: SEQUENCE, REFER=CENTRE, L=FCCeeRacetrackLength;
+		LSS1, 		   at = 0;
+		FCCeeLSSIR1,   at = 0.5*lssLengthIR;
+		Arc1, 		   at = 1.0*lssLengthIR;
+		FCCeeSarc,     at = 1.0*lssLengthIR				 			      + 0.5*arcLengthSarc;
+		LSS2, 		   at = 1.0*lssLengthIR 				 			  + 1.0*arcLengthSarc;
+		FCCeeLSS, 	   at = 1.0*lssLengthIR + 0.5*lssLength 			  + 1.0*arcLengthSarc;
+		Arc23,	 	   at = 1.0*lssLengthIR + 1.0*lssLength 			  + 1.0*arcLengthSarc;
+		FCCeeLarc,     at = 1.0*lssLengthIR + 1.0*lssLength 			  + 1.0*arcLengthSarc + 0.5*arcLengthLarc;
+		ESS1,	 	   at = 1.0*lssLengthIR + 1.0*lssLength 			  + 1.0*arcLengthSarc + 1.0*arcLengthLarc;
+		FCCeeESS, 	   at = 0.25 * FCCeeRacetrackLength + 0.5*lssLengthIR;
+		Arc45,	 	   at = 1.0*lssLengthIR + 1.0*lssLength +   essLength + 1.0*arcLengthSarc + 1.0*arcLengthLarc;
+		FCCeeLarc,     at = 1.0*lssLengthIR + 1.0*lssLength +   essLength + 1.0*arcLengthSarc + 1.5*arcLengthLarc;
+		LSS3,	 	   at = 1.0*lssLengthIR + 1.0*lssLength +   essLength + 1.0*arcLengthSarc + 2.0*arcLengthLarc;
+		FCCeeLSS2, 	   at = 1.0*lssLengthIR + 1.5*lssLength +   essLength + 1.0*arcLengthSarc + 2.0*arcLengthLarc;
+		Arc6,	 	   at = 1.0*lssLengthIR + 2.0*lssLength +   essLength + 1.0*arcLengthSarc + 2.0*arcLengthLarc;
+		FCCeeSarc,     at = 1.0*lssLengthIR + 2.0*lssLength +   essLength + 1.5*arcLengthSarc + 2.0*arcLengthLarc;
+		LSS4,	 	   at = 1.0*lssLengthIR + 2.0*lssLength +   essLength + 2.0*arcLengthSarc + 2.0*arcLengthLarc;
+		FCCeeLSSIR2,   at = 0.5 * FCCeeRacetrackLength + 0.5*lssLengthIR;
+		Arc7,	 	   at = 2.0*lssLengthIR + 2.0*lssLength +   essLength + 2.0*arcLengthSarc + 2.0*arcLengthLarc;
+		FCCeeSarc,     at = 2.0*lssLengthIR + 2.0*lssLength +   essLength + 2.5*arcLengthSarc + 2.0*arcLengthLarc;
+		LSS5,	 	   at = 2.0*lssLengthIR + 2.0*lssLength +   essLength + 3.0*arcLengthSarc + 2.0*arcLengthLarc;
+		FCCeeLSS, 	   at = 2.0*lssLengthIR + 2.5*lssLength +   essLength + 3.0*arcLengthSarc + 2.0*arcLengthLarc;
+		Arc89,	       at = 2.0*lssLengthIR + 3.0*lssLength +   essLength + 3.0*arcLengthSarc + 2.0*arcLengthLarc;
+		FCCeeLarc,     at = 2.0*lssLengthIR + 3.0*lssLength +   essLength + 3.0*arcLengthSarc + 2.5*arcLengthLarc;
+		ESS2,	 	   at = 2.0*lssLengthIR + 3.0*lssLength +   essLength + 3.0*arcLengthSarc + 3.0*arcLengthLarc;
+		FCCeeESS, 	   at = 0.75 * FCCeeRacetrackLength + 0.5*lssLengthIR;
+		Arc1011, 	   at = 2.0*lssLengthIR + 3.0*lssLength + 2*essLength + 3.0*arcLengthSarc + 3.0*arcLengthLarc;
+		FCCeeLarc,     at = 2.0*lssLengthIR + 3.0*lssLength + 2*essLength + 3.0*arcLengthSarc + 3.5*arcLengthLarc;
+		LSS6,	 	   at = 2.0*lssLengthIR + 3.0*lssLength + 2*essLength + 3.0*arcLengthSarc + 4.0*arcLengthLarc;
+		FCCeeLSS2, 	   at = 2.0*lssLengthIR + 3.5*lssLength + 2*essLength + 3.0*arcLengthSarc + 4.0*arcLengthLarc;
+		Arc12,	 	   at = 2.0*lssLengthIR + 4.0*lssLength + 2*essLength + 3.0*arcLengthSarc + 4.0*arcLengthLarc;
+		FCCeeSarc,     at = 2.0*lssLengthIR + 4.0*lssLength + 2*essLength + 3.5*arcLengthSarc + 4.0*arcLengthLarc;
+	ENDSEQUENCE;
+!
+! --------------------------------------------------------------------
+!  Edit sequence
+! --------------------------------------------------------------------
+!
+	SEQEDIT, sequence=FCCeeRacetrack;
+		flatten;
+	ENDEDIT;
+!
+	SEQEDIT, sequence=FCCeeRacetrack;
+		install, element=Arc1.startfodos,    at=100,   from=arc1;
+		install, element=Arc23.startfodos,   at=100,   from=arc23;
+		install, element=Arc45.startfodos,   at=100,   from=arc45;
+		install, element=Arc6.startfodos,    at=100,   from=arc6;
+		install, element=Arc7.startfodos,    at=100,   from=arc7;
+		install, element=Arc89.startfodos,   at=100,   from=arc89;
+		install, element=Arc1011.startfodos, at=100,   from=arc1011;
+		install, element=Arc12.startfodos,   at=100,   from=arc12;
+!
+		install, element=Arc1.endfodos,      at= 4300, from=arc1;
+		install, element=Arc23.endfodos,     at=16300, from=arc23;
+		install, element=Arc45.endfodos,     at=16300, from=arc45;
+		install, element=Arc6.endfodos,      at= 4300, from=arc6;
+		install, element=Arc7.endfodos,      at= 4300, from=arc7;
+		install, element=Arc89.endfodos,     at=16300, from=arc89;
+		install, element=Arc1011.endfodos,   at=16300, from=arc1011;
+		install, element=Arc12.endfodos,     at= 4300, from=arc12;
+!
+		install, element=LSS1.startfodos,    at=200,   from=lss1;
+		install, element=LSS2.startfodos,    at=200,   from=lss2;
+		install, element=LSS3.startfodos,    at=200,   from=lss3;
+		install, element=LSS4.startfodos,    at=200,   from=lss4;
+		install, element=LSS5.startfodos,    at=200,   from=lss5;
+		install, element=LSS6.startfodos,    at=200,   from=lss6;
+		install, element=ESS1.startfodos,    at=200,   from=ess1;
+		install, element=ESS2.startfodos,    at=200,   from=ess2;
+!
+		install, element=LSS1.endfodos,      at=1200,  from=lss1;
+		install, element=LSS2.endfodos,      at=1200,  from=lss2;
+		install, element=LSS3.endfodos,      at=1200,  from=lss3;
+		install, element=LSS4.endfodos,      at=1200,  from=lss4;
+		install, element=LSS5.endfodos,      at=1200,  from=lss5;
+		install, element=LSS6.endfodos,      at=1200,  from=lss6;
+		install, element=ESS1.endfodos,      at=4000,  from=ess1;
+		install, element=ESS2.endfodos,      at=4000,  from=ess2;
+	ENDEDIT;
+!
+	SEQEDIT, sequence=FCCeeRacetrack;
+		flatten;
+		cycle, start=IP1R;
+		flatten;
+	ENDEDIT;
+!
+! ====================================================================

@@ -1,0 +1,42 @@
+!Carbon cell
+TITLE, "CARBON CELL 430 MeV";
+
+!Constants
+!NMASS=0.931494;                              !Mass, GeV, 1/12th of carbon
+Z=6;                                         !amount of charges
+N=12;                                        !amount of nucleons
+T=0.430;                                     !Kinetic energy per nucleon, GeV
+alp=PI/6;
+phi=2*alp;                                   !bending angle, rad
+B=20;                                        !Magnet field, kGaus
+
+EN=N*(NMASS+T);                              !Total energy, GeV
+PC =N*SQRT((NMASS+T)^2-NMASS^2);             !GeV
+PC0=N*SQRT((NMASS+0.43)^2-NMASS^2);          !GeV
+h =Z*B/PC*4.803e-10*1e2/(1.602e-19*1e6*1e7); !rigidity, m^-1
+h0=Z*B/PC0*4.803e-10*1e2/(1.602e-19*1e6*1e7);!rigidity, m^-1
+LT=phi/h;                                    !magnet length, m
+VDH=0.2-2./h0*(PC/PC0-1)*sin(phi);           !drift between magnets, m
+
+!INITIAL CONDITIONS
+BETX0 :=5.815836030655;
+BETY0 :=22.045209699012;
+ALFX0 :=-0.728805459212;
+ALFY0 :=16.973349363321;
+DX0   := 0;
+DPX0  := 0;
+
+mirrow : sbend, L:=LT, ANGLE:=phi,E1:=-1*(PI/2.-0.5*phi),E2:=-1*(PI/2.-0.5*phi); !E1:=-1.047197551,E2:=-1.047197551;
+
+!**************************************************************
+!sequence
+
+cellseq: sequence,REFER=ENTRY, l:=LT+VDH+LT;
+B1S : mirrow, at=0; ! -1.047197551
+MES : MARKER, at=B1S->L+VDH/2;
+!B2S : sbend, L:=LT, ANGLE:=phi, E1=-1*(PI/2.-0.5*phi),E2=-1*(PI/2.-0.5*phi), at=B1S->L+VDH;
+endsequence;
+
+
+
+RETURN;

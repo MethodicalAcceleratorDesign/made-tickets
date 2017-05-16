@@ -1,0 +1,31 @@
+call,file="seq_thick.seq";
+
+beam,particle=proton,bunched=true,pc:=0.9542628623,ex:=1.75E-6,ey:=1.75E-6,sigt:=0.69,sige:=1.4E-3,npart:=1.19E11;
+use, period = machine;
+
+sigx := sqrt((BEAM->ex)*table(twiss,betx)+table(twiss,dx)^2*(BEAM->sige)^2);
+sigy := sqrt((BEAM->ey)*table(twiss,bety));
+
+select,flag=twiss,clear;
+select,flag=twiss,column=name,s,betx,bety,dx,dy,sigx,sigy;
+twiss,file="twiss";
+
+plot,haxis=s,vaxis=sigx,sigy,colour=100,noversion,file='plot';
+plot,haxis=s,vaxis1=betx,bety,vaxis2=dx,dy,colour=100,noversion,file='plot';
+
+select,flag=makethin,clear;
+select,flag=makethin,class=sbend,slice=8;
+select,flag=makethin,class=rbend,slice=8;
+select,flag=makethin,class=quadrupole,slice=4;
+select,flag=makethin,class=sextupole,slice=4;
+select,flag=makethin,class=solenoid,slice=4;
+use,period=machine;
+makethin,sequence=machine,makedipedge=true,style=teapot;
+
+Option, debug;
+
+use,period=machine;
+twiss,file="twiss_thin";
+plot,haxis=s,vaxis1=betx,bety,vaxis2=dx,dy,colour=100,noversion,file='plot';
+
+save,sequence=machine,file="seq_thin.seq";

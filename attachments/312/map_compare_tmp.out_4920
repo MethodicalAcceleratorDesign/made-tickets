@@ -1,0 +1,246 @@
+
+  ++++++++++++++++++++++++++++++++++++++++++++
+  +     MAD-X 5.02.02  (64 bit, Linux)       +
+  + Support: mad@cern.ch, http://cern.ch/mad +
+  + Release   date: 2014.07.04               +
+  + Execution date: 2014.11.07 00:31:26      +
+  ++++++++++++++++++++++++++++++++++++++++++++
+call,file=foborodobo8.lat;
+
+! File fobodobo_s.lat
+
+! 
+
+! Written for the January, 2007 USPAS.
+
+! To be used in conjunction with CHEF.
+
+! 
+
+! Send complaints to the author: Leo Michelotti
+
+! 
+
+! Add an RF cavity (EGS) 01/30/2009
+
+!
+
+! ------------------
+
+! Parameters
+
+! ------------------
+
+twopi       :=   6.2831853072;
+
+++++++ warning: ignored: attempt to redefine constant: twopi
+n           :=   32;                   !         : number of cells
+
+momentum    := 10;                   ! [GeV/c] : particle momentum; 
+
+                                     !         :   arbitrary number
+
+bendangle   := twopi/(2*n);           ! [rad]   : dipole bend angle
+
+focus       :=   7;                   ! [m]     : focal length of equivalent 
+
+                                     !         :   thin quad
+
+sepn        :=  10;                   ! [m]     : distance between quad centers
+
+quadlength  :=   0.2;                 ! [m]     : quadrupole length
+
+strength    := 1/(focus*quadlength);  ! [m**-2] : quadrupole strength
+
+                                     !         :   = B'/brho, where
+
+                                     !         :   brho = momentum/0.299792458
+
+pct         :=   0.4;                 !         : fraction of space between
+
+                                     !         :   quads occupied by dipole
+
+bendlength  := pct*(sepn-quadlength); ! [m]     : length of dipole
+
+! bendlength := 0.4*(10-0.2) = 3.92
+
+driftlength := (sepn-quadlength-bendlength)/2;
+
+! driftlenth := (10-0.2-3.92)/2 = 2.94
+
+beam, particle=proton, pc=momentum;
+
+! harmonic number = 80  harmonic number, yields 2 meter wavelength
+
+! the actual frequence is harmno following
+
+harmno=32;
+
+lambda = 160.0/harmno;
+
+
+
+!hvoltage = 12500
+
+hvoltage = 5.0;
+
+
+
+cavlen = 0.0; ! rf cavity length 1 meter, (half bucket length)
+
+shortdlen = (driftlength - cavlen)/2.0;   ! 0.97 m
+
+! this lattice has 32 copies of a 20 m cell.
+
+
+
+! ------------------
+
+! Elements
+
+! ------------------
+
+o: drift,      l=driftlength;
+
+os: drift,      l=shortdlen;
+
+f: quadrupole, l=quadlength, k1=strength;
+
+d: quadrupole, l=quadlength, k1=(-strength);
+
+b: sbend,      l=bendlength, angle=bendangle;
+
+r: rfcavity,	l=cavlen, volt=hvoltage, harmon=harmno;
+
+
+
+! ------------------
+
+! Lattices
+
+! ------------------
+
+fobodobo:  line=( f, o, b, o, d, o, b, o );
+
+fobrdobo:  line=( f, o, b, os, r, os, d, o, b, o);
+
+model:     line=( fobrdobo,7*fobodobo );
+
+model2:     line=( 8*fobodobo );
+
+use, sequence=model;
+
+
+
+ptc_create_universe;
+
+ Now PTC
+ptc_create_layout,model=2,method=2,nst=4,exact,time=false;
+
+ MAD-X Beam Parameters
+                  Energy : 0.100439E+02
+          Kinetic Energy : 0.910565E+01
+      Particle Rest Mass : 0.938272E+00
+                Momentum : 0.100000E+02
+ Setting MADx with 
+     energy           10.043921267727313     
+     method                   2
+     Num. of steps            4
+     charge           1.0000000000000000     
+  Length of machine:    159.99999999999991     
+ The machine is a RING
+ ------------------------------------ PTC Survey ------------------------------------
+ Before start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ Before   end:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After  start:    0.0000000000000000        0.0000000000000000        0.0000000000000000     
+ After    end:   -101.70941370285578        0.0000000000000000        101.90941370285576     
+ HARMONIC NUMBER defined in the ring:           32
+++++++ warning: ptc_input   Cavity R                        defined with harmonic number    32.000000000000000      . Using SUM(LD) as ring length:    159.99999999999991       instead of real orbit length. Obtained freq. =    59696297.910280280       Hz
+ptc_align;
+
+select, flag=sectormap, clear;
+
+set, format="30.26g";
+
+select,flag=ptc_twiss,column=name,keyword,s,pos,k1,k2,k3,k4,k5,k6,
+
+    re11,re21,re31,re41,re51,re61,
+
+    re12,re22,re32,re42,re52,re62,
+
+    re13,re23,re33,re43,re53,re63,
+
+    re14,re24,re34,re44,re54,re64,
+
+    re15,re25,re35,re45,re55,re65,
+
+    re16,re26,re36,re46,re56,re66;
+
+ptc_twiss,closed_orbit,icase=6,file=map_compare_madx_output;
+
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     2
+  Default integration steps      4
+ This is a proton 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  FALSE
+       TIME        =  FALSE
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_4D     =  FALSE
+       DELTA       =  FALSE
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+ Closed orbit:   -9.2048448356951183E-017  -6.5585043195839406E-018   0.0000000000000000        0.0000000000000000        1.8969397802554215E-016  -3.6628592422222953E-017
+Deviation from symplecticity  0.3528002226659578E-11 %
+  Eigenvalues are 
+           1  0.93863793708119014       0.34490407807387652     
+           2  0.93863793708119014      -0.34490407807387652     
+           3  0.96000640410535765        0.0000000000000000     
+           4   1.0416597178139786        0.0000000000000000     
+           5  0.99852338901016302        5.4323490311862968E-002
+           6  0.99852338901016302       -5.4323490311862968E-002
+  HYPERBOLIC NORMAL FORM DETECTED 
+  All TPSA/DA/LIE CALCULATIONS INTERRUPTED AT YOUR REQUEST 
+  PLEASE RESET STABLE FLAGS 
+++++++ warning: ptc_twiss::maptoascript:   DA got unstable during Normal Form: PTC msg: d_lielib.f90 mapflol : one of ri components is 0
+++++++ Error: seterrorflag : Errorcode: 10   Reported from ptc_twiss::maptoascript :
+++++++ Error: seterrorflag : Description:  DA got unstable during Normal Form: PTC msg: d_lielib.f90 mapflol : one of ri components is 0                                                                                                                                                                                                                                                                                                                 
+ptc_twiss,closed_orbit,icase=5,no=2,file=map_compare_madx_output5;
+
+++++++ info: Zero value of SIGT replaced by 1.
+++++++ info: Zero value of SIGE replaced by 1/1000.
+ ************ State Summary ****************
+ MADTHICK=>KIND =   37  MATRIX-KICK-MATRIX     
+  Rectangular Bend: input arc length (rho alpha) 
+  Default integration method     2
+  Default integration steps      4
+ This is a proton 
+       EXACT_MODEL =  TRUE 
+       TOTALPATH   =     0
+       RADIATION   =  FALSE
+       STOCHASTIC  =  FALSE
+       ENVELOPE    =  FALSE
+       NOCAVITY    =  TRUE 
+       TIME        =  FALSE
+       FRINGE      =  FALSE
+       PARA_IN     =  FALSE
+       ONLY_4D     =  TRUE 
+       DELTA       =  TRUE 
+       SPIN        =  FALSE
+       MODULATION  =  FALSE
+       RAMPING     =  FALSE
+       ACCELERATE  =  FALSE
+++++++ warning: ptc_twiss:  DA got unstable even before finding closed orbit
+++++++ Error: seterrorflag : Errorcode: 10   Reported from ptc_twiss :
+++++++ Error: seterrorflag : Description: DA got unstable even before finding closed orbit

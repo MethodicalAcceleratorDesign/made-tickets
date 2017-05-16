@@ -1,0 +1,106 @@
+!Choice of Magnetic lengths of PETRA III magnets
+
+L_effective = 1; !Selects 0=Iron length, 1=Effective length
+;
+if (L_effective==0){
+
+     print, text="**** INFO **** Loading PETRA III Optics with Magnet Iron lengths.";
+     !*************** SEXTUPOLES ****************;
+     s_L = 0.250;
+     !*************** CORRECTORS ****************;
+     !****   CORRECTORS OF HERA TYPE;
+       L_PCV  = 0.3;
+       L_PCVM = 0.200;
+       L_PCH  = 0.3;
+     !****   CORRECTORS OF BINP TYPE;
+       L_PKVW = 0.155;
+       L_PKHW = 0.150;
+     !****   FAST CORRECTORS OLD OCTANTS;
+      L_PKVSA = 0.4;
+      L_PKHSA = 0.4;
+     !****   CORRECTORS NEW OCTANT - IRON CORE;
+       L_PKV = 0.152;
+       L_PKH = 0.125;
+     !****   CORRECTORS NEW OCTANT - FAST CORRECTORS;
+       L_PKHS = 0.197;
+       L_PKVS = 0.197;
+     ;
+     !**************** DIPOLES AT FODO AND DBA OCTANT ****************;
+     D_L    = 5.310;
+     PDA_L  = 1.0;
+     PDAK_L = 0.999992*PDA_L;
+     PDC_L  = 0.3;
+     !*************** QUADRUPOLES ****************;
+     QA_L   = 0.660;
+     QA1_L  = 1.000;
+     QA1M_L = QA1_L;
+     QA1H_L = QA1_L/2;
+     PQK_L  = 0.44;
+     PQL_L  = 0.72;
+     PQG_L  = 0.280;
+};
+
+else {
+
+   print, text="**** INFO **** Loading PETRA III Optics with Magnet effective lengths.";
+   !*************** SEXTUPOLES ****************;
+   s_L = 0.286; !53;
+   !*************** CORRECTORS ****************;
+   !****   CORRECTORS OF HERA TYPE;
+     L_PCV  = 0.3934;
+     L_PCVM = 0.3176;
+     L_PCH  = 0.3934;
+   !****   CORRECTORS OF BINP TYPE;
+     L_PKVW = 0.2375;
+     L_PKHW = 0.1523;
+   !****   FAST CORRECTORS OLD OCTANTS;
+     L_PKVSA = 0.405;
+     L_PKHSA = 0.405;
+   !****   CORRECTORS NEW OCTANT - IRON CORE;
+     L_PKV = 0.2158;
+     L_PKH = 0.1722;
+   !****   CORRECTORS NEW OCTANT - FAST CORRECTORS;
+     L_PKHS = 0.197;
+     L_PKVS = 0.197;
+   ;
+   !**************** DIPOLES AT FODO AND DBA OCTANT ****************;
+      D_L    = 5.378;
+      PDA_L  = 1.0527;
+      PDAK_L = 0.999992*PDA_L;
+      PDC_L  = 0.310;
+   !*************** QUADRUPOLES ****************;
+     QA_L   = 0.7028;
+     QA1_L  = 1.0426;
+     QA1M_L = 1.0426; !546;
+     QA1H_L = QA1_L/2;
+     PQK_L  = 0.4759;
+     PQL_L  = 0.7548;
+     PQG_L  = 0.3242;
+};
+;
+! No of correctors in the Horizontal plane
+!Slow correction
+N_pch  = 25;
+N_pkh  = 41;
+N_pkhw = 12;
+N_pkdk = 106;
+N_pkpda= 26;
+!Fast correction
+N_pkhs = 37;
+N_pkhsa= 12;
+! No of correctors in the Vertical plane
+!Slow correction
+N_pcv  = 27;
+N_pcvm = 15;
+N_pkv  = 55;
+N_pkvw = 12;
+N_pkvsx= 60;
+N_pkvsu= 25;
+!Fast correction
+N_pkvs = 35;
+N_pkvsa= 14;
+;
+! No. of BPMs
+N_bpm  = 246;
+
+return;

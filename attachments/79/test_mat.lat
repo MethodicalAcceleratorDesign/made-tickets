@@ -1,0 +1,14 @@
+DR0: drift, L=0.1;
+BEND: rbend, L=0.1, angle=0.4;
+!GAP: drift, L=0;
+GAP: matrix, L=0.000,RM21=0.5,RM43=0.5,RM65=-1.0;
+test_line: line=(DR0, GAP, DR0, BEND);
+
+beam,ENERGY=0.941,PARTICLE=PROTON;
+bstart:  beta0, betx=1.0,alfx=0.,bety=1.,alfy=0.;
+use, period=test_line;
+select,flag=twiss,clear;
+set,    format="12.6f";
+select,flag=twiss,column=name,s,betx,alfx,bety,alfy,dx,dpx;
+twiss,beta0=bstart,sequence=test_line,file="ref.out";
+stop;

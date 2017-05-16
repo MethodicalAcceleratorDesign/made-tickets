@@ -1,0 +1,125 @@
+OPTION, ECHO=false;
+
+// 1 Element definitions
+//CALL, FILE = "HEB100km_elements_v2.madx" ;
+	// 0 Dummy settings
+md.main.l = 1 ;
+
+	  // 1 Markers
+x.dummy:	MARKER ;
+
+		// 2 Drifts
+dcon:		DRIFT, L = 0.25 ;	! drift for connect between mq and md
+dmd:		DRIFT, L := md.main.l ;	! drift with main dipole length
+dms:		DRIFT, L := ms.main.l ;	! drift with main sextupole length
+
+		// 3 Dipoles
+md.main: SBEND, L := md.main.l, ANGLE := md.main.an ; ! main dipole (to be chopped up)
+md.half: SBEND, L := md.main.l, ANGLE := md.main.an/2 ; ! main dipole (to be chopped up)
+
+	 // 4 Quadrupoles
+mq.main.arc.f:	QUADRUPOLE, L := mq.main.l, K1 := mq.main.arc.f.k ;	! main arc focussing quad
+mq.main.arc.d:	QUADRUPOLE, L := mq.main.l, K1 := mq.main.arc.d.k ;	! main arc defocussing quad
+mq.half.arc.f:	QUADRUPOLE, L := mq.main.l/2, K1 := mq.main.arc.f.k ;	! half main arc focussing quad
+mq.half.arc.d:	QUADRUPOLE, L := mq.main.l/2, K1 := mq.main.arc.d.k ;
+
+mq.main.ds.f:	QUADRUPOLE, L := mq.main.l, K1 := mq.main.ds.f.k ;	! main dispersion suppressor focussing quad
+mq.main.ds.d:	QUADRUPOLE, L := mq.main.l, K1 := mq.main.ds.d.k ;	! main dispersion suppressor defocussing quad
+mq.half.ds.f:	QUADRUPOLE, L := mq.main.l/2, K1 := mq.main.ds.f.k ;	! half main dispersion suppressor focussing quad
+mq.half.ds.d:	QUADRUPOLE, L := mq.main.l/2, K1 := mq.main.ds.d.k ;
+
+mq.main.straight.f:	QUADRUPOLE, L := mq.main.l, K1 := mq.main.straight.f.k ;	! main straight focussing quad
+mq.main.straight.d:	QUADRUPOLE, L := mq.mainl, K1 := mq.main.straight.d.k ;	! main straight defocussing quad
+mq.half.straight.f:	QUADRUPOLE, L := mq.main.l/2, K1 := mq.main.straight.f.k ;	! half main straight focussing quad
+mq.half.straight.d:	QUADRUPOLE, L := mq.main.l/2, K1 := mq.main.straight.d.k ;
+
+mq.main.tune.f:	QUADRUPOLE, L := mq.main.l, K1 := mq.main.tune.f.k ;	! main dispersion suppressor focussing quad
+mq.main.tune.d:	QUADRUPOLE, L := mq.main.l, K1 := mq.main.tune.d.k ;	! main dispersion suppressor defocussing quad
+mq.half.tune.f:	QUADRUPOLE, L := mq.main.l/2, K1 := mq.main.tune.f.k ;	! half main dispersion suppressor focussing quad
+mq.half.tune.d:	QUADRUPOLE, L := mq.main.l/2, K1 := mq.main.tune.d.k ;
+
+		// 5 Sextupoles
+ms.main.f: SEXTUPOLE, L := ms.main.l, K2 := ms.main.f.k ; ! main arc focussing sextupole
+ms.main.d: SEXTUPOLE, L := ms.main.l, K2 := ms.main.d.k ; ! main arc defocussing sextupole
+
+//CALL, FILE = "HEB100km_values_v2.madx" ;
+	// 1 Lengths
+md.main.l = 40.5 ;
+mq.main.l = 4.5 ;
+ms.main.l = 2 ;
+
+	  // 2 Strengths
+md.main.an = pi/784 ;
+
+mq.main.arc.f.k = 0.006483391904 ;
+mq.main.arc.d.k = -0.006483453344 ;
+mq.main.ds.f.k = 0.006483448062 ;
+mq.main.ds.d.k = -0.006483463422 ;
+mq.main.straight.f.k = 0.006483466781 ;
+mq.main.straight.d.k = -0.006483466781 ;
+mq.main.tune.f.k = 0.006276581807 ;
+mq.main.tune.d.k = -0.006276581807 ;
+
+//ms.main.f.k = 0.03975414771 ;
+//ms.main.d.k = -0.07663879131 ;
+
+
+// 2 Line definition
+//CALL, FILE = "HEB100km_lines_v2.madx" ;
+	       // 1 Basic FODO cells
+fodo.arc:	LINE = ( mq.half.arc.f, dcon, dms, dcon, md.main, dcon, dms, dcon, mq.half.arc.d,
+			mq.half.arc.d, dcon, dms, dcon, md.main, dcon, dms, dcon, mq.half.arc.f ) ;
+fodo.ds:	LINE = ( mq.half.ds.f, dcon, dms, dcon, md.half, dcon, dms, dcon, mq.half.ds.d,
+			mq.half.ds.d, dcon, dms, dcon, md.half, dcon, dms, dcon, mq.half.ds.f ) ;
+fodo.straight:	LINE = ( mq.half.straight.f, dcon, dms, dcon, dmd, dcon, dms, dcon, mq.half.straight.d,
+			mq.half.straight.d, dcon, dms, dcon, dmd, dcon, dms, dcon, mq.half.straight.f ) ;
+fodo.tune:	LINE = ( mq.half.tune.f, dcon, dms, dcon, dmd, dcon, dms, dcon, mq.half.tune.d,
+			mq.half.tune.d, dcon, dms, dcon, dmd, dcon, dms, dcon, mq.half.tune.f ) ;
+
+		// 2 HEB building blocks
+LAR: LINE = ( 160*fodo.arc ) ;
+SAR: LINE = ( 32*fodo.arc ) ;
+DISA: LINE = ( 2*fodo.ds, 2*fodo.tune ) ;
+DISB: LINE = ( 2*fodo.tune, 2*fodo.ds ) ;
+
+      	        // 3 Dummy lines
+dummy.dispersion:	LINE = ( 4*fodo.arc, DISA, x.dummy, 4*fodo.straight, DISB, 4*fodo.arc) ;
+
+		// 4 HEB line
+HEB: LINE = (
+		 7*fodo.straight, DISB, SAR, DISA, 
+		14*fodo.straight, DISB, LAR, DISA,
+		42*fodo.straight, DISB, LAR, DISA,
+		14*fodo.straight, DISB, SAR, DISA,
+		14*fodo.straight, DISB, SAR, DISA,
+		14*fodo.straight, DISB, LAR, DISA,
+		42*fodo.straight, DISB, LAR, DISA,
+		14*fodo.straight, DISB, SAR, DISA,
+		 7*fodo.straight
+		) ;
+		
+halfHEB:	LINE = (
+		 7*fodo.straight, DISB, SAR, DISA, 
+		14*fodo.straight, DISB, LAR, DISA,
+		42*fodo.straight, DISB, LAR, DISA,
+		14*fodo.straight, DISB, SAR, DISA,
+		7*fodo.straight
+		) ;
+
+OPTION, ECHO=true;
+
+// 3 Load beam
+BEAM, PARTICLE = PROTON, ENERGY = 3300 ;
+USE, SEQUENCE = HEB ;
+
+// 4 Invoke bug
+TWISS, FILE="HEB_chroma_0.tfs" ;
+PLOT, TITLE = "DELTAP=0.0", HAXIS = s, VAXIS = x,y, COLOUR = 100, TABLE = twiss, FILE = "HEB_chroma", 
+       INTERPOLATE=true ; // triggers the PLOT failure
+//      NOLINE=true, NOVERSION=true, INTERPOLATE=false ; 
+
+TWISS, FILE="HEB_chroma_plus.tfs", DELTAP = 0.0001 ;   // fails if the PLOT above has failed on "buffer full"
+PLOT, TITLE = "DELTAP=0.0001", HAXIS = s, VAXIS = x,y, COLOUR = 100, TABLE = twiss, FILE = "HEB_chroma", 
+      NOLINE=true, NOVERSION=true, INTERPOLATE=false ;
+
+STOP;

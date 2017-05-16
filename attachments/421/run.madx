@@ -1,0 +1,22 @@
+option -echo;
+//Option, RBARC=false;
+
+//***
+
+CA1 : RFCAVITY, FREQ:= 500.0, LAG:= 0.5, VOLT:= 200.0;
+
+CAV: SEQUENCE, REFER = CENTRE, L=1.0;
+CA1.1: CA1, AT = 0.5;
+ENDSEQUENCE;
+
+//***
+
+BEAM, PARTICLE = electron, ENERGY=1.0;
+
+//***
+
+USE, SEQUENCE = CAV; 
+
+SXFWRITE, FILE="CAV.seq";
+
+STOP();

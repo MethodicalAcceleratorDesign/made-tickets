@@ -1,0 +1,21 @@
+Option,  warn,info;
+System,"rm -rf temp";
+System,"mkdir temp";
+System,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
+System,"ln -fns /afs/cern.ch/eng/lhc/optics/SLHCV3.1b slhc";
+
+option,-echo,-info;
+
+call,file="slhc/toolkit/macro.madx";        !Call some macro facilities
+
+call,file="db5/V6.5.seq";
+
+seqedit,sequence=lhcb1;flatten;cycle,start=IP3;endedit; ! It works
+seqedit,sequence=lhcb1;cycle,start=IP3;endedit; ! It works
+
+!Thin lens
+exec,myslice;
+seqedit,sequence=lhcb1;cycle,start=IP3;endedit; ! It crashes
+seqedit,sequence=lhcb1;flatten;cycle,start=IP3;endedit; !It works
+
+stop;

@@ -1,0 +1,112 @@
+!! ************************************************
+!!
+!! Create transfer line
+!!
+!! ************************************************
+beam, particle=proton, sequence=xferline, energy=0.968272, ex=2.4436E-5, ey=1.6874E-5;
+
+select,flag=twiss,clear;
+select,flag=twiss,column=name,s,l,angle,betx,bety,alfx,alfy,gammax,gammay,dx,disp,dpx,dispp,dy,dpy,dimx,dimxpr,dimy,dimypr ;
+
+option, info, warn, echo;
+
+
+ldrift1 := 0.77;
+ldrift2 := 1.6;
+lcol := 0.10;
+
+!! Markers
+!! *******
+
+start.line: marker;
+stop.line: marker;
+obv1: marker;
+
+coll:COLLIMATOR, l=lcol, APERTYPE=rectangle, APERTURE={0.0005, 0.0005}; 
+
+
+
+ltot :=  ldrift1 + lcol + ldrift2;
+
+xferline: sequence,refer=center, l:=ltot;
+start.line, at:= 0.0;
+coll, at := ldrift1 + lcol/2;
+obv1, at := ldrift1 + lcol;
+stop.line, at:=  ldrift1 + lcol + ldrift2;
+endsequence;
+
+
+!! Set initial parameters
+
+initbeta0: beta0,
+
+betx := 2.8876,
+bety := 0.4320,
+alfx := -1.9519,
+alfy :=0.0;
+
+Eh :=2.4436E-5; Ev :=1.6874E-5; Delp :=0.01;
+
+disp := table(twiss,dx)*0.247;
+dispp := table(twiss,dpx)*0.247;
+gammax := (table(twiss,alfx)^2+1)/table(twiss, betx);
+gammay := (table(twiss,alfy)^2+1)/table(twiss, bety);
+
+dimx := sqrt(table(twiss,betx)*Eh+(Delp*table(twiss,disp))^2)*100; !cm
+dimxpr := sqrt(table(twiss,gammax)*Eh+(Delp*table(twiss,dispp))^2)*1000;   !mrad
+
+dimy := sqrt(table(twiss,bety)*Ev)*100;   !cm
+dimypr := sqrt(table(twiss,gammay)*Ev)*1000;    !mrad
+
+
+use, sequence=xferline;
+save,sequence=xferline,file=effective emittance.seq;
+
+use,sequence=xferline;
+twiss,beta0=initbeta0, centre,file=effective emittance.tfs;
+
+
+select, flag=aperture, column=name,s,n1,betx,bety, apertype, aper_1, aper_2, aper_3, aper_4, n1x_m, n1y_m;
+aperture, range=start.line/stop.line,  file=elemnts-aperture.tex;
+
+use,sequence=xferline;
+
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=10,exact;
+ptc_align;
+
+n := 0;
+nparts := 9;
+
+
+option,-info;
+
+particles: macro={
+
+sx := 0.84E-2*gauss();
+spx := 6.384E-3*gauss();
+sy := 0.27E-2*gauss();
+spy := 6.25E-3*gauss();
+
+ptc_start, x= sx, px= spx, y= sy, py= spy, t= 0, pt= 0;
+}
+
+while (n < nparts + 1) {
+
+exec, particles;
+
+n = n + 1;
+}
+
+ptc_observe,place=obv1;          
+
+ptc_track,icase=6,deltap=0.01,dump,
+       element_by_element, onetable, 
+       turns=1, ffile=1, norm_no=1,radiation=true, maxaper={0.25,0.5,0.25,0.5,1.0,0.1};
+
+
+ptc_track_end;
+
+
+ptc_end;
+

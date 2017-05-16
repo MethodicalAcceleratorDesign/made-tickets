@@ -1,0 +1,52 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %03s "SEQ"
+@ PARTICLE         %08s "POSITRON"
+@ MASS             %le    0.00051
+@ CHARGE           %le    1.00000
+@ ENERGY           %le    1.00000
+@ PC               %le    1.00000
+@ GAMMA            %le  1956.95127
+@ KBUNCH           %le    1.00000
+@ BCURRENT         %le    0.00000
+@ SIGE             %le    0.00000
+@ SIGT             %le    0.00000
+@ NPART            %le    0.00000
+@ EX               %le    1.00000
+@ EY               %le    1.00000
+@ ET               %le    1.00000
+@ LENGTH           %le    1.00000
+@ ALFA             %le    0.00000
+@ ORBIT5           %le   -0.00000
+@ GAMMATR          %le    0.00000
+@ Q1               %le    0.12967
+@ Q2               %le    0.11993
+@ DQ1              %le    0.00000
+@ DQ2              %le    0.00000
+@ DXMAX            %le    0.00000
+@ DYMAX            %le    0.00000
+@ XCOMAX           %le    0.00000
+@ YCOMAX           %le    0.00000
+@ BETXMAX          %le    2.74115
+@ BETYMAX          %le    2.28216
+@ XCORMS           %le    0.00000
+@ YCORMS           %le    0.00000
+@ DXRMS            %le    0.00000
+@ DYRMS            %le    0.00000
+@ DELTAP           %le    0.00000
+@ SYNCH_1          %le    0.00000
+@ SYNCH_2          %le    0.00000
+@ SYNCH_3          %le    0.00000
+@ SYNCH_4          %le    0.00000
+@ SYNCH_5          %le    0.00000
+@ TITLE            %08s "no-title"
+@ ORIGIN           %22s "MAD-X 5.02.00 Linux 64"
+@ DATE             %08s "17/07/14"
+@ TIME             %08s "21.59.46"
+* NAME                          S         L         X        PX      ALFX      BETX        DX         Y        PY      ALFY      BETY        DY 
+$ %s                          %le       %le       %le       %le       %le       %le       %le       %le       %le       %le       %le       %le 
+ "SEQ$START"              0.00000   0.00000   0.00000   0.00000   0.00000   1.00000   0.00000   0.00000   0.00000   0.00000   1.00000   0.00000
+ "BEGSEQ"                 0.00000   0.00000   0.00000   0.00000   0.00000   1.00000   0.00000   0.00000   0.00000   0.00000   1.00000   0.00000
+ "QUAD1"                  1.00000   1.00000   0.00000   0.00000  -1.64186   2.74115   0.00000   0.00000   0.00000  -1.36652   2.28216   0.00000
+ "ENDSEQ"                 1.00000   0.00000   0.00000   0.00000  -1.64186   2.74115   0.00000   0.00000   0.00000  -1.36652   2.28216   0.00000
+ "SEQ$END"                1.00000   0.00000   0.00000   0.00000  -1.64186   2.74115   0.00000   0.00000   0.00000  -1.36652   2.28216   0.00000

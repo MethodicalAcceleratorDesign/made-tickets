@@ -1,0 +1,157 @@
+!Common definitions and constants
+
+MYCAVITY : TWCAVITY;
+
+jscale =        1; ! ;! at 128MeV with 3rd turn and v bpm corrected
+
+bhscale =       1.;!it is used in TL1
+
+hscale =        1.00;
+fscale =        1.00;
+gscale =        1.0;
+
+
+!bhe.hgap = 0.033;!fitted with madx agrees with PTC
+!bhe.fint = 0.561;
+
+bhe.hgap = 0.0225;!theory
+tl1.bhe.fint = 0.561*1.8;!
+bhe.fint = 0.561*1.8; 
+
+
+
+bhf.hgap = 0.029;!fitted to TL1 data 2008, no quad scaling, bhscale=1
+bhf.fint = 0.5;!fitted to CR data to hgap 0.0225
+
+
+bhf.hgap = 0.0225;!theory
+
+tl1.bhf.fint = 0.561*1.7;!
+!bhf.fint = 0.561*1.7;!
+
+!bhf.fint = 1.05;!fits CR
+!bhf.fint = 0.65;!fits TL1
+
+! Fitted FINT based on September 2011 measurements - logbook 6/10/11 (BC)
+!bhe.fint =0.72826 ;
+!tl1.bhe.fint =0.72826 ;
+!bhf.fint =0.50573 ;
+!tl1bhf.fint =0.50573 ;
+
+! Fitted FINT based on September 2011 measurements - improved iterative optimisation 10/11/11 (BC)
+bhe.fint =0.70754 ;
+bhf.fint =0.50271 ;
+
+tl1.bhe.fint =0.70754  ;
+tl1.bhf.fint =0.50271 ;
+
+ECQA    := 0.25;             ! excitation constant dB/dx/I = 0.25 T/Am
+FQA     := CLIGHT*1E-6*ECQA; ! for old QS type, now QXA
+ECQB    := 0.25;             ! excitation constant dB/dx/I = 0.25 T/Am
+FQB     := CLIGHT*1E-6*ECQB; ! for old QL1 type, now QXB, air cooled
+ECQC    := 0.056;            ! excitation constant dB/dx/I = 0.056 T/Am
+FQC     := CLIGHT*1E-6*ECQC; ! for old QL2 type, now QXC, water cooled
+ECQD    := 0.056;            ! excitation constant dB/dx/I = 0.056 T/Am
+FQD     := CLIGHT*1E-6*ECQD; ! for new QL3 type, QXD, water cooled
+!ECQE    := 0.0268;! 0.51 [T] /  50.[A] / 0.38 [m] 
+                  ! 0.38 is l used in the model, magn length is 0.357
+                  ! Corrected for the lengh from the EDMS doc no. 857744
+                  ! https://edms.cern.ch/file/857744/1/PS-PSR-Note_85-18_Mesures_magnetiques_du_quadripole_EPA_type_N_no.1.pdf
+                  ! Old value ECQE    := 0.03095;          ! 
+                  !
+ECQE    := 0.03095;
+FQE     := CLIGHT*1E-6*ECQE; ! Large EPA
+ECQF    := 0.016;            ! 
+FQF     := CLIGHT*1E-6*ECQF; ! QN
+ECQG    := 2.4/0.300/200;    ! GL[T]/L[m]/I[A]  From note AT-MTM-IN-2006-018
+FQG     := CLIGHT*1E-6*ECQG; ! New Slim
+ECQH    := 2.049/0.380/150;  ! GL[T]/L[m]/I[A]
+FQH     := CLIGHT*1E-6*ECQH; ! Wide EPA Terwilliger
+ECQI    := 0.55/0.359/55;    ! GL[T]/L[m]/I[A]  !!! to be verified !!!
+FQI     := CLIGHT*1E-6*ECQI; ! Normal EPA
+!  The length we use in the model is 0.4
+ECQJ    := (0.431/0.4) * 1.5957/0.431/200; ! GL[T]/L[m]/I[A]  From note AT-MTM-IN-2007-001  ; old values 3.2/0.400/450;
+FQJ     := CLIGHT*1E-6*ECQJ; ! S-ACO I
+
+! Sint = 6.568 T/m at 100A /EDMS no 754421/ AT-MTM-IN-2006-032
+! Lmodel =0.1
+ECXI = 6.568 / 0.1 / 100;!== 0.658
+FXB     := CLIGHT * 1E-6 *  ECXI;!== 299.8*0.658 = 196.902
+
+
+!CR.CORRCALIB := 0.3244/3.335641/EN;! here we know the energy and assigne the normalized factor
+
+CR.CORRCALIB := 0.091 / EN;
+
+KC.CORRCALIB := 0.049 ; !EN is different for each so it is define is sequence
+
+KD.CORRCALIB = 299.8*0.224*0.0098/7.;!=0.094   !Thory from A.Ghigo communication Io=7A Bo=9.8*10^-3T  Lo=0.224m
+
+KD.CORRCALIB = 0.094 *0.75;
+
+CL.DH0480CAL :=  KC.CORRCALIB;
+CL.DH0520CAL :=  KC.CORRCALIB; 
+CL.DH0620CAL :=  KC.CORRCALIB;
+CL.DH0720CAL :=  KC.CORRCALIB;
+CL.DH0820CAL :=  KC.CORRCALIB;
+CL.DH0920CAL :=  KC.CORRCALIB;
+CL.DH1020CAL :=  KC.CORRCALIB;
+CL.DH1120CAL :=  KD.CORRCALIB;
+CL.DH1220CAL :=  KD.CORRCALIB;
+CL.DH1320CAL :=  KD.CORRCALIB;
+CL.DH1420CAL :=  KD.CORRCALIB;
+CL.DH1520CAL :=  KD.CORRCALIB;
+
+CL.DV0480CAL :=  KC.CORRCALIB;
+CL.DV0520CAL :=  KC.CORRCALIB;
+CL.DV0620CAL :=  KC.CORRCALIB;
+CL.DV0720CAL :=  KC.CORRCALIB;
+CL.DV0820CAL :=  KC.CORRCALIB;
+CL.DV0920CAL :=  KC.CORRCALIB;
+CL.DV1020CAL :=  KC.CORRCALIB;
+CL.DV1120CAL :=  KD.CORRCALIB;
+CL.DV1220CAL :=  KD.CORRCALIB;
+CL.DV1320CAL :=  KD.CORRCALIB;
+CL.DV1420CAL :=  KD.CORRCALIB;
+CL.DV1520CAL :=  KD.CORRCALIB;
+
+
+
+
+
+KE.CORRCALIB := 0.07 * 0.49 / EN; !calibration factors for Kickers of D type
+KF.CORRCALIB := 0.3244/3.335641 / EN; !calibration factors for Kickers of D type
+
+value, fqf;
+value, fqg;
+value, fqj;
+value, fqh;
+
+deg2rad   :=  0.0174532925;
+
+
+sige := 0.8e-2;
+
+
+ptcenergy := table(twiss, energy);
+value, ptcenergy;
+ptcs      := table(twiss, s);
+ptcbetx   := table(twiss, beta11);
+ptcbety   := table(twiss, beta22);
+ptcdx     := table(twiss, disp1);
+
+ptcsigx := sqrt(nex*ptcbetx/ptcenergy*.511e-3)*1000.;
+ptcsigy := sqrt(ney*ptcbety/ptcenergy*.511e-3)*1000.;
+ptcsigp := sqrt( (nex*ptcbetx/ptcenergy*.511e-3) + (sige*ptcdx)^2 )*1000.;
+
+
+dx10:= 10*table(twiss,dx);
+sigx  :=  sqrt(ex*table(twiss,betx)+sige^2*table(twiss,dx)^2);
+sigy  :=  sqrt(ey*table(twiss,bety));
+
+sigxm := -sigx;
+envp  := table(twiss,x)+3*sqrt(ex*table(twiss,betx)+sige^2*table(twiss,dx)^2);
+envm  := table(twiss,x)-3*sqrt(ex*table(twiss,betx)+sige^2*table(twiss,dx)^2);
+sbp   := 3*sqrt(ex*table(twiss,betx)+sige^2*table(twiss,dx)^2);
+sbm   :=-3*sqrt(ex*table(twiss,betx)+sige^2*table(twiss,dx)^2);
+

@@ -1,0 +1,44 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with MadX
+!   Derived from dec17f.txt
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20,
+        post=1,font=-4,lwidth=5;
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=20,
+        post=2,font=-4,lwidth=10;
+
+!-- Define triplet lattice for gantry
+call,file="dec17c.sav";
+title,"Triplet lattice for gantry - dec17i";
+
+!-- Analyse matching result
+beam,ex=3.6692e-6,ey=3.6692e-6,sige=0.03;
+use,period=gantry;
+dpp:=-0.3;
+maxdpp:=+0.305;
+select,flag=twiss,clear;
+select,flag=twiss,range=#e,column=name,s,betx,alfx,mux,dx,dpx,x,px, 
+bety,alfy,muy,dy,dpy,y,py,t,pt,alfa;
+system,"erase dec17i.lis";
+twiss,betx=beta,bety=beta,dx=0,table,file="twiss.lis",deltap=-0.3:+0.3:0.1;
+system,"copy twiss.lis dec17i.lis";
+
+stop;
+
+!-- Compute fields and gradients
+amu:=0.931494320;
+beam,mass=12*amu,charge=6,pc=8.414;
+use,period=cell;
+value,beam->energy,beam->mass,beam->charge;               
+kinE:=beam->energy-beam->mass;
+emu:=(beam->energy-beam->mass)*amu/beam->mass;
+brho:=beam->pc*1e9/clight/beam->charge;
+value,kinE,emu,brho;
+fieldF=bf->angle*brho/bf->l;
+fieldD=bd->angle*brho/bd->l;
+gradF=bf->k1*brho;
+gradD=bd->k1*brho;
+value,fieldF,fieldD,gradF,gradD;
+value,beam->beta,beam->gamma,beam->beta*beam->gamma;
+value,bf->k1,bd->k1;
+
+stop

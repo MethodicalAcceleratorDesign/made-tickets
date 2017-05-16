@@ -1,0 +1,246 @@
+
+
+
+
+
+//______________________________________________________________________
+//Define the beam
+//______________________________________________________________________
+
+
+
+
+energye=80;
+energyee:=energye/1e3;
+BEAM, PARTICLE=ELECTRON, PC:=energyee;
+
+
+
+//______________________________________________________________________
+//Define the initial beam Twiss parameters
+//______________________________________________________________________
+
+gamma0:=(energye)/0.511;
+divergence=1e-3;
+emittance=1e-6;
+normemittance:=emittance/gamma0;
+
+real igamma0:=(divergence^2)/normemittance;
+real ibeta0:=1/igamma0;
+real ialpha:=0;
+real iphi0:= atan(sqrt(igamma0/ibeta0));
+
+
+
+
+//_____________________________________________________________________
+//Define the PMQs
+//_____________________________________________________________________
+
+
+real maxgradpmq1=480;
+real maxgradpmq2=507;
+real maxkpmq1:=((maxgradpmq1*3e8)/(energye*1e6));
+real maxkpmq2:=((maxgradpmq2*3e8)/(energye*1e6));
+
+PMQD: DRIFT,L=4.03e-2;
+//a gives structure FDF in x-plane for -ve charge particles.
+//a should be the correct version for the alphax as designed by MP
+PQFa: QUADRUPOLE, L=0.0106, K1:=-maxkpmq1;
+PQDa: QUADRUPOLE, L=0.0181, K1:=maxkpmq2;
+PMQa: LINE=(PQFa,PMQD,PQDa,PMQD,PQFa);
+
+//PMQD: DRIFT,L=4.1e-2;
+PQFb: QUADRUPOLE, L=0.010, K1:=maxkpmq1;
+PQDb: QUADRUPOLE, L=0.018, K1:=-maxkpmq2;
+PMQb: LINE:=(PQFb,PMQD,PQDb,PMQD,PQFb);
+
+
+
+
+//______________________________________________________________________
+//Define electromagnets
+//______________________________________________________________________
+
+TQF: QUADRUPOLE, L=12.2E-2, K1:=kqf1;
+TQD: QUADRUPOLE, L=21.8E-2, K1:=kqd1;
+
+
+maxcurrent=20;
+emqrad=1.5e-2;
+
+
+real maxgrademq:=(12.3e-3*maxcurrent)/emqrad;
+real maxkemq:=((maxgrademq*3e8)/(energye*1e6));
+
+
+
+//_______________________________________________________________________
+//Define the sequence
+//_______________________________________________________________________
+
+
+
+lseq=4.925;
+
+
+//BEAMLINE: SEQUENCE,REFPOS=centre, l:=lseq;
+BEAMLINE: SEQUENCE,REFER=centre, l:=lseq;
+
+PQFa1:	PQFa,	at=3.5e-2;
+Pqda1:	PQDa,	at=9e-2;
+Pqfa2:	PQFa,	at:=posq1;
+
+TQF1: TQF, at=1.238;
+TQD1: TQD, at=1.615;
+TQF2: TQF, at=1.992;
+
+M1: MARKER, at=4.175;
+
+endsequence;
+
+
+//Normal posq1=14.5e-2;
+
+//_______________________________________________________________________
+//
+//_______________________________________________________________________
+
+maxtar=10;
+tartemp=1e11;
+//create,table=mytab,column=number,energye,emqf1k1,emqd1k1,emqf2k1,cur1,cur2,cur3,position,tar;
+energyemax=200;
+denergye=1;
+
+
+
+create,table=mytab2,column=energye,tempemqf1k1,tempemqd1k1,tempemqf2k1,tempcur1,tempcur2,tempcur3,undbetx,undbety,undalfx,undalfy,pmq1betx,pmq1bety,pmq2betx,pmq2bety,pmq3betx,pmq3bety,pmq3position,tartemp;
+
+iposq1=13e-2;
+tempposq1=iposq1;
+posq1=iposq1;
+
+maxposq1=25e-2;
+dposq1=2e-2;
+number=1;
+maxnumber=20;
+
+
+use,sequence=beamline;
+
+
+
+
+while (energye<=energyemax)
+{
+tartemp=1e20;
+
+while (tempPOSQ1<=MAXPOSQ1)
+{
+
+
+while (NUMBER<=MAXNUMBER)
+{
+
+
+value,energye;
+value,tempposq1;
+value,posq1;
+value,number;
+
+CUR1=0+(20*RANF());
+CUR2=-20+(20*RANF());
+
+posq1=tempposq1;
+
+
+gradqf1=(12.3e-3*cur1)/emqrad;
+gradqd1=(12.3e-3*cur2)/emqrad;
+kqf1=((gradqf1*3e8)/(energye*1e6));
+kqd1=((gradqd1*3e8)/(energye*1e6));
+
+//tqf1->K1:=kqf1;
+//tqf2->K1:=kqf1;
+//tqd1->K1:=kqd1;
+
+MATCH,VLENGTH=TRUE,RMATRIX,SEQUENCE=BEAMLINE, betx=ibeta0, bety=ibeta0, alfx=0, alfy=0;
+//MATCH,RMATRIX,SEQUENCE=BEAMLINE, betx=ibeta0, bety=ibeta0, alfx=0, alfy=0;
+
+CONSTRAINT, SEQUENCE=BEAMLINE, RANGE=M1, BETX=0.75;
+CONSTRAINT, SEQUENCE=BEAMLINE, RANGE=M1, BETY=0.75;
+CONSTRAINT, SEQUENCE=BEAMLINE, RANGE=M1, ALFX=0, ALFY=0;
+
+VARY,NAME=kqf1, STEP=1E-6, LOWER=0,UPPER=maxkemq;
+VARY,NAME=kqd1, STEP=1E-6, LOWER=-maxkemq,UPPER=0;
+VARY,NAME=posq1, step=1e-5, LOWER=iposq1, UPPER=maxposq1;
+
+
+//LMDIF, CALLS=10000, TOLERANCE=1E-30;
+JACOBIAN, CALLS=10000, TOLERANCE=1E-30,STRATEGY=3;
+endmatch;
+
+
+
+
+
+
+if (tar<tartemp)
+{
+if (tartemp>0)
+{
+TWISS,SEQUENCE=BEAMLINE, betx=ibeta0, bety=ibeta0, alfx=0, alfy=0;
+
+tempEMQF1K1=TQF1->K1;
+tempEMQD1K1=TQD1->K1;
+tempEMQF2K1=TQF2->K1;
+
+
+tempcur1:=(emqf1k1*energye*1e6*emqrad)/(3e8*12.3e-3);
+tempcur2:=(emqd1k1*energye*1e6*emqrad)/(3e8*12.3e-3);
+tempcur3:=(emqf2k1*energye*1e6*emqrad)/(3e8*12.3e-3);
+
+pmq3position=posq1;
+
+
+// Output Twiss parameters at the centre of the undulator
+undbetx=table(twiss,m1,betx);
+undbety=table(twiss,m1,bety);
+undalfx=table(twiss,m1,alfx);
+undalfx=table(twiss,m1,alfy);
+
+//Output Beta functions at the quadrupole centres
+pmq1betx=table(twiss,pqfa1,betx);
+pmq1bety=table(twiss,pqfa1,bety);
+
+pmq2betx=table(twiss,pqda1,betx);
+pmq2bety=table(twiss,pqda1,bety);
+
+pmq3betx=table(twiss,pqfa2,betx);
+pmq3bety=table(twiss,pqfa2,bety);
+
+tartemp=tar;
+
+
+}
+}
+
+
+
+
+
+
+number=number+1;
+}
+number=1;
+tempposq1=tempposq1+dposq1;
+}
+fill,table=mytab2;
+tempposq1=iposq1;
+energye=energye+denergye;
+}
+
+
+
+
+
+write,table=mytab2,file=optimumcp3.dat;

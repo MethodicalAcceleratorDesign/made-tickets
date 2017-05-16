@@ -1,0 +1,17 @@
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/runII/opt_med/ db5";
+
+Option, -echo,-warn,-info;
+call,file="db5/V6.5.seq";
+Option, -echo,warn,-info;
+
+NRJ=450;
+Beam,particle=proton,energy=NRJ,sequence=lhcb1,bv= 1;
+Beam,particle=proton,energy=NRJ,sequence=lhcb2,bv=-1;
+seqedit,sequence=lhcb1;  cycle,start=IP3; flatten; endedit;
+seqedit,sequence=lhcb2;  cycle,start=IP3; flatten; endedit;
+use,sequence=lhcb1; ! crash
+
+!works
+seqedit,sequence=lhcb1; flatten; cycle,start=IP3; flatten; endedit;
+seqedit,sequence=lhcb2; flatten; cycle,start=IP3; flatten; endedit;
+use,sequence=lhcb1;

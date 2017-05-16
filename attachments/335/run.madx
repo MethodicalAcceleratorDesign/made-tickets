@@ -1,0 +1,17 @@
+option,-echo,info,warn,-no_fatal_stop;
+call,file="cell.madx";
+call,file="macro.madx";
+
+exec,mk_beam(175);
+
+jac_calls=100;  bisec=3; jac_tol=1e-11; jac_strategy=1;
+
+exec,check(cell_seq);
+PLOT, TABLE=TWISS,TITLE="FODO", HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,COLOUR=100,INTERPOLATE,noversion;
+PLOT, TABLE=TWISS,TITLE="FODO", HAXIS=S,VAXIS1=DX,VAXIS2=DDX,COLOUR=100,-INTERPOLATE,noversion;
+PLOT, TABLE=TWISS,TITLE="FODO", HAXIS=S,VAXIS1=WX,WY,VAXIS2=DDX,COLOUR=100,-INTERPOLATE,noversion;
+
+exec,check_chrom_optics(cell_seq);
+PLOT, TABLE=TWISS_CHROMATIC,TITLE="FODO", HAXIS=S,VAXIS1=BETX,B1X,VAXIS2=DX,COLOUR=100,noversion;
+
+STOP;

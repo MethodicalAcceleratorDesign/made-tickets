@@ -1,0 +1,16 @@
+@ NAME             %06s "SURVEY"
+@ TYPE             %06s "SURVEY"
+@ TITLE            %08s "no-title"
+@ ORIGIN           %23s "MAD-X 5.02.01 Darwin 64"
+@ DATE             %08s "08/05/14"
+@ TIME             %08s "15.43.40"
+* NAME                                S                  L              ANGLE                  X                  Y                  Z              THETA                PHI                PSI         GLOBALTILT    SLOT_ID ASSEMBLY_ID           MECH_SEP              V_POS 
+$ %s                                %le                %le                %le                %le                %le                %le                %le                %le                %le                %le         %d         %d                %le                %le 
+ "CPS$START"                          0                  0                  0                  0                  0                  0                  0                  0                  0                  0          0          0                  0                  0
+ "Q1"                               0.1                0.1                  0                  0                  0                0.1                  0                  0                  0                  0          0          0                  0                  0
+ "ROT1"                             0.1                  0                  0                  0                  0                0.1      -0.7853981634                  0                  0                  0          0          0                  0                  0
+ "DRIFT_0"                  1.514213562        1.414213562                  0                 -1                  0                1.1      -0.7853981634                  0                  0                  0          0          0                  0                  0
+ "ROT2"                     1.514213562                  0                  0                 -1                  0                1.1                  0                  0                  0                  0          0          0                  0                  0
+ "Q2"                       1.614213562                0.1                  0                 -1                  0                1.2                  0                  0                  0                  0          0          0                  0                  0
+ "DRIFT_1"                            3        1.385786438                  0                 -1                  0        2.585786438                  0                  0                  0                  0          0          0                  0                  0
+ "CPS$END"                            3                  0                  0                 -1                  0        2.585786438                  0                  0                  0                  0          0          0                  0                  0

@@ -1,0 +1,26 @@
+option,-echo, -info, warn, -no_fatal_stop;
+call,file="cell.madx";
+option, echo;
+
+beam, particle=electron, energy=3., radiate=false;
+
+seqedit, sequence=super_cell_seq; flatten; endedit;
+
+! a second flatten in a different seqedit is required to avoid that Q3[3] and following are undefined... ?!
+seqedit, sequence=super_cell_seq; flatten; endedit;
+
+seqedit, sequence=super_cell_seq;
+        install,element=SY1,class=SSY1, at := Q3->L/2+0.2+SY1->L/2    , from=Q3[1];
+	install,element=SY2,class=SSY1, at := Q3->L/2+0.2+SY1->L/2    , from=Q3[2];
+	install,element=SY3,class=SSY1, at := Q3->L/2+0.2+SY1->L/2    , from=Q3[3];
+endedit;
+
+use, sequence=super_cell_seq,;
+
+select, flag=twiss, COLUMN=S,NAME,L,BETX,BETY,ALFX,ALFY,MUX,MUY,DX,DPX;
+twiss, file="twiss.tfs", rmatrix, chrom;
+
+PLOT, TABLE=TWISS, TITLE="Super cell", HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,COLOUR=100,INTERPOLATE;
+PLOT, TABLE=TWISS, TITLE="Super cell", HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,COLOUR=100,INTERPOLATE,range=q3[1]/q3[7];
+
+STOP;

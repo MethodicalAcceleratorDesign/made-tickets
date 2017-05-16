@@ -1,0 +1,205 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with MadX
+!   Derived from jul31h.txt 
+amu:=0.931494320;
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20,
+        post=1,font=-4,lwidth=5;
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=20,
+        post=2,font=-4,lwidth=10;
+
+!-- Define triplet lattice for gantry
+BF: RBEND, L=0.3, ANGLE:=FANG, K1:=FK1, K2:=FK2;
+BD: RBEND, L=0.3, ANGLE:=DANG, K1:=DK1, K2:=DK2;
+RF: RBEND, L=0.3, ANGLE:=-3*FANG, K1:=FK1, K2:=-FK2;
+RD: RBEND, L=0.3, ANGLE:=-3*DANG, K1:=DK1, K2:=-DK2;
+SF: RBEND, L=0.3, K1:=FK1, K2:=FK2;
+SD: RBEND, L=0.3, K1:=DK1, K2:=DK2;
+D1: DRIFT, L=0.06;
+D2: DRIFT, L:=0.5*PERIODL-BF->L-BD->L-D1->L;
+COL: ECOLLIMATOR, XSIZE=0.1, YSIZE=0.1;
+MARK: MARKER;
+QF: QUADRUPOLE, L=0.100000037761, K1:=QFK1;
+QD: QUADRUPOLE, L=0.102870968475, K1:=QDK1;
+D1I: DRIFT, L=0.05;
+D3I: DRIFT, L=0.050009708435;
+D4I: DRIFT, L=0.0;
+MID: MARKER;
+D3: DRIFT, L=4.963444;
+TRI: LINE=(BD,D1,BF);
+RTRI: LINE=(RD,D1,RF);
+STRI: LINE=(SD,D1,SF);
+CELL: LINE=(D2,-TRI,TRI,D2);
+RCELL: LINE=(D2,-RTRI,RTRI,D2);
+SCELL: LINE=(D2,-STRI,STRI,D2);
+INS: LINE=(D3I,QF,D1I,QD);
+!GANTRY: LINE=(INS,TRI,D2,8*CELL,D2,-TRI,MID,RTRI,D2,17*RCELL,D2,-RTRI,-INS,D3);
+INS2: LINE=(INS,-INS);
+PERIODL := 1.38;
+PERIODN := 32;
+FANG := 6.28318530718/PERIODN/4;
+DANG := 6.28318530718/PERIODN/4;
+FK1 := 2.5;
+DK1 := -2.5;
+FK2 := 0;
+DK2 := 0;
+QX := 0.190184157474;
+QY := 0.096976707038;
+QS := 0.0;
+QX' := -0.163247945453;
+QY' := -0.18393605486;
+ALFX := 0.0;
+ALFY := 0.193989082742E-15;
+BETX := 0.734826363803;
+BETY := 0.734826363798;
+X0 := 0.0;
+PX0 := 0.0;
+Y0 := 0.0;
+PY0 := 0.0;
+T0 := 0.0;
+PT0 := 0.0;
+QFK1 := 26.948730866925;
+QDK1 := -21.917714109902;
+BETA := 0.734826363802;
+
+title,"Triplet lattice for gantry - jul31i";
+beam,ex=3.6692e-6,ey=3.6692e-6,sige=0.03;
+use,period=cell;
+
+!-- Match CELL
+match,sequence=cell;
+vary,name=fk1,step=0.1;
+vary,name=dk1,step=0.1;
+!vary,name=fk2,step=0.1;
+!vary,name=dk2,step=0.1;
+global,sequence=cell,q1=1/4,q2=1/4;!,dq1=0,dq2=0;
+lmdif,calls=100,tolerance=1e-20; 
+endmatch; 
+
+!-- Analyse matching result
+select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,x,px, 
+bety,alfy,muy,dy,dpy,y,py,t,pt,alfa; 
+system,"erase jul31i_twiss.lis"; 
+savebeta,label=atc,place=#s,sequence=cell;
+system,"erase twiss.lis";
+twiss,rmatrix,table,file="twiss.lis"; 
+title," "; 
+!plot,file="jul31i",haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,interpolate, 
+!noversion,notitle;
+system,"copy twiss.lis jul31i.lis";
+
+!-- Define gantry consisting of 6 cells and 6 cells with opposite deflection
+!   at dpp=0 all orbit functions are matched
+!   Initial cell with quadrupoles transports beam to centre of triplet
+use,period=ins;
+twiss,betx:=beta,bety:=beta,dx:=0,table="ins.tab",file="jul31i_ins_twiss.lis";
+!plot,table="ins.tab",file="jul31i",haxis=s,vaxis=betx,bety,colour=100,interpolate;
+use,period=ins2;
+twiss,file="jul31i_ins2_twiss.lis";
+!savesigma,place=#s,label=sigi;
+gantry: line=(4*cell,3*scell,4*rcell);
+use,period=gantry;
+!print,mid;
+survey,table,file="jul31i_srv.lis";
+!plot,table=survey,file="jun24o",haxis=z,vaxis=x,interpolate,noversion;
+
+!print,clear;
+system,"erase gantry.lis";
+twiss,betx=atc->betx,bety=atc->bety,dy=atc->dx,file="gantry.lis";
+system,"copy /y jul31i.lis+gantry.lis jul31i.lis";
+!plot,file="jul31i",haxis=s,vaxis=betx,colour=100,interpolate,noline;
+!plot,file="jul31i",haxis=s,vaxis=bety,colour=100,interpolate,noline;
+plot,file="jul31i",haxis=s,vaxis=dx,colour=100,interpolate,noline;
+plot,file="jul31i",haxis=s,vaxis=dx,colour=100,noline;
+!plot,file="jul31i",haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,interpolate,noline; 
+
+!-- Compute fields and gradients
+amu:=0.931494320;
+value,amu;
+beam,particle=ion,mass=12*amu,charge=6,pc=11.42;
+use,period=cell;
+value,beam->energy,beam->mass,beam->charge;               
+kinE:=beam->energy-beam->mass;
+emu:=(beam->energy-beam->mass)*amu/beam->mass;
+brho:=beam->pc*1e9/clight/beam->charge;
+value,kinE,emu,brho;
+fieldD=bd->angle*brho/bd->l;
+fieldF=bf->angle*brho/bf->l;
+gradF=bf->k1*brho;
+gradD=bd->k1*brho;
+value,fieldF,fieldD,gradF,gradD;
+value,beam->beta,beam->gamma,beam->beta*beam->gamma;
+value,bf->k1,bd->k1,d2->l;
+value,pi;
+rhoD=brho/fieldD;
+rhoF=brho/fieldF;
+value,rhod,rhoF;
+Foff=fieldF/gradF;
+Doff=fieldD/gradD;
+value,doff,foff;
+nrhof=bf->k1*rhoF;
+nrhoD=bd->k1*rhoD;
+value,nrhoF,nrhoD;
+
+stop;
+
+!-- Match INS
+use,period=ins;
+beta:=1;
+value,beta,atc->betx;
+system,"erase twiss.lis";
+match,betx=beta,bety=beta;
+vary,name=qfk1,step=0.1;
+vary,name=qdk1,step=0.1;
+vary,name=beta,step=0.01,lower=0;
+!vary,name=d1i->l,step=0.01,lower=0.02;
+vary,name=d3i->l,step=0.01,lower=0.02;
+!vary,name=qf->l,step=0.01,lower=0.1;
+!vary,name=qd->l,step=0.01,lower=0.1;
+constraint,sequence=ins,range=#e,betx=atc->betx,bety=atc->bety,alfx=atc->alfx,alfy=atc->alfy;
+lmdif,calls=10000,tolerance=1e-20;
+endmatch;
+twiss,table,betx=beta,bety=beta,file="twiss.lis";
+system,"copy /y jul31i.lis+twiss.lis jul31i.lis";
+plot,filename="jul31i",haxis=s,vaxis=betx,bety,colour=100,interpolate,
+noversion,notitle;
+
+stop;
+
+!-- Track through gantry starting with orbit functions at dpp=0
+!   All orbit functions are mismatched at dpp .ne. 0 in whole gantry
+!   Mismatch increases with |dpp|
+!   Orbit oscillates through whole gantry
+dpp:=-0.2;
+stepdpp:=0.1;
+maxdpp:=6;
+ndpp:=0;
+use,period=gantry;
+while(ndpp<maxdpp)
+{
+ndpp=ndpp+1;
+twiss,betx:=beta,bety:=beta,file,deltap=dpp,dx=0,table,file="gantry_twiss.lis";
+plot,file="jul31i",haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,interpolate,noline;
+plot,file="jul31i",haxis=s,vaxis=x,colour=100,interpolate,noline;
+plot,file="jul31i",haxis=s,vaxis=px,colour=100,interpolate,noline;
+dpp=dpp+stepdpp;
+}
+value,fang,dang;
+!-- Compute fields and gradients
+amu:=0.931494320;
+value,amu;
+beam,particle=ion,mass=12*amu,charge=6,pc=11.42;
+use,period=cell;
+value,beam->energy,beam->mass,beam->charge;               
+kinE:=beam->energy-beam->mass;
+emu:=(beam->energy-beam->mass)*amu/beam->mass;
+brho:=beam->pc*1e9/clight/beam->charge;
+value,kinE,emu,brho;
+fieldD=bd->angle*brho/bd->l;
+fieldF=bf->angle*brho/bf->l;
+gradF=bf->k1*brho;
+gradD=bd->k1*brho;
+value,fieldF,fieldD,gradF,gradD;
+value,beam->beta,beam->gamma,beam->beta*beam->gamma;
+value,bf->k1,bd->k1,d2->l;
+
+stop;

@@ -1,0 +1,56 @@
+title,    "IRS aperture, Beam 1";
+ set,    format="13.8f";
+
+ system, "ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db";
+
+ real const l.tanal = 0;
+ real const l.tanar = 0;
+ real const l.tanc = 0;
+ real const l.tcdqa = 0;
+ real const l.tcp   = 0.0;
+
+ real const l.mbas2 = 0.0;
+ real const l.mbcs2 = 0.0;
+ real const l.mbls2 = 0.0;
+ real const l.tasb  = 0.0;
+ real const l.btvss075 = 0.0;
+ real const l.tcddm = 0.0;
+ real const l.tctvb = 0;
+ real const l.x5zdc002 = 0;
+ real const l.tcddm = 0;
+ real const l.acnca = 0.0;
+ real const l.lejl = 0.0;
+ real const l.mbaw = 0.0;
+ real const l.mblw = 0.0;
+ real const l.tcsm = 0.0;
+
+ option, -echo, warn, -info, verify;
+ call,   file="db/V6.5.seq";
+ call,   file="db/V6.5.inj_special.str";                  // common offset with right sign
+
+ call,   file="db/aperture/aperture.b1.madx";
+ call,   file="db/aperture/aper_tol.b1.madx";
+ call,   file="db/aperture/as-built/exp_pipe_model_after_LS2.madx";
+ call,   file="db/aperture/as-built/exp_pipe_install_after_LS2.madx";
+ option, -echo, warn, info, verify;
+
+beam,   sequence=lhcb1, particle=proton, pc= 450;
+
+on_x1:=1; on_sep1:=1; on_o1:=0;
+on_x2:=1; on_sep2:=1; on_o2:=0; on_a2:=0;
+on_x5:=1; on_sep5:=1; on_o5:=0;
+switch_V_cross8:=0;!2.4;!130/90;
+on_x8:= 220/130*(1-switch_V_cross8); on_sep8:=1-switch_V_cross8; on_o8:=0; on_a8:=0; on_sep8h:=switch_V_cross8*0; on_x8v:=239/90*switch_V_cross8;
+on_alice:=7000/450;
+on_lhcb:=-7000/450;
+
+ use,    sequence=lhcb1;
+ select, flag=aperture, column=name,s,n1,n1x_m,n1y_m,apertype,on_ap,on_elem,aper_1,aper_2,aper_3,aper_4; !,betx,bety,dx,dy,x,px,y,py,rtol,xtol,ytol,mech_sep;
+
+ select, flag=twiss, range=e.ds.l2.b1/s.ds.r2.b1, column=name,s,n1,aper_1,aper_2,aper_3,aper_4;!,betx,bety,dx,dy,x,px,y,py,aptol_1,aptol_2,aptol_3,mech_sep;
+ twiss,    sequence=lhcb1, table=twiss, file="twiss.ir2.b1.tfs";
+ aperture, range=e.ds.l2.b1/s.ds.r2.b1, spec=7,
+           offsetelem="db/aperture/offset.ip2.b1.tfs",
+           cor=0.0040, spec=7, interval=1.0, file="twiss.ir2.b1.n1_inj.tfs";  //  450
+
+stop;

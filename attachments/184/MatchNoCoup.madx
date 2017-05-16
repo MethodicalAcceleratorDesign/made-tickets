@@ -1,0 +1,20 @@
+! Match Chromaticities to predefined values 
+
+  MATCH;
+    WEIGHT, DX=0.1, BETX=1., BETY=1.;
+    CONSTRAINT, RANGE=CtrS20[1], BETX=BetHEC, BETY=BetVEC, DX=DisEC;
+    GWEIGHT, Q1=100., Q2=100.;
+    GLOBAL, Q1 = TuneH, Q2 = TuneV;
+    GWEIGHT, dQ1=100., dQ2=100.;
+    GLOBAL, dQ1 = TuneHp, dQ2 = TuneVp;
+    VARY, NAME = kD1030, STEP=0.01;
+    VARY, NAME = kF1030, STEP=0.01;
+    VARY, NAME = kF2040, STEP=0.01;
+    VARY, NAME = kD2040, STEP=0.01;
+    VARY, NAME = kF2344, STEP=0.01;
+    VARY, NAME = sD1030, STEP=0.01;
+    VARY, NAME = sF1030, STEP=0.01;
+    LMDIF, CALLS=3000, TOLERANCE = 10E-18;
+  ENDMATCH;
+
+  RETURN;

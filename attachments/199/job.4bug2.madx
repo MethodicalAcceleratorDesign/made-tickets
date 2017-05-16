@@ -1,0 +1,85 @@
+! job using thin lattice to create the error tables and calculate the corrections needed for the thick lattice version.
+!24/10/12
+
+!---|----1----|----2----|----3----|----4----|----5----|----6----|----7----|---8;
+Option,  warn,info;
+System,"rm -rf temp";
+System,"mkdir temp";
+System,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
+System,"ln -fns /afs/cern.ch/eng/lhc/optics/SLHCV1.0 slhc";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503/FiDeL fidel";
+
+option,-echo,-info;
+
+ mylhcbeam=2 ;
+
+betastar=0.6;
+
+ NRJ= 4000.0 ;
+
+
+
+!######### CALL MACRO FACILITIES ###########################################
+call,file="slhc/toolkit/macro.madx";
+
+
+!######### CALL SEQUENCE ###################################################
+! these seem to be the most up to date thin sequences...
+   call,file="./db5/as-built/V6.5.2009-11.thin.seq";
+
+
+!Cycling w.r.t. to IP3 (mandatory to find closed orbit in collision in the presence of errors)
+seqedit,sequence=lhcb1;flatten;cycle,start=IP3;endedit;
+seqedit,sequence=lhcb2;flatten;cycle,start=IP3;endedit;
+
+
+
+
+ !############ SQUEEZED OPTICS -> ###########################################
+ !############################## qx0 =64.31000;qy0 =59.32000; qprime=2.000;##
+
+  call, file="./db5/V6.5.thin.coll_special.4.0TeV_0.6m3.0m0.6m3.0m.str";
+
+   Beam,particle=proton,sequence=lhcb1,energy=NRJ,NPART=1.15E11,sige=4.5e-4;       
+   Beam,particle=proton,sequence=lhcb2,energy=NRJ,NPART=1.15E11,sige=4.5e-4,bv = -1;
+
+
+Use, sequence=lhcb2;
+
+
+
+
+
+
+ SELECT,FLAG=ERROR, CLEAR;
+SELECT,FLAG=ERROR,PATTERN="^MB\.";
+EOPTION,ADD=TRUE;
+EALIGN,DX:=0,DY:=0,DPSI=0.0005;
+
+
+
+select,flag=twiss,clear;
+select, flag=twiss, pattern="IP", column=name,s,x,y,betx,bety;
+twiss, chrom, sequence=lhcb2,file=twiss.test.tfs;
+
+select, flag=error, clear;
+select, flag=error, pattern=^M;
+esave,  file="Errors_mad.tfs";
+
+  ptc_create_universe;
+  ptc_create_layout,model=1,method=2,nst=1,exact,ERRORS_OUT;
+  ptc_align;
+
+  write, table=errors_field,file=errors_field.dat;
+
+  select,flag=ptc_twiss, clear;
+  select,flag=ptc_twiss,  pattern="IP", column=name,s,x,y,betx,beta11,bety,beta22;
+  ptc_twiss,closed_orbit,icase=5,no=2,table,file='ptc_twiss.test.tfs';
+
+  select, flag=error, clear;
+  select, flag=error, pattern=^M;
+  esave,  file="Errors_ptc.tfs";
+
+  ptc_end;
+
+stop;

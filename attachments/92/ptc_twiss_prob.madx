@@ -1,0 +1,78 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with madX
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20, 
+        post=1,font=-4,lwidth=5;
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=16, 
+        post=2,font=-4,lwidth=10;
+
+!-- Define EMMA lattice  with dipoles
+title,"EMMA baseline lattice - oct21k";
+beam,particle=electron,energy=0.015+beam->mass;
+periodL:=0.394481;
+periodN:=42;
+fang:=-0.05;
+dang:=2*pi/periodN-fang;
+qf: sbend,l=0.058782,k1:=+129.469,angle:=fang,e1:=fang;!,fint=0.5,hgap=0.01;
+qd: sbend,l=0.075699,k1:=-90.967,angle:=dang,e2:=dang;!,fint=0.5,hgap=0.01;
+ld: drift,l=0.21;
+sd: drift,l=0.05;
+cell: line=(ld,qf,sd,qd);
+ring: line=(42*cell);
+
+!-- Adjust fang 
+!/*
+use,period=cell;
+match,use_macro; 
+vary,name=fang,step=0.01; 
+m1: macro={twiss,rmatrix;}; 
+constraint, expr= table(summ,alfa)=0.001085326514; 
+jacobian,tolerance=1e-20; 
+endmatch; 
+!*/
+fang:=-0.07513508489 ;
+dang:=0.2247347351 ;
+value,fang,dang;
+!stop;
+
+!-- Survey EMMA
+use,period=ring;
+survey,file="oct21k.srv";
+
+!-- Compute ideal orbit at one value of dpp with PTC_TWISS 
+use,period=ring; 
+dpp=0; 
+ptc_create_universe; 
+ptc_create_layout,model=2,method=6,nst=30,exact,time=false; 
+select,flag=ptc_twiss,column=name,s,beta11,alfa11,mu1,disp1,
+ beta22,alfa22,mu2,disp3,x,px,y,py,t,pt; 
+ptc_twiss,closed_orbit,icase=5,deltap=dpp,file="ptc.lis",table; 
+ptc_end; 
+system,"cat ptc.lis >> oct21k.lis"; 
+option,echo=true,info=true; 
+
+!-- Compute orbits in a ring at dpp=0 with PTC_TWISS 
+use,period=ring;
+trunc=2.5; 
+maxorb=2;
+norb=0;
+eoption,add=false;
+while(norb<maxorb)
+{
+norb=norb+1;
+select,flag=error,class=qd;
+select,flag=error,class=qf;
+ealign,dx:=5e-5*tgauss(trunc),dy:=5e-5*tgauss(trunc);
+!ealign,dx:=0,dy:=0;
+dpp=0; 
+system,"rm ptc.lis";
+ptc_create_universe; 
+ptc_create_layout,model=2,method=6,nst=30,exact;!,time=false; 
+ptc_align;
+select,flag=ptc_twiss,column=name,s,beta11,alfa11,mu1,disp1,
+ beta22,alfa22,mu2,disp3,x,px,y,py,t,pt; 
+ptc_twiss,closed_orbit,icase=5,deltap=dpp,file="ptc.lis",table; 
+ptc_end; 
+system,"cat ptc.lis >> oct21k.lis"; 
+}
+
+stop;

@@ -1,0 +1,15 @@
+! single bend sequence  +++ memory access outside program range, fatal +++   ok with my makethin from June
+
+lenseq=10.;
+mb: sbend,l=10.,angle=2.*pi;
+mb, hgap:=.1, fint:=-1.24;
+
+SingleBend : sequence, l=lenseq;
+mb1: mb, at=5;
+endm: marker, at=lenseq;
+endsequence;
+
+beam;
+use,sequence=SingleBend;
+
+makethin,sequence=SingleBend,style=teapot,makedipedge;

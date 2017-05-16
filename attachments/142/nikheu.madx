@@ -1,0 +1,217 @@
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!                  NEUE EXTERNE STRAHLFÜHRUNG FÜR ELSA                  
+!
+! 05.03.2012	Nikolas Heurich
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+!+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+!********************************************
+! MAKROS
+!********************************************
+
+
+mycrap(xx,yy,zz) : macro = {myval = table(xx,yy,zz);};
+
+
+!********************************************
+! DEFINITION DER VARIABLEN
+!********************************************
+
+k1_max := 0.685 ;		!max. k für EX2QF1 (runder Quad.) [Ohne Vorzeichen!]
+k2_max := 3.426 ;		!max. k für EX2QD1 (ELSA Quad.)
+k3_max := 0.857 ;		!max. k für EX2QF2
+k4_max := 3.426 ;		!max. k für EX2QD2
+
+ang_MSE22 := -5.171e-3 ;	!Ablenkwinkel für Vorseptum (MSE6)
+ang_MSE23 := -0.084853 ;	!Ablenkwinkel für Hauptseptum (MSE7)
+
+len_beamline := 28.709 ;	!Länge der Beamline
+len_MSE22 := 0.65 ;		!Länge des Vorseptums
+len_EDip := 2.875 ;		!Länge eines ELSA-Dipols
+len_EQuad := 0.4997 ;		!Länge eines ELSA-Quadrupols
+len_EX2MB := 1.50+0.01 ;	!Länge des EX2MB-Dipols
+len_MSE23 := 0.9 ;		!Länge des Hauptseptums
+len_RQuad := 0.5+0.02 ;		!Länge des runden Quadrupols (EX2QF1)
+len_ssv := 0.2+0.15 ;		!Länge der Strahlschieber
+len_ssh := 0.2+0.15 ;		!(Länge der Polschuhe plus Randfeldabschätzung)
+len_cs := 0.07 ;		!Länge Chromox-Schirm
+
+ang_EDip := pi/12 ;		!Ablenkwinkel ELSA-Dipol
+k_EQuad := -0.5799908151 ;	!k für ELSA-Quad. (Qx=4.617, Qz=4.428)
+ang_ELSAEX2 := -80.285e-3 ;	!Winkel zwischen ELSA-Strahl und ext. Strahl
+ang_EX2MB := 12.0*pi/180 ;	!Ablenkwinkel EX2MB-Dipol
+ang_ssv1 := 0.0 ;		!Winkel SSV1
+ang_ssh1 := 0.0 ;		!Winkel SSH1
+ang_ssv2 := 0.0 ;		!Winkel SSV2
+ang_ssh2 := 0.0 ;		!Winkel SSH2
+ang_ssv3 := 0.0 ;		!Winkel SSV3
+ang_ssh3 := 0.0 ;		!Winkel SSH3
+
+ELSA_energ:= 3.5 ;		!Energie der Elektronen
+
+betax := 14.5 ;			!Optische Parameter (ideal)
+betay := 3.32 ;
+alphax := 2.46 ;
+alphay := -0.72 ;
+dispx := 2.44 ;
+disppx := -0.368 ;
+
+ex := 616.2e-9 ;		!Emittanz in x-Richtung
+ey := 31.4e-9 ;			!Emittanz in y-Richtung
+delpp := 0.88e-3 ;		!Impulsabweichung (delta p / p)
+
+stepsize := 0.001 ;		!Schrittgröße für das Matching
+nsteps := 500 ;			!Anzahl der Schritte
+
+max_beta := 400.0 ;		!max. Beta-Funktion
+max_disp := 0.0 ;		!max. Dispersions-Funktion
+max_dispp := 0.0 ;		!max. Ableitung der Disp.-Funkt.
+max_mvar1 := 1.6 ;		!max. halbe Strahlbreite x
+max_mvar2 := 1.6 ;		!max. halbe Strahlbreite z
+max_kluxen := 4.0 ;		!max. halbe Strahlbreite im Kluxen
+max_dump := 30 ;		!max. halbe Strahlbreite am Dump
+
+
+
+create, table = match_erg, column = k_EX2QF1_i, k_EX2QD1_i, k_EX2QF2_i, k_EX2QD2_i, k_EX2QF1, k_EX2QD1, k_EX2QF2, k_EX2QD2, sig_x_test, sig_z_test, sig_x_dump, sig_z_dump ;
+
+k_EX2QF1 := 0.0;
+k_EX2QD1 := -0.7;
+k_EX2QF2 := 0.7;
+k_EX2QD2 := -1.8;
+
+
+!********************************************
+! DEFINITION DER ELEMENTE
+!********************************************
+
+
+MSE22 : rbend, l := len_MSE22, angle := ang_MSE22, e1 := 0.0, e2 := ang_MSE22 ;
+!label: Magnet, Länge, Ablenkwinkel, Ein- buw. Austrittswinkel zur Polfläche
+EDip : rbend, l := len_EDip, angle := ang_EDip, e1 := -ang_EDip/2+ang_MSE22, e2 := -ang_EDip/2+ang_MSE22 ;
+EQuad : quadrupole, l := len_EQuad, k1 := k_EQuad ;
+MSE23 : rbend, l := len_MSE23, angle := ang_MSE23, e1 := -ang_MSE23+ang_ELSAEX2, e2 := -ang_ELSAEX2 ;
+EX2QF1 : quadrupole, l := len_RQuad, k1 := k_EX2QF1 ;
+EX2QD1 : quadrupole, l := len_EQuad, k1 := k_EX2QD1 ;
+EX2MB : rbend, l := len_EX2MB, angle := -ang_EX2MB, e1 := -ang_EX2MB/2, e2 := -ang_EX2MB/2 ;
+EX2QF2 : quadrupole, l := len_EQuad, k1 := k_EX2QF2 ;
+EX2QD2 : quadrupole, l := len_EQuad, k1 := k_EX2QD2 ;
+EX2SSV1 : vkicker, l := len_ssv, kick := ang_ssv1 ;
+EX2SSH1 : hkicker, l := len_ssh, kick := ang_ssh1 ;
+EX2SSV2 : vkicker, l := len_ssv, kick := ang_ssv2 ;
+EX2SSH2 : hkicker, l := len_ssh, kick := ang_ssh2 ;
+EX2SSV3 : vkicker, l := len_ssv, kick := ang_ssv3 ;
+EX2SSH3 : hkicker, l := len_ssh, kick := ang_ssh3 ;
+nmon : monitor, l := len_cs ;
+
+
+!********************************************
+! BEAMLINE
+!********************************************
+
+
+neueextsf: sequence, refer = centre, l := len_beamline ;
+!---------------------------------------
+EX2START : marker, at = 0.0 ;
+MSE6 : MSE22, at = 0.325 ;
+M6 : EDip, at = 2.911 ;
+QD7 : EQuad, at = 4.849 ;
+MSE7 : MSE23, at = 5.961 ;
+Mark1 : marker, at = 6.5 ;
+Mark2 : marker, at = 7.5 ;
+CS1 : nmon, at = 8.245 ;
+SSV1 : EX2SSV1, at = 8.818 ;
+SSH1 : EX2SSH1, at = 9.277 ;
+RQuad1 : EX2QF1, at = 9.817 ;
+Mark3 : marker, at = 10.5 ;
+Mark4 : marker, at = 12.0 ;
+Mark5 : marker, at = 13.5 ;
+SSV2 : EX2SSV2, at = 15.505 ;
+SSH2 : EX2SSH2, at = 15.963 ;
+EQuad2 : EX2QD1, at = 16.512 ;
+RMon : nmon, at = 17.0 ;
+MBDip : EX2MB, at = 18.407 ;
+EQuad3 : EX2QF2, at = 20.301 ;
+Mark6 : marker, at = 21.0 ;
+SSV3 : EX2SSV3, at = 21.601 ;
+SSH3 : EX2SSH3, at = 22.059 ;
+KLUXEN : nmon, at = 22.5 ;
+EQuad4 : EX2QD2, at = 22.907 ;
+Test1 : marker, at = 23.5 ;
+Test2 : marker, at = 24.0 ;
+Test3 : marker, at = 24.5 ;
+Test4 : marker, at = 25.0 ;
+DUMP : marker, at = len_beamline ;
+!---------------------------------------
+endsequence ;
+
+
+beam, particle = electron, energy := ELSA_energ ;
+use, period = neueextsf ;
+
+
+!********************************************
+! TWISS- UND BETA-TABELLE
+!********************************************
+
+
+twiss, chrom, file = "nikheu.twissx", betx = betax, bety = betay, alfx = alfax, alfy = alfay, dx = dispx, dpx = disppx, centre ;
+select, flag = twiss, clear ;
+select, flag = twiss, column = name, s, betx, bety, dx, dpx ;
+!twiss, chrom, file = "nikheu.betax", betx = betax, bety = betay, alfx = alfax, alfy = alfay, dx = dispx, dpx = disppx, centre ;
+
+
+!********************************************
+! STRAHLBREITENDEFINITION
+!********************************************
+
+
+mvar1 := 1000*sqrt(ey*table(twiss,betx) + (delpp*table(twiss,dx))^2) ;
+!x-Beam width
+
+mvar2 := 1000*sqrt(ey*table(twiss,bety)) ;
+!y-Beam width
+
+twiss, chrom, file = "nikheu.twissx", betx = betax, bety = betay, alfx = alfax, alfy = alfay, dx = dispx, dpx = disppx, centre ;
+select, flag = twiss, clear ;
+select, flag = twiss, column = name, s, betx, bety, dx, dpx, mvar1, mvar2 ;
+twiss, chrom, file = "nikheu.betax", betx = betax, bety = betay, alfx = alfax, alfy = alfay, dx = dispx, dpx = disppx, centre ;
+
+
+!********************************************
+! MATCHING
+!********************************************
+
+
+match, sequence = neueextsf, betx = betax, bety = betay, alfx = alfax, alfy = alfay, dx = dispx, dpx = disppx ;
+
+vary, name = k_EX2QF1, step = stepsize, lower = 0.0, upper = k1_max ;
+vary, name = k_EX2QD1, step = stepsize, lower = -k2_max, upper = 0.0 ;
+vary, name = k_EX2QF2, step = stepsize, lower = 0.0, upper = k3_max ;
+vary, name = k_EX2QD2, step = stepsize, lower = -k4_max, upper = 0.0 ;
+
+constraint, sequence = neueextsf, range = Mark1/Test4, betx < max_beta ;
+constraint, sequence = neueextsf, range = Test2, dp < max_disp ;
+constraint, sequence = neueextsf, range = Test2, dpx < max_dispp ;
+constraint, sequence = neueextsf, range = Test2, mvar1 = max_mvar1 ;
+constraint, sequence = neueextsf, range = Test2, mvar2 = max_mvar2 ;
+!constraint, sequence = neueextsf, range = Test1/Test4, mvar1 = max_kluxen ;
+!constraint, sequence = neueextsf, range = Test1/Test4, mvar2 = max_kluxen ;
+constraint, sequence = neueextsf, range = EQuad3, mvar1 < 7 ;
+constraint, sequence = neueextsf, range = EQuad3, mvar2 < 7 ;
+constraint, sequence = neueextsf, range = EQuad4, mvar1 < 5 ;
+constraint, sequence = neueextsf, range = EQuad4, mvar2 < 5 ;
+
+LMDIF, calls = 10000, tolerance = 1.0e-10 ;
+endmatch ;
+
+
+
+select, flag = twiss, clear ;
+select, flag = twiss, column = name, s, betx, bety, dx, dpx, mvar1, mvar2 ;
+twiss, chrom, file = "nikheu.betax", betx = betax, bety = betay, alfx = alfax, alfy = alfay, dx = dispx, dpx = disppx, centre ;
+
+
+return ;

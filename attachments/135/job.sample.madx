@@ -1,0 +1,111 @@
+TITLE, "LHEC LATTICE 1.0" ;
+
+CALL FILE="vir1.2.1Deg.15sext.seq";
+CALL FILE="vir1.2.1Deg.15sext.str";
+
+// RF parameters with synchrotron radiation
+vrf  = 5;
+lgrf = 0.3584713518;
+
+BEAM, SEQUENCE=LHEC, PARTICLE=ELECTRON,ENERGY=60.,RADIATE;
+
+use, sequence=lhec;
+seqedit, sequence=lhec;
+flatten;
+cycle, start=IP2;
+flatten;
+endedit;
+
+USE,SEQUENCE=LHEC;
+SELECT,FLAG=TWISS,CLEAR;
+SELECT,FLAG=TWISS,RANGE=#S/#E,COLUMN=NAME, KEYWORD, L, S, ANGLE, K1L, BETX, BETY, ALFX, ALFY, DX, DPX, DY, DPY, X, PX, Y, PY, MUX, MUY;
+TWISS,SEQUENCE=LHEC,file="LHEC.tfs",CHROM=TRUE;
+PLOT, TABLE=TWISS,VAXIS1=BETX,BETY, VAXIS2=DX, HAXIS=S, COLOUR=100; 
+PLOT, TABLE=TWISS,VAXIS1=X,Y, HAXIS=S, COLOUR=100; 
+
+USE,SEQUENCE=LHEC;
+SELECT,FLAG=SURVEY,CLEAR;
+SELECT,FLAG=SURVEY,RANGE=#S/#E,COLUMN=NAME, S, L, ANGLE, X, Y, Z, THETA, PHI, PSI;
+SURVEY,SEQUENCE=LHEC,file="LHEC.SURVEY.tfs";
+
+nturns=1024;
+!beam size at IP2
+sigmax=0.0000447214;
+sigmay=0.0000223605;
+
+pmax=8;
+nsigma=0.0;
+use, sequence=lhec;
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=1,exact,resplit,xbend=0.001,thin=0.001;
+ptc_start, x=1e-3,px=0.0,y=0,py=0.0,pt=0.0,t=0.0,t=0,pt=0;
+ptc_track,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="0_sigma0.dat";
+ptc_track_end;
+ptc_end;
+stop;
+nsigma=1.0;
+use, sequence=lhec;
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=1,exact,resplit,xbend=0.001,thin=0.001;
+ptc_start, x=nsigma*sigmax,px=0.0,y=0,py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="1_sigma0.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(pi/pmax),px=0.0,y=nsigma*sigmay*sin(pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="1_sigma225.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(2*pi/pmax),px=0.0,y=nsigma*sigmay*sin(2*pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="1_sigma450.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(3*pi/pmax),px=0.0,y=nsigma*sigmay*sin(3*pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="1_sigma675.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(4*pi/pmax),px=0.0,y=nsigma*sigmay*sin(4*pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="1_sigma900.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(5*pi/pmax),px=0.0,y=nsigma*sigmay*sin(5*pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="1_sigma1125.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(6*pi/pmax),px=0.0,y=nsigma*sigmay*sin(6*pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="1_sigma1350.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(7*pi/pmax),px=0.0,y=nsigma*sigmay*sin(7*pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="1_sigma1575.dat";
+ptc_track_end;
+ptc_start, x=0.0,px=0.0,y=nsigma*sigmay,py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="1_sigma1800.dat";
+ptc_track_end;
+ptc_end;
+
+nsigma=10.0;
+use, sequence=lhec;
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=1,exact,resplit,xbend=0.001,thin=0.001;
+ptc_start, x=nsigma*sigmax,px=0.0,y=0,py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="10_sigma0.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(pi/pmax),px=0.0,y=nsigma*sigmay*sin(pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="10_sigma225.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(2*pi/pmax),px=0.0,y=nsigma*sigmay*sin(2*pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="10_sigma450.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(3*pi/pmax),px=0.0,y=nsigma*sigmay*sin(3*pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="10_sigma675.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(4*pi/pmax),px=0.0,y=nsigma*sigmay*sin(4*pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="10_sigma900.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(5*pi/pmax),px=0.0,y=nsigma*sigmay*sin(5*pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="10_sigma1125.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(6*pi/pmax),px=0.0,y=nsigma*sigmay*sin(6*pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="10_sigma1350.dat";
+ptc_track_end;
+ptc_start, x=nsigma*sigmax*cos(7*pi/pmax),px=0.0,y=nsigma*sigmay*sin(7*pi/pmax),py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="10_sigma1575.dat";
+ptc_track_end;
+ptc_start, x=0.0,px=0.0,y=nsigma*sigmay,py=0.0,pt=0.0,t=0.0;
+ptc_track,radiation,icase=6,closed_orbit,turns=nturns,onetable,dump,ffile=1,file="10_sigma1800.dat";
+ptc_track_end;
+ptc_end;
+stop;

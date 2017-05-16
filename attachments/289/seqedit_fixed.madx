@@ -1,0 +1,55 @@
+
+System,"ln -fns /afs/cern.ch/eng/fcc/ee/IR/CERN-LM-21May14/ tlepdir";
+
+option, -warn,-info,-echo;
+call,file="tlepdir/FCCee.madx";
+call,file="tlepdir/FCCee_IR.madx";
+option,  warn,info,echo;
+
+use, sequence=MINB;
+save, sequence=MINB, file="myMINB.seq", bare=true, newname="myMINB";
+
+use, sequence=ARC10;
+save, sequence=ARC10, file="myARC10.seq", bare=true, newname="myARC10";
+
+use, sequence=STR10;
+save, sequence=STR10, file="mySTR10.seq", bare=true, newname="mySTR10";
+
+Option, -echo;
+Call, file="myMINB.seq";
+Call, file="myARC10.seq";
+Call, file="mySTR10.seq";
+Option, echo;
+
+lARC  = 3150. ;
+lSTR  =  450. ;
+lMINB = 1592.421928 ;
+
+lQFCC =  6*lARC+2*lSTR+lMINB ;
+
+QFCC: sequence, L= lQFCC, refer=centre;
+      mySTR10, at=                      lstr/2.;
+      myARC10, at=  lstr              + larc/2.;
+      myARC10, at=  lstr+  larc       + larc/2.;
+      myMINB,  at=  lstr+2*larc       + lminb/2.;
+      myARC10, at=  lstr+2*larc+lminb + larc/2.;
+      myARC10, at=  lstr+3*larc+lminb + larc/2.;
+      mySTR10, at=  lstr+4*larc+lminb + lstr/2.;
+      myARC10, at=2*lstr+4*larc+lminb + larc/2;
+      myARC10, at=2*lstr+5*larc+lminb + larc/2.;
+endsequence;
+
+FCC: sequence, L= 4 * lQFCC, refer=centre;
+     QFCC, at=lQFCC * 1/2;
+     QFCC, at=lQFCC * 3/2;
+     QFCC, at=lQFCC * 5/2;
+     QFCC, at=lQFCC * 7/2;
+endsequence;
+
+use, sequence=fcc;
+seqedit, sequence=FCC; flatten; cycle, start=IP; endedit;
+
+use, sequence = FCC;
+
+Twiss, save;
+Stop;

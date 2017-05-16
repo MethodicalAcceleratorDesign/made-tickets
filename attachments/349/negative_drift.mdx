@@ -1,0 +1,17 @@
+beam, particle=proton, pc=8, exn=0.35e-6, eyn=0.07e-6, sige=3e-4;
+
+D1: drift, l=1;
+D2: drift;
+QF: quadrupole, l=0.5, k1=0.1;
+QD: quadrupole, l=0.5, k1=-0.1;
+
+!D2->l = 1;
+D2->l = -3.50;
+
+seq: line=(QF,D1,QD,D2);
+
+use,SEQUENCE=SEQ;
+value,D2->l;
+
+save sequence=seq, file='seq.madx';
+call file='seq.madx';

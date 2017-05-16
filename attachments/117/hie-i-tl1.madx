@@ -1,0 +1,68 @@
+ title, 'HIE-ISOLDE beamline TL1 (Helios phase 2)';
+
+ option, -echo;
+ option, RBARC=FALSE;
+
+! xt01
+
+real const brho = 2.045456; 
+
+call, file = 'xt01.seq';
+ 
+beam, particle=ion, mass=41.9172435, energy=42.3640, charge=10;
+use, sequence=xt01;
+
+set,  format="12.6f";
+
+ex := 3.95e-6; !geometric
+ey := 3.68e-6; !geometric
+
+
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=10,exact,closed_layout=true;
+
+                                    
+! Example 2: Input twiss parameters manually  ==============================
+SELECT, flag= ptc_twiss0, clear;
+SELECT, flag= ptc_twiss0, range= #s/#e,
+            column= name, keyword,l,s, beta11, beta22,alfa11, alfa22, disp1, disp3;
+ptc_twiss,icase=5,no=1,table=ptc_twiss0,
+          betx=1.55,bety=1.21,alfx=0.30,alfy=0.0,
+          dx=0.0,dpx=0.0,mux=0.0,muy=0.0,
+          x= 0.0,px=0.0, 
+          y=0.0, py=0.0,
+          file=twiss.ptc.out, slice_magnets=false;
+ptc_end;
+
+PLOT,FILE="madxptc",TABLE= ptc_twiss0,NOVERSION=TRUE,COLOUR= 100,RANGE= #s/#e,HAXIS= S,VAXIS1= BETA11;
+PLOT,FILE="madxptc",TABLE= ptc_twiss0,NOVERSION=TRUE,COLOUR= 100,RANGE= #s/#e,HAXIS= S,VAXIS1= BETA22;
+PLOT,FILE="madxptc",TABLE= ptc_twiss0,NOVERSION=TRUE,COLOUR= 100,RANGE= #s/#e,HAXIS= S,VAXIS1= DISP1, DISP3;
+
+beta=sqrt(1-1/beam->gamma^2);
+value, beta;
+dispx:=beta*table(twiss,dx); ! Delta_x=disp*Delta_p/p;
+
+use, sequence = xt01;
+select, flag=twiss, clear;
+select, flag=twiss, column=name, s, l, x, y, betx, alfx, mux, dx, dispx, dpx, 
+                           bety, alfy, muy, dy, dpy, sigx, sigy, 
+			   aper_1, aper_2, aper_3, aper_4 ;
+
+twiss,  sequence=xt01, file="twiss.tl1.out",
+       BETX   = 1.55,    ALFX = 0.3,   MUX  = 0.0
+      , X      = 0.0 ,    PX   = 0.0
+      , DX     = 0.0 ,    DPX  = 0.0
+      , BETY   = 1.21,    ALFY = 0.0,   MUY  = 0.0
+      , Y      = 0.0 ,    PY   = 0.0
+      , DY     = 0.0  ,   DPY  = 0.0;
+
+plot,title='HIE-ISOLDE TL1',haxis=s,vaxis=betx,vmin=0.0;
+plot,title='HIE-ISOLDE TL1',haxis=s,vaxis=bety,vmin=0.0;
+plot,title='HIE-ISOLDE TL1',haxis=s,vaxis=dx;
+plot,title='HIE-ISOLDE TL1',haxis=s,vaxis=dispx;
+
+
+
+
+stop;
+

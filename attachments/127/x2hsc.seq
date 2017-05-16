@@ -1,0 +1,104 @@
+ lex02001sfx = 49.60683841 - 49.79373841; // negative !
+ lv2 = 26.770241432 ; // orig. length bendstart to vertend
+ lt2 = 16.5223114407; // length rfl to rf3
+ lh2 = 19.9554849; // orig. length bendstart to horend
+ lrfltorf3sfx = 16.6973114407;
+ Lrflsfxtorf3sfx = lrfltorf3sfx - lex02001sfx;
+ lrfltobendstart = 0; 
+ lrfltobend = 19.64067242; 
+ lrflsfxtobendstart = lrfltobend - lex02001sfx;
+ lrf3sfxtobend = lrfltobend -lrfltorf3sfx;
+ 
+ltorf3sfx: sequence, l = lt2 - lex02001sfx + 0.175; // original length rfl to ltobendstart was l= 19.640672420;
+  rflsfx, at = 0;
+  rfl, at = -lex02001sfx;
+  
+  ex02005mqf, at = 1.0131 , from =  rfl;
+  ex02006mqd, at = 2.3631 , from =  rfl;
+
+  ex03000mbh, at = 4.0881 , from =  rfl;
+
+  t200000vvg, at = 5.4381 , from =  rfl;
+  t200000mqf, at = 6.33 , from =  rfl;
+  t200000sfx, at = 6.98 , from =  rfl;
+  t200001mqd, at = 8.336209302 , from =  rfl;
+  t200000mch, at = 0.7, from = t200001mqd;
+  t200001mcv, at = -0.7, from = t200002mqf;
+  t200002mqf, at = 10.3424186 , from =  rfl;
+  t200000bst, at = 11.0093186 , from =  rfl;
+  t201000mbh, at = 12.5843186 , from =  rfl;
+  t201000mqd, at = 14.3093186 , from =  rfl;
+
+  t201000wal, at = 14.8584326 , from =  rfl;
+  t201001wal, at = 16.3607776 , from =  rfl;
+  rf3, at = 16.5223114407 , from =  rfl; // Marker present in Winagile File t2.lat etc. 16.52231144 
+  t201000sfx2, at =  0.175/2, from =  rf3;
+  rf3sfx, at =  16.6973114407 , from =  rfl;
+  endsequence;
+ 
+rf3sfxtohorend: sequence, l= lh2 + lrf3sfxtobend;
+  
+  rf3sfx, at =  0 ;
+  t201001sfx2, at = 0.175/2; 
+  t201001mqd, at = 17.34720428 - lrfltorf3sfx;
+  t201000mch, at = 0.6, from = t201001mqd;
+  t201001mcv, at = -0.6, from = t201002mqf;
+  t201002mqf, at = 19.01567242 - lrfltorf3sfx;
+  t202000mbv, at = 1.0 + lrf3sfxtobend;
+  h200000vvg, at = 4.0 + lrf3sfxtobend;
+  h200000mch, at = 4.5 + lrf3sfxtobend;
+  h200001mcv, at = 5.0 + lrf3sfxtobend;
+  h200000mqf, at = 6.63340111 + lrf3sfxtobend;
+  h200001mqd, at = 8.07478342 + lrf3sfxtobend;
+  h200000sfx, at = 11.3054849 + lrf3sfxtobend;
+  h200000msv, at = 12.2554849 + lrf3sfxtobend;
+  h200001msh, at = 12.9554849 + lrf3sfxtobend;
+  h200001sfx, at = 18.4304849 + lrf3sfxtobend;
+  h200000rhe, at = 19.1054849 + lrf3sfxtobend;
+  rf4, at = 19.9554849 + lrf3sfxtobend;
+  h200000rfp, at = 0.0, from = rf4;
+endsequence;
+
+
+rf3sv: sequence, l = lv2 + lrf3sfxtobend ;
+  
+  rf3sfx, at = 0;
+  t201001sfx2,at = 0.175/2; 
+  t201001mqd, at = 17.34720428 - lrfltorf3sfx;
+  t201000mch, at = 0.6, from = t201001mqd;
+  t201001mcv, at = -0.6, from = t201002mqf;
+  t201002mqf, at = 19.01567242 - lrfltorf3sfx;
+  t202000mbv, at = 1.0 + lrf3sfxtobend;
+  v200000mbv, at = 3.5 + lrf3sfxtobend ;
+  v200000mch, at = 1.4, from = v200000mbv;
+  v200001mcv, at = -0.5, from = v200000mqd;
+  v200000mqd, at = 5.825 + lrf3sfxtobend;
+  v200000vvg, at = 6.3 + lrf3sfxtobend;
+  v200001mqf, at = 6.773891352 + lrf3sfxtobend;
+  v200002mqd, at = 8.016689092 + lrf3sfxtobend;
+  v201000mbv, at = 9.641689092 + lrf3sfxtobend;
+  v201001mbv, at = 12.141689092 + lrf3sfxtobend;
+  v201000mqd, at = 13.766689092 + lrf3sfxtobend;
+  v201001mqf, at = 14.513778612 + lrf3sfxtobend;
+  v201000sfx, at = 15.121254932 + lrf3sfxtobend;
+  v201002mqd, at = 15.709326882 + lrf3sfxtobend;
+  v201000msv, at = 16.386326882 + lrf3sfxtobend;
+  v201001msh, at = 17.088326882 + lrf3sfxtobend;
+  v202000mbv, at = 21.258851532 + lrf3sfxtobend;
+  v202000rhe, at = 25.920241432 + lrf3sfxtobend;
+  rf4, at = 26.770241432 + lrf3sfxtobend;
+  v202000rfp, at = 0.0, from = rf4;
+endsequence;
+
+
+h2hsc: sequence, l = Lrflsfxtorf3sfx + lh2 + lrf3sfxtobend;
+  ltorf3sfx, at = 0; rf3sfxtohorend at = Lrflsfxtorf3sfx;
+endsequence;
+
+v2hsc: sequence, l = lv2 + lrf3sfxtobend;
+  rf3sv, at = 0;  
+endsequence;
+
+tv2hsc: sequence, l = Lrflsfxtorf3sfx + lv2 + lrf3sfxtobend;
+  ltorf3sfx, at = 0;  rf3sv, at =lt2 - lex02001sfx + 0.175;
+endsequence;

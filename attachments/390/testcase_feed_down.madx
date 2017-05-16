@@ -1,0 +1,71 @@
+!----generic test sequencefrom two other sequences----------------------------
+KQ1 = 0.01;
+KQ2 = -0.01;
+testseq_thick: sequence, l = 100.0, REFER=exit;
+	MQ1_thick: QUADRUPOLE, K1=KQ1, l= 2, at=20;
+	MQ2_thick: QUADRUPOLE, K1=KQ2, l= 2, at=80;
+	ENDMARKER_thick: MARKER, at=100;
+endsequence;
+testseq_thin: sequence, l = 100.0;
+	MQ1_thin: MULTIPOLE, knl:={0,KQ1*2}, at=19;
+	MQ2_thin: MULTIPOLE, knl:={0,KQ2*2}, at=79;
+	ENDMARKER_thin: MARKER, at=100;
+endsequence;
+
+BEAM, PARTICLE=PROTON, ENERGY=7000.0;
+
+
+!-----thick TWISS without and with Field errors ------------------------------
+USE, SEQUENCE=testseq_thick;
+
+TWISS, BETX=100, BETY=100, PX = 1e-3, file=twiss_thick_noerror.out;
+BETX_noError_thick = table(twiss,ENDMARKER_thick,BETX);
+BETY_noError_thick = table(twiss,ENDMARKER_thick,BETY); 
+
+select,flag=error,clear;
+select,flag=error,pattern="MQ1_thick";
+EFCOMP, ORDER=1, RADIUS=0.05, DKNR = {0, 0, 0, 2e-4};
+select,flag=error,clear;
+select,flag=error,pattern="MQ2_thick";
+EFCOMP, ORDER=1, RADIUS=0.05, DKNR = {0, 0, 0, 5e-4};
+
+TWISS, BETX=100, BETY=100, PX = 1e-3, file=twiss_thick_error.out;
+BETX_Error_thick = table(twiss,ENDMARKER_thick,BETX);
+BETY_Error_thick = table(twiss,ENDMARKER_thick,BETY);
+
+DeltaBETX_thick = BETX_noError_thick - BETX_Error_thick;	!detect feed down by measuring change of beta
+DeltaBETY_thick = BETY_noError_thick - BETY_Error_thick;
+
+select,flag=error,pattern="MQ1_thick";
+select,flag=error,pattern="MQ2_thick";
+ESAVE, FILE=error_thick.out;
+
+
+!-----thin TWISS without and with Field errors ------------------------------
+USE, SEQUENCE=testseq_thin;
+
+TWISS, BETX=100, BETY=100, PX = 1e-3, file=twiss_thin_noerror.out;
+BETX_noError_thin = table(twiss,ENDMARKER_thin,BETX);
+BETY_noError_thin = table(twiss,ENDMARKER_thin,BETY); 
+
+select,flag=error,clear;
+select,flag=error,pattern="MQ1_thin";
+EFCOMP, ORDER=1, RADIUS=0.05, DKNR = {0, 0, 0, 2e-4};
+select,flag=error,clear;
+select,flag=error,pattern="MQ2_thin";
+EFCOMP, ORDER=1, RADIUS=0.05, DKNR = {0, 0, 0, 5e-4};
+
+TWISS, BETX=100, BETY=100, PX = 1e-3, file=twiss_thin_error.out;
+BETX_Error_thin = table(twiss,ENDMARKER_thin,BETX);
+BETY_Error_thin = table(twiss,ENDMARKER_thin,BETY);
+
+DeltaBETX_thin = BETX_noError_thin - BETX_Error_thin;	!detect feed down by measuring change of beta
+DeltaBETY_thin = BETY_noError_thin - BETY_Error_thin;
+
+select,flag=error,pattern="MQ1_thin";
+select,flag=error,pattern="MQ2_thin";
+ESAVE, FILE=error_thin.out;
+
+!-----Results-----------------------------------------------------------------
+value, DeltaBETX_thick, DeltaBETY_thick;
+value, DeltaBETX_thin, DeltaBETY_thin;

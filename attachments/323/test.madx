@@ -1,0 +1,30 @@
+
+q1: quadrupole, k1=400.5e-2, l=0.2;
+
+l0: line = (q1);
+lattice: line = (l0);
+!beam, particle=	proton, energy=1.0;
+beam, particle=	antiproton, energy=1.0;
+use, period=lattice;
+
+show, beam;
+
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=10;
+ptc_start, x=6.0e-06, px=0.0, y=0.0, py=0.0, t=0.0, pt=0.0;
+ptc_align;
+PTC_OBSERVE, place=q1;
+ptc_track, element_by_element, dump, turns=1, icase=5, onetable;
+PTC_TRACK_END;
+ptc_end;
+
+select, flag=twiss, column=name,s,betx,alfx,mux,bety,alfy,muy;
+twiss, betx=1, bety=1, file=toto.twiss;
+
+track, deltap=0.0, file='output.dat', dump=TRUE;
+start, x=6.0e-6, px=0.0, y=0.0, py=0.0, t=0.0, pt=0.0;
+observe, place=q1;
+run, turns=1;
+endtrack;
+
+Stop;

@@ -1,0 +1,39 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with madX
+!-- Derived from 2010/Feb2010/19Feb10/feb19e.txt
+
+!-- Define EMMA lattice  with dipoles
+title,"EMMA baseline lattice - dec20i";
+beam,particle=electron,energy=0.015+beam->mass;
+
+periodN:=42;
+fang:=-0.05;
+dang:=2*pi/periodN-fang;
+
+ld: drift,l=0.21;
+qf: sbend,l=0.058782,k1:=+129.469,angle:=fang,e1:=-fang;
+sd: drift,l=0.05;
+qd: sbend,l=0.075699,k1:=-90.967,angle:=dang,e2:=dang;
+cell: line=(ld,qf,sd,qd);
+
+!-- Adjust fang 
+use,period=cell;
+select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,x,px,bety,alfy,muy,dy,dpy,y,py,t,pt,alfa;
+
+match,use_macro; 
+vary,name=fang,step=0.01; 
+m1: macro={twiss,rmatrix,file=twiss-1.tfs;}; 
+constraint, expr= table(summ,alfa)=0.001085326514;
+jacobian,tolerance=1e-20; 
+endmatch; 
+
+!-- Use twiss for plotting orbit functions in a cell
+use,period=cell;
+select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,x,px,bety,alfy,muy,dy,dpy,y,py,t,pt,alfa;
+removefile,file="dec20i_twiss.lis";
+twiss,rmatrix,table,file="dec20i_twiss.lis",deltap=1/30;
+plot,file="dec20i",haxis=s,vaxis=x,noversion;
+twiss,rmatrix,table,file="twiss.lis",deltap=-1/30;
+system,"cat twiss.lis >> dec20i_twiss.lis"; 
+plot,file="dec20i",haxis=s,vaxis=x,noversion;
+

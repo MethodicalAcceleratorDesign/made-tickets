@@ -1,0 +1,57 @@
+option,-echo,info,warn,-no_fatal_stop;
+call,file="cell.madx";
+
+beam,particle=positron,energy=175,radiate=false;
+
+set,format="22.15g";
+select,flag=twiss,clear;
+select,flag=twiss,COLUMN=S,NAME,keyword,L,BETX,BETY,ALFX,ALFY,MUX,MUY,DX,DPX,DY,DPY,DDX,DDPX,WX,PHIX,WY,PHIY,ANGLE,E1,E2,TILT,K1L,K2L,K3L;
+
+use,sequence=cell_seq;
+twiss,file="twiss.tfs",rmatrix,chrom;
+PLOT, TABLE=TWISS,TITLE="FODO", HAXIS=S,VAXIS1=BETX,BETY,VAXIS2=DX,COLOUR=100,INTERPOLATE,noversion;
+
+//Calculation of chromatic derivatives
+	deltap=1e-4;
+
+	dpp= 0*deltap;	twiss,table=twiss_0,rmatrix,chrom,deltap=dpp;
+	dpp=-1*deltap;	twiss,table=twiss_n,rmatrix,chrom,deltap=dpp;
+	dpp=+1*deltap;	twiss,table=twiss_p,rmatrix,chrom,deltap=dpp;
+	
+	nrows = table(twiss_0,tablelength);
+	n=0;
+!	select,flag=twiss_chromatic,clear;
+	create,table=twiss_chromatic, column=s,_name,betx,bety,b1x,a1x,b1y,a1y,b2x,a2x,b2y,a2y,dx,d1x,d2x,k1l,k2l,k3l,wx,w1x,wy,w1y;
+!	select,flag=twiss_chromatic,column=s,_name,betx,bety,b1x,a1x,b1y,a1y,b2x,a2x,b2y,a2y,dx,d1x,d2x,k1l,k2l,k3l;
+	while (n<nrows){
+		n=n+1;
+		setvars, table=twiss_n, row=n;
+		betx_n1=betx;	alfx_n1=alfx;	dx_n1=dx;
+		bety_n1=bety;	alfy_n1=alfy;
+
+		setvars, table=twiss_p, row=n;
+		betx_p1=betx;	alfx_p1=alfx;	dx_p1=dx;
+		bety_p1=bety;	alfy_p1=alfy;
+
+		setvars, table=twiss_0, row=n;
+		betx_0=betx;	alfx_0=alfx;	dx_0=dx;
+		bety_0=bety;	alfy_0=alfy;
+
+		d1x=1./2*(dx_p1-dx_n1)/(2*deltap);
+		d2x=1./6*(dx_p1+dx_n1-2*dx_0)/deltap^2;
+
+		b1x=1./betx_0*(betx_p1-betx_n1)/(2*deltap);			b1y=1./bety_0*(bety_p1-bety_n1)/(2*deltap);
+		a1x=(alfx_p1-alfx_n1)/(2*deltap)-alfx_0*b1x;		a1y=(alfy_p1-alfy_n1)/(2*deltap)-alfy_0*b1y;
+	
+		b2x=1./betx_0*(betx_p1+betx_n1-2*betx_0)/deltap^2;	b2y=1./bety_0*(bety_p1+bety_n1-2*bety_0)/deltap^2;
+		a2x=(alfx_p1+alfx_n1-2*alfx_0)/deltap^2-alfx_0*b2x;	a2y=(alfy_p1+alfy_n1-2*alfy_0)/deltap^2-alfy_0*b2y;
+		
+		w1x=sqrt(b1x^2+a1x^2);		w1y=sqrt(b1y^2+a1y^2);
+		fill, table=twiss_chromatic;
+	};
+	write, table=twiss_chromatic, file=twiss_chromatic.tfs;
+
+
+PLOT, TABLE=TWISS_CHROMATIC,TITLE="FODO", HAXIS=S,VAXIS1=BETX,B1X,VAXIS2=DX,COLOUR=100,noversion;
+
+STOP;

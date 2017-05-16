@@ -1,0 +1,14 @@
+beam;
+
+cps:sequence, l=3, refer=entry;
+q1: drift, l=.1, at=0;
+rot1: yrotation, angle=PI/4, at=0.1;
+rot2: yrotation, angle=-PI/4, at=0.1+sqrt(2);
+q2: drift, l=.1, at=0.1+sqrt(2);
+endsequence;
+
+use, sequence=cps;
+twiss, betx=1, bety=1;
+SELECT,FLAG=TWISS,column=name,s,betx,alfx,x,angle,px;
+write, table=twiss;
+survey, file=survey;

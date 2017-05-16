@@ -1,0 +1,11 @@
+! Long quadrupole, negative mux/muy example
+
+beam;
+d: drift, l=1;
+qf: quadrupole, l=10, k1=0.1;
+testLine: line=(d,qf,d);
+use, period=testLine;
+twiss, betx=10, bety=10, x=0.01, y=0.01;
+mux_twiss = table(twiss,testLine$end,mux);
+muy_twiss = table(twiss,testLine$end,muy);
+value, mux_twiss, muy_twiss;

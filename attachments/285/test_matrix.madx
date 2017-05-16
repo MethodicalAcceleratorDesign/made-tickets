@@ -1,0 +1,162 @@
+/***********************************************************
+ * test_matrix.madx
+ *
+ * Call this program by: >madx < test_matrix.madx
+ *
+ * This program illustrates the how to put in a MATRIX element
+ *
+ ***********************************************************/
+ set,  format =  "-21s";
+ set,  format =  "9.5f"; ! the format of numbers in the twiss output file
+
+/***********************************************************
+ * Element definitions
+ ***********************************************************/
+!quad1  : QUADRUPOLE,     L=1, K1=0.2;
+ quad1  : MATRIX,   L=1,
+  RM11=0.90165560, RM21=0.19339968, RM31=0         , RM41=0         , RM51=0         , RM61=0         ,
+  RM12=0.96699842, RM22=0.90165560, RM32=0         , RM42=0         , RM52=0         , RM62=0         ,
+  RM13=0         , RM23=0         , RM33=1.10167782, RM43=0.20673365, RM53=0         , RM63=0         ,
+  RM14=0         , RM24=0         , RM34=1.03366826, RM44=1.10167782, RM54=0         , RM64=0         ,
+  RM15=0         , RM25=0         , RM35=0         , RM45=0         , RM55=1.00000000, RM65=0         ,
+  RM16=0         , RM26=0         , RM36=0         , RM46=0         , RM56=0.00000026, RM66=1.00000000;
+
+
+
+
+
+
+
+
+
+/***********************************************************
+ * sequence definition
+ ***********************************************************/
+ seq    : SEQUENCE, refer=centre   , L  =  1.0;
+ begseq : marker     , at =  0.0;
+ !pos    : marker     , at =  0.5;
+ endseq : marker     , at =  1.0;
+ ENDSEQUENCE;
+
+ SEQEDIT,SEQUENCE=seq;
+ INSTALL, element=quad1,  at=0.5,from=begseq;
+ ENDEDIT;
+
+
+
+
+
+
+/***********************************************************
+ * Initial parameters
+ ***********************************************************/
+
+ BETX0  :=  1.0;
+ ALFX0  :=  0.0;
+ MUX0   :=  0.0;
+ BETY0  :=  1.0;
+ ALFY0  :=  0.0;
+ MUY0   :=  0.0;
+ X0     :=  0.0;
+ PX0    :=  0.0;
+ Y0     :=  0.0;
+ PY0    :=  0.0;
+ T0     :=  0.0;
+ PT0    :=  0.0;
+ DX0    :=  0.0;
+ DPX0   :=  0.0;
+ DY0    :=  0.0;
+ DPY0   :=  0.0;
+
+ INITBETA0: BETA0,
+   BETX=BETX0,
+   ALFX=ALFX0,
+   MUX=MUX0,
+   BETY=BETY0,
+   ALFY=ALFY0,
+   MUY=MUY0,
+   X=X0,
+   PX=PX0,
+   Y=Y0,
+   PY=PY0,
+   T=T0,
+   PT=PT0,
+   DX=DX0,
+   DPX=DPX0,
+   DY=DY0,
+   DPY=DPY0;
+
+ PSHIFT=0;
+
+
+
+
+
+ /***********************************************************
+  ***********************************************************
+  * MADX
+  ***********************************************************
+  ***********************************************************/
+
+
+ /***********************************************************
+  * BEAM and USE
+  ***********************************************************/
+  beam; use, sequence=seq;
+
+
+
+ /***********************************************************
+  * TWISS
+  ***********************************************************/
+
+ select, flag=twiss, clear;
+ select, flag=twiss,column=name, s, l, x, px, alfx, betx, dx, y, py, alfy, bety, dy;
+!twiss , centre , BETA0=INITBETA0
+ twiss , sectormap, RMATRIX, BETA0=INITBETA0
+       , DELTAP = PSHIFT
+       , file=optics.out
+       , sectorfile=secmap;
+
+
+
+
+
+/***********************************************************
+ ***********************************************************
+ * PTC
+ ***********************************************************
+ ***********************************************************/
+
+
+/***********************************************************
+ * BEAM and USE
+ ***********************************************************/
+ beam; use, sequence=seq;
+
+
+
+/***********************************************************
+ * PTC
+ ***********************************************************/
+ select, flag=ptc_twiss,clear;
+ select, flag=ptc_twiss,column=name, s, l, x, px, alfa11, beta11, disp1, y, py, alfa22, beta22, disp3;
+
+ ptc_create_universe;
+ !ptc_create_layout,model=2,method=6,nst=5,exact, closed_layout=false;
+ ptc_create_layout,model=2,method=6,nst=5,time=true,exact;
+
+ ptc_twiss, table=ptc_twiss, icase=5, no=1, BETA0=INITBETA0
+          , DELTAP = PSHIFT
+          , file=opticsptc.out;
+ ptc_normal,no=3,icase=5,maptable; ! no = number of orders, inside the fort.18 table
+
+ ptc_end;
+ stop;
+ !write,table=ptc_twiss;
+ !ptcx=table(ptc_twiss,seq$END,x);
+ system,"./fort2tfs_fort.perl > /dev/null";
+ system,"./secmap2tfs_secmap_2010.perl > /dev/null";
+
+
+ STOP;

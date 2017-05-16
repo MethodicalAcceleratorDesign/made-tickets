@@ -1,0 +1,143 @@
+!! oblancog First twiss 20161123 
+option,echo,info,warn;
+
+! the beam 
+E0     := 45.000;![GeV]
+npar   := 1.9e10;
+emitx  := 5.73e-9;![m]
+emity  := 5.73e-11;![m] 
+blength:= 3.6e-3;![m]
+bcur   := 240e-3;![A]
+nbunch := 100;
+nparpb := 3.1e11;
+espread:= 1e-3;
+beam, PARTICLE=positron, ENERGY=E0,
+      ex=emitx, ey=emity, et=blength*espread,
+      sigt=blength, sige=espread, kbunch=nbunch,
+      NPART=nparpb, bcurrent=bcur, RADIATE=true;
+
+! The ring 
+call, file = "Pos_45GeV_Ring_8.mad.madx";
+use, sequence=Low_Emit_RING, range=#s/#e;
+SXT_ON := 1;
+
+! The cavity parameters
+RF_ON       := 0;
+RFc->LAG    := 0.5-0.016;!0.378 with rad and RF on=1; w/o rad 0.5-0.016;
+RFc->FREQ   := 500.117256;
+RFc->HARMON := 10510;
+
+! Beam pipe
+Rpipe = 50e-3;![m]
+AngMax = 1.0; !maximum angle 1[rad]=
+
+! arcs twiss parameters definition (from last match in mad)
+KSF2 :=   1.95*sxt_on;
+KS1A :=  -2.17*sxt_on;
+KS1B :=  -1.56*sxt_on;
+KS1D :=  -1.56*sxt_on;
+KS1E :=  -2.17*sxt_on;
+KOF1 := -38.5;
+KDF1 := 150.0;
+KDD1 :=   0.0;
+KQD9 :=  -3.502004E-01;
+KQF8 :=   2.355622E-01;
+KQD7 :=  -3.659796E-01;
+KQF6 :=   2.317365E-01;
+KQD5 :=  -2.041680E-01;
+KQF4 :=   1.784162E-01;
+KQD3 :=  -2.234357E-01;
+KQD2 :=  -3.917201E-01;
+KQD1 :=  -3.801510E-01;
+KQF2 :=   2.048242E-01;
+KQF1 :=   1.977323E-01;
+
+! Here I get the beam and twiss params for the part. generation
+system, "rm -f *tws";
+use, sequence=Low_Emit_RING;
+savebeta,label=betalowhinv,place=#s;
+savebeta,label=betaENDlowhinv,place=#e;
+select, flag=twiss, clear;
+select, flag=twiss,column=name,keyword,s,l,betx,bety,alfx,alfy,mux,muy,dx,dy,x,
+	dpx,dpy,ddx,ddy;
+TWISS, chrom, SAVE, file="myLEMMAp_SXT_ON.tws";
+!EMIT, deltap=0;
+!show, beam;
+!stop;
+! New starting point
+system, "rm -f beta*.txt beam0.txt";
+assign, echo="betaSTART.txt";
+show, betalowhinv;
+assign, echo="betaEND.txt";
+show, betaENDlowhinv;
+assign, echo="beam0.txt";
+show, beam;
+assign, echo=terminal;
+
+
+
+
+! NO purpose tracking in MAD-X
+system, "rm -f track*";
+!makethin lenses
+
+!  BEGIN of my notes for the MAD-X team :
+!!  the expected energy loss per turn U0 is 511MeV, which is 1.1% of 45GeV.
+!!  When tracking I expect to have in each particle 1.1% less energy per turn.
+!!  However, as I increase NSLICES, the effect of radiation dissapears and
+!!  it is strange, the particles loose less and less energy.
+!!  If instead I set the sbend to "thick=true" then, NSLICES do not
+!!  affect the radiation, there is always 1.1% less energy on every turn, and
+!!  this is as expected. But the time coordinate do not longer has a linear
+!!  correlation with energy, therefore, the cavity phase can not be set
+!!  to an stable value.
+NSLICES=5; !<--- here. 5 slices gave me an energy loss close to 1%
+select,flag=makethin,class=sbend,thick=false,slice=NSLICES;!<-and one of these
+!select,flag=makethin,class=sbend,thick=true,slice=NSLICES;!<-and one of these
+!  END of my notes for the MAD-X team
+
+!select,flag=makethin,class=rbend,thick=false,slice=2;!no rbends
+select,flag=makethin,class=quadrupole,thick=false,slice=1;
+select,flag=makethin,class=sextupole,thick=false,slice=1;
+makethin, sequence=Low_Emit_RING,makedipedge=true,style=teapot;
+save, sequence=Low_Emit_RING,file="Low_Emit_RING.thin.seq";
+call, file="Low_Emit_RING.thin.seq";
+use, sequence=Low_Emit_RING;
+select, flag=twiss, clear;
+select, flag=twiss,column=name,keyword,s,l,betx,bety,alfx,alfy,mux,muy,dx,dy,x,
+	dpx,dpy,ddx,ddy,hinv;
+TWISS, chrom, SAVE, file="myLEMMAp_SXT_ON.tws";
+plot, colour=100, haxis=s, vaxis1=betx,bety, vaxis2=dx,hmin=0,hmax=200,title="slicing";
+plot, colour=100, haxis=s, vaxis=hinv, hmin=0, hmax=200, title="slicing";
+plot, colour=100, haxis=s, vaxis1=betx,bety, vaxis2=dx,dy,title="slicing";
+plot, colour=100, haxis=s, vaxis1=wx,wy, vaxis2=ddx,title="slicing";
+system, "ps2pdf madx.ps";
+
+
+!set parameters
+track, onepass=true,aperture=true,onetable,recloss,dump;
+!call, file="observe.madx";!observe;!set observation points
+!set particles
+start, X=0, PX=0, Y=0, PY=0, T=0, PT= 4e-2;
+start, X=0, PX=0, Y=0, PY=0, T=0, PT= 3e-2;
+start, X=0, PX=0, Y=0, PY=0, T=0, PT= 2e-2;
+start, X=0, PX=0, Y=0, PY=0, T=0, PT= 1e-2;
+start, X=0, PX=0, Y=0, PY=0, T=0, PT= 0;
+start, X=0, PX=0, Y=0, PY=0, T=0, PT=-1e-2;
+start, X=0, PX=0, Y=0, PY=0, T=0, PT=-2e-2;
+start, X=0, PX=0, Y=0, PY=0, T=0, PT=-3e-2;
+start, X=0, PX=0, Y=0, PY=0, T=0, PT=-4e-2;
+run,turns=1,maxaper={Rpipe,AngMax,Rpipe,AngMax,1.0,0.1};!run track
+!dynap;
+endtrack;
+write, table=trackloss, file="trackloss";!write lost particles
+! End of NO purpose tracking in MAD-X
+
+
+
+! split tracking results into plot friendly files
+system, "./getobservedata trackone";
+system, "mv trackLOW_EMIT_RING\$END trackEND";
+! plot the phase  space
+!system, 'root -x -l -q "DrawPhaseSpace.C(\"START\")" ';
+!system, 'root -x -l -q "DrawPhaseSpace.C(\"END\")" ';

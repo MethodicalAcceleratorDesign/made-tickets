@@ -1,0 +1,52 @@
+@ NAME             %05s "TWISS"
+@ TYPE             %05s "TWISS"
+@ SEQUENCE         %08s "TEST_SEQ"
+@ PARTICLE         %08s "POSITRON"
+@ MASS             %le          0.000510998928
+@ CHARGE           %le                       1
+@ ENERGY           %le                     175
+@ PC               %le        174.999999999254
+@ GAMMA            %le        342466.471867041
+@ KBUNCH           %le                       1
+@ BCURRENT         %le                       0
+@ SIGE             %le                       0
+@ SIGT             %le                       0
+@ NPART            %le                       0
+@ EX               %le                       1
+@ EY               %le                       1
+@ ET               %le                       1
+@ LENGTH           %le                       2
+@ ALFA             %le                       0
+@ ORBIT5           %le                      -0
+@ GAMMATR          %le                       0
+@ Q1               %le       0.210997792257577
+@ Q2               %le       0.249920413580775
+@ DQ1              %le                       0
+@ DQ2              %le                       0
+@ DXMAX            %le                       0
+@ DYMAX            %le                       0
+@ XCOMAX           %le   3.37481016052122e-006
+@ YCOMAX           %le                       0
+@ BETXMAX          %le        8.49460101244229
+@ BETYMAX          %le        3999.10096625177
+@ XCORMS           %le   2.26389147902473e-006
+@ YCORMS           %le                       0
+@ DXRMS            %le                       0
+@ DYRMS            %le                       0
+@ DELTAP           %le                       0
+@ SYNCH_1          %le                       0
+@ SYNCH_2          %le                       0
+@ SYNCH_3          %le                       0
+@ SYNCH_4          %le                       0
+@ SYNCH_5          %le                       0
+@ TITLE            %08s "no-title"
+@ ORIGIN           %18s "5.02.04 Windows 64"
+@ DATE             %08s "09/02/15"
+@ TIME             %08s "13.20.49"
+*                      S NAME               KEYWORD                                 L                      X                     PX                      Y                     PY                   BETX                   BETY                   ALFX                   ALFY                    MUX                    MUY                     DX                    DPX                     DY                    DPY 
+$                    %le %s                 %s                                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le                    %le 
+                      0 "TEST_SEQ$START"    "MARKER"                                 0                      0                      0                      0                      0                    0.5                  0.001                      0                      0                      0                      0                      0                      0                      0                      0
+                      0 "L.IP"              "MARKER"                                 0                      0                      0                      0                      0                    0.5                  0.001                      0                      0                      0                      0                      0                      0                      0                      0
+                      1 "L.SOL1"            "SOLENOID"                               1 -1.68740508026061e-006                      0                      0                      0       2.49865025311057       999.775991562943      -1.99932501265331       -999.88748945216      0.176186699857817      0.249840827201353                      0                      0                      0                      0
+                      2 "L.SOL2"            "SOLENOID"                               1 -3.37481016052122e-006                      0                      0                      0       8.49460101244229       3999.10096625177      -3.99865002530661      -1999.77497890432      0.210997792257577      0.249920413580775                      0                      0                      0                      0
+                      2 "TEST_SEQ$END"      "MARKER"                                 0 -3.37481016052122e-006                      0                      0                      0       8.49460101244229       3999.10096625177      -3.99865002530661      -1999.77497890432      0.210997792257577      0.249920413580775                      0                      0                      0                      0

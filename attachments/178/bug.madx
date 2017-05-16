@@ -1,0 +1,25 @@
+option, -echo, -info, warn;
+
+!---- Shortcuts
+
+system, "ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db";
+
+!---- Sequence and strength
+
+call, file="db/V6.5.thin.seq";
+call, file="db/V6.5.thin.inj.str";
+
+!---- Beam type
+
+beam, particle=proton, sequence=lhcb1, energy=450.0;
+
+use, period=lhcb1;
+
+select, flag=twiss, clear;
+select, flag=twiss, pattern=bpmpattern,column=name,s,betx,bety,alfx,alfy,mux,muy,phix,phiy,r11,r12,r21,r22;    !-- choose beam
+twiss, deltap=dpp, file=twiss_file;
+
+readmytable, file="error.small.dat",table=myerrtab;
+! This commands is creating memory access outside of range
+seterr, table=myerrtab;
+

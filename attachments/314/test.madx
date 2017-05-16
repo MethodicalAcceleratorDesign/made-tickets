@@ -1,0 +1,151 @@
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! TITLE,"FCC-ee Version 14, 100km";       !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! author: Bastian Harer, CERN ABP-BE-LAT, bastian.harer@cern.ch
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+option echo;
+ENERGY := 175;
+GeV2TM := 1E9/3e8;
+!BRHO   := ENERGY * GeV2TM;
+!value, BRHO;
+
+BETXSTAR := 1.000;
+BETYSTAR := 0.001;
+TUNECELX := 1/4;	!0.249;
+TUNECELY := 1/6;	!0.166;
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! Call files with machine description
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+option, -echo;
+    call, file = fcc-ee_v14_elements.def;
+    call, file = fcc-ee_v14.seq;
+! ---------------------------------------
+   call, file = fcc-ee_v13.str;
+!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+option, echo;
+
+! --------------------------------------------------------------------------------------
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!   Los Geht's
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!
+    beam, particle = electron, energy=ENERGY, npart=9e12,radiate=false;
+!
+!--------------------
+    k2sf = 0;
+    k2sd = 0;
+!
+    VRF1   :=  0;
+    VRFIR  :=  0;
+    LGRF1  :=  0.5;
+    LGRFIR :=  LGRF1;
+!--------------------
+!
+! ################################################ 
+print, text = "--------------------";
+print, text = "NATURAL CHROMATICITY";
+print, text = "--------------------";
+!
+    use, sequence = TLEPminibeta;
+!
+k1hilff1 := k1qfsc2;
+k1hilff2 := k1qfsc2;
+k1hilfd1 := k1qdsc2;
+k1hilfd2 := k1qdsc2;
+!
+/*
+	MQDIR1neu :  QUADRUPOLE, L:=LQIR1/2, K1:=K1QDIR1;
+	MQFIR1neu :  QUADRUPOLE, L:=LQIR1/2, K1:=K1QFIR1;
+	MSF1neu   :  SEXTUPOLE,  L:=LS/2,    K2:=k2sf1;
+	MSD1neu   :  SEXTUPOLE,  L:=LS/2,    K2:=k2sd1;
+!
+    SEQEDIT, sequence= TLEPminibeta;
+	remove, element=MQD33.IR1.R;
+	remove, element=MQF34.IR1.R;
+	remove, element=MSF1.A1C3;
+	remove, element=MSD2.A1C3;
+!	
+	install, element=MQD33.IR1.R1, class=MQDIR1neu, at=737.05+LQIR1/4;
+	install, element=markMQD33.IR1.R, class=marker, at=737.425;
+	install, element=MQD33.IR1.R2, class=MQDIR1neu, at=737.8-LQIR1/4;
+!
+	install, element=MQF34.IR1.R1, class=MQFIR1neu, at=745.3+LQIR1/4;
+	install, element=markMQF34.IR1.R, class=marker, at=745.675;
+	install, element=MQF34.IR1.R2, class=MQFIR1neu, at=746.05-LQIR1/4;
+!
+	install, element=MSF1.A1C31, class=MSF1neu, at=1571.0+LS/4;
+	install, element=markMSF1.A1C3, class=marker, at=1571.25;
+	install, element=MSF1.A1C32, class=MSF1neu, at=1571.5-LS/4;
+!
+	install, element=MSD2.A1C31, class=MSD1neu, at=1596.0+LS/4;
+	install, element=markMSD2.A1C3, class=marker, at= 1596.25;
+	install, element=MSD2.A1C32, class=MSD1neu, at=1596.5-LS/4;
+!
+	install, element=s.sc2, class=marker, at = 920.1;
+	install, element=e.sc2, class=marker, at = 970.1;
+    ENDEDIT;
+*/
+!
+    SEQEDIT, sequence= TLEPminibeta;
+	cycle, start=IP1;
+    ENDEDIT;
+!
+    use, sequence = TLEPminibeta;
+!
+    select, flag = twiss, clear;
+    select, flag = twiss, column=name, s, betx, bety, alfx, alfy, mux, muy, wx, wy, phix, phiy;
+
+
+! Calculation of chromatic functions from two twiss tables
+    const deltapval = 1.e-6;
+
+    Select, flag=twiss, column=name, s, betx, bety, alfx, alfy, mux, muy, wx, wy, phix, phiy, dx, dpx, dy, dpy;
+
+    Twiss, betx=1, bety=0.001, alfx=0, alfy=0, dx=0, dpx=0, wx=0, wy=0, x=0, y=0, px=0, py=0, 
+           deltap=0.0, file=twiss1;
+    Twiss, betx=1, bety=0.001, alfx=0, alfy=0, dx=0, dpx=0, wx=0, wy=0, x=0, y=0, px=0, py=0, 
+           deltap=deltapval, file=twiss2;
+
+    Readmytable, table=twiss1, file=twiss1;
+    Readmytable, table=twiss2, file=twiss2;
+
+    Create, table=chromatic, column=_name, s, wx, wy, chromax, chrombx, chromay, chromby;
+    Select, flag=chromatic, column=name, s, wx, wy, chromax, chrombx, chromay, chromby;
+
+    nrows = table(twiss1,tablelength);
+
+    n=0;
+    wx=0; wy=0;
+
+    Option, -info; 
+    while (n<nrows) {
+      n = n+1;
+      Setvars, table=twiss1, row=n;
+      bx1=betx; by1=bety; ax1=alfx; ay1=alfy;
+      Setvars, table=twiss2, row=n;
+      bx2=betx; by2=bety; ax2=alfx; ay2=alfy;
+
+      chromax = (ax2-ax1)/deltapval - (ax1/bx1)*(bx2-bx1)/deltapval;
+      chrombx = (bx2-bx1)/(bx1*deltapval);
+      wx = sqrt(chromax^2 + chrombx^2); 
+
+      chromay = (ay2-ay1)/deltapval - (ay1/by1)*(by2-by1)/deltapval;
+      chromby = (by2-by1)/(by1*deltapval);
+      wy = sqrt(chromay^2 + chromby^2);
+
+      Fill, table=chromatic;      
+    }
+    Option, info;
+
+    Write, table=chromatic, file=chromatic.tfs;
+
+Stop;
+
+
+

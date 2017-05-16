@@ -1,0 +1,31 @@
+Option, -echo, -warn;
+CALL FILE=ring_seq_bb_spch_thin.madx;
+Option, echo, warn, info;
+
+show, beam;
+
+beam, particle=ion_proton, bunched=true, radiate=false,
+      mass:= 9.3828131999999997e-01, charge:= 1.,
+      energy:= 2.9382799500012058e+00, pc:= 2.7844419960053299e+00, gamma:= 3.1315554166645945e+00,
+      ex:= 1.1794049309381677e-06, exn:= 1.4e-05, ey:= 7.4134024230399120e-07, eyn:= 8.8e-06, et:= 1., sigt:= 0., sige:= 0.,
+      kbunch:= 1, npart:= 1.3071350336269143e+13, bcurrent:= 9.4692732048790562e-01, freq0:= .45215343892573456, circ:= 628.3185307,
+      dtbyds:= 0., deltap:= 0., beta:= 9.4764353410374913e-01, alfa:= 1.0197173227135646e-01,
+      u0:= 0., qs:= 0., arad:= 1.5346830254934754e-18, bv:= 1, pdamp:={1,1,2}, n1min:= -1.;
+
+USE, PERIOD= ring;
+
+TWISS; 
+
+show, beam;
+
+value, BEAM->circ;
+value, BEAM->freq0;
+
+BEAM, NPART=0;
+
+show, BEAM;
+
+value, BEAM->circ;
+value, BEAM->freq0;
+
+stop;

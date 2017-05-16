@@ -1,0 +1,51 @@
+option,-echo,info,warn,-no_fatal_stop;
+call,file="sol-1.seq";
+
+Nrj=175;
+beam,particle=positron,energy=Nrj,radiate=false;
+Brho:=Nrj*1e9/clight;
+show,beam;
+value,BXIP,BYIP,Brho;
+
+Bs=0;				//solenoid field
+KS1:= Bs/Brho;
+KS2:=-Bs/Brho;
+value,KS1,KS2;
+value,L.sol1->KS,L.sol2->KS;
+
+set,format="22.15g";
+select,flag=twiss,clear;
+select,flag=twiss,COLUMN=S,NAME,keyword,L,X,PX,Y,PY,BETX,BETY,ALFX,ALFY,MUX,MUY,DX,DPX,DY,DPY;
+
+use,sequence=test_seq;
+
+x0=0; px0=0; y0=0; py0=0;
+
+twiss,rmatrix,chrom,file="twiss-0.tfs", betx=BXIP,bety=BYIP,alfx=AXIP,alfy=AYIP,mux=0,muy=0,dx=DXIP,dpx=DPXIP,x=x0,px=px0,y=y0,py=py0;
+PLOT, TABLE=TWISS,TITLE="no alignment errors", HAXIS=S,VAXIS1=X,VAXIS2=Y,COLOUR=100;
+qx0=table(summ,q1); qy0=table(summ,q2);
+
+select,flag=error,clear;
+select,flag=error,pattern="L.sol1";
+ealign,dtheta=L_cross;
+select,flag=error,clear;
+select,flag=error,pattern="L.sol2";
+ealign,dtheta=L_cross;!,dx=tan(L_cross)*sol1->L;
+
+!eprint,full=true;
+
+SELECT, FLAG = ERROR, FULL;
+ESAVE, FILE = err.tfs;
+
+twiss,rmatrix,chrom,file="twiss-1.tfs", betx=BXIP,bety=BYIP,alfx=AXIP,alfy=AYIP,mux=0,muy=0,dx=DXIP,dpx=DPXIP,x=x0,px=px0,y=y0,py=py0;
+PLOT, TABLE=TWISS,TITLE="with alignment error", HAXIS=S,VAXIS1=X,VAXIS2=Y,COLOUR=100;
+qx1=table(summ,q1); qy1=table(summ,q2);
+
+value,qx1-qx0,qy1-qy0;
+value,
+	table(twiss,L.sol1,x),
+	tan(L_cross)-sin(L_cross),
+	atan(sin(L_cross))-L_cross,
+	asin(tan(L_cross))-L_cross;
+
+!stop;

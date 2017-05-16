@@ -1,0 +1,32 @@
+IP:marker;
+quad1a: quadrupole, L = 1, k1 := qk1;
+quad1b: quadrupole, L = 1, k1 := qk1;
+hqb1: multipole, knl:={-6/3.3356*7000};
+
+E0 :=7000 ;   !the energy is 7 TeV.  rigidity=2.3333e4;
+BEAM, PARTICLE = proton, ENERGY =E0;
+
+use, sequence=myseqSEQ;
+select, flag=twiss, column=name, s,l, betx, bety, alfx, alfy, mux, muy ,dx, dpx, k0l, k1l, k2l, angle;
+
+use, sequence=myseqseq;
+
+myseqSEQ: sequence, refer=centre,l=40;
+	IP,          at=0;
+	quad1a,      at=23.6;
+	hqb1,	     at=24.1;
+	quad1b,      at=24.6;
+endsequence;
+
+use, sequence=myseqSEQ;
+
+qk1 = -0.004712727273 ;
+qk2 =  qk1;
+
+SURVEY, x0=0, y0=0, z0=0, theta0=2e-3, table=tabla1;
+value,table(tabla1,quad1b,x);
+
+twiss, betx=1.5, bety=0.15, table=tabla2;
+value,table(tabla2,quad1b,betx);
+
+

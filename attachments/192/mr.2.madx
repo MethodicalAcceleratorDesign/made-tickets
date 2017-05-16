@@ -1,0 +1,138 @@
+option, -echo;
+
+TITLE "OPT_EXTR 10:54:37 AM";
+
+BEAM, PARTICLE=  12C 6+, MASS=11.17467, CHARGE=6, PC=20.3025141300283+1000000;
+
+
+SS_MR_01_03: DRIFT, L=0.75;
+ES_injection: DRIFT, L=0.15;
+SS_MR_01_04: DRIFT, L=0.95;
+QF__1_: QUADRUPOLE, L=0.175, K1=0.31357054698;
+SS_MR_02: DRIFT, L=0.332;
+MB: SBEND, L=1.661, ANGLE=-0.3926990817, 
+ K1=0, E1=-0.19634954085, E2=-0.19634954085, 
+ K2=0, HGAP=0, FINT=0;
+SS_MR_03: DRIFT, L=0.562;
+QD: QUADRUPOLE, L=0.175, K1=-0.5248105691;
+SS_MR_04: DRIFT, L=0.662;
+SS_MR_05: DRIFT, L=0.362;
+SS_MR_06_01: DRIFT, L=0.8;
+XC__D_1: SEXTUPOLE, L=0.2, K2=1.7853732277*1;
+XC__D_2: SEXTUPOLE, L=0.2, K2=1.7853732277*1;
+SS_MR_06_02: DRIFT, L=0.2;
+QF__2_: QUADRUPOLE, L=0.175, K1=0.5251583166;
+SS_MR_07: DRIFT, L=0.362;
+SS_MR_08: DRIFT, L=1.212;
+SS_MR_09: DRIFT, L=0.562;
+SS_MR_10: DRIFT, L=0.362;
+SS_MR_11: DRIFT, L=1.35;
+SS_MR_12: DRIFT, L=0.362;
+SS_MR_13: DRIFT, L=0.562;
+SS_MR_14_01: DRIFT, L=0.5;
+XC__F_1: SEXTUPOLE, L=0.2, K2=-0.4812370368*1;
+XC__F_2: SEXTUPOLE, L=0.2, K2=-0.4812370368*1;
+SS_MR_14_02: DRIFT, L=0.512;
+SS_MR_15: DRIFT, L=0.362;
+SS_MR_16: DRIFT, L=2;
+SS_MR_17: DRIFT, L=0.362;
+SS_MR_18: DRIFT, L=0.662;
+SS_MR_19: DRIFT, L=0.562;
+SS_MR_20: DRIFT, L=0.332;
+SS_MR_21_01: DRIFT, L=2.3;
+SS_MR_21_02: DRIFT, L=1.335;
+XR__Reson_: SEXTUPOLE, L=0.2, K2=10.7*(1);
+!XR__Reson_: SEXTUPOLE, L=0.2, K2=0.0;
+!XR__Reson_2: MULTIPOLE, KNL := {0, 0, 10.7*0.2};  
+XR__Reson_2: MULTIPOLE, KNL := {0, 0, 10.7*0.2*0.};  
+SS_MR_21_03: DRIFT, L=0.765;
+SS_MR_22: DRIFT, L=0.332;
+SS_MR_23: DRIFT, L=0.562;
+SS_MR_24: DRIFT, L=0.662;
+SS_MR_25: DRIFT, L=0.362;
+SS_MR_26_01: DRIFT, L=1.6;
+SS_MR_26_02: DRIFT, L=0.2;
+SS_MR_27: DRIFT, L=0.362;
+SS_MR_28: DRIFT, L=1.212;
+SS_MR_29: DRIFT, L=0.562;
+SS_MR_30: DRIFT, L=0.362;
+SS_MR_31: DRIFT, L=1.35;
+SS_MR_32: DRIFT, L=0.362;
+SS_MR_33: DRIFT, L=0.562;
+SS_MR_34_01: DRIFT, L=0.5;
+SS_MR_34_02: DRIFT, L=0.512;
+SS_MR_35: DRIFT, L=0.362;
+SS_MR_36_01: DRIFT, L=0.25;
+ESextraction: DRIFT, L=0.2;
+SS_MR_36_02: DRIFT, L=0.95;
+SS_MR_37: DRIFT, L=0.362;
+SS_MR_38: DRIFT, L=0.662;
+SS_MR_39: DRIFT, L=0.562;
+SS_MR_40: DRIFT, L=0.332;
+SS_MR_01_01: DRIFT, L=0.556;
+MSextraction: DRIFT, L=0.1625;
+SS_MR_01_02: DRIFT, L=1.094;
+
+
+OPT_EXTR: LINE=(SS_MR_01_03,ES_injection,ES_injection,ES_injection, 
+                ES_injection,XR__Reson_2, SS_MR_01_04,QF__1_,QF__1_, 
+                SS_MR_02,MB,SS_MR_03,QD, 
+                QD,SS_MR_04,MB,SS_MR_05, 
+                QF__1_,QF__1_,SS_MR_06_01,SS_MR_06_01, 
+                XC__D_1,SS_MR_06_02,QF__2_,QF__2_, 
+                SS_MR_07,MB,SS_MR_08,QD, 
+                QD,SS_MR_09,MB,SS_MR_10,               
+                QF__2_,QF__2_,SS_MR_11,SS_MR_11, 
+                QF__2_,QF__2_,SS_MR_12,MB, 
+                SS_MR_13,QD,QD,SS_MR_14_01, 
+                XC__F_1,SS_MR_14_02,MB,SS_MR_15, 
+                QF__2_,QF__2_,SS_MR_16,QF__1_, 
+                QF__1_,SS_MR_17,MB,SS_MR_18, 
+                QD,QD,SS_MR_19,MB, 
+                SS_MR_20,QF__1_,QF__1_,SS_MR_21_01, 
+                SS_MR_21_02,XR__Reson_,SS_MR_21_03,QF__1_, 
+                QF__1_,SS_MR_22,MB,SS_MR_23, 
+                QD,QD,SS_MR_24,MB, 
+                SS_MR_25,QF__1_,QF__1_,SS_MR_26_01, 
+                XC__D_2,SS_MR_26_02,QF__2_,QF__2_, 
+                SS_MR_27,MB,SS_MR_28,QD, 
+                QD,SS_MR_29,MB,SS_MR_30, 
+                QF__2_,QF__2_,SS_MR_31,SS_MR_31, 
+                QF__2_,QF__2_,SS_MR_32,MB, 
+                SS_MR_33,QD,QD,SS_MR_34_01, 
+                XC__F_2,SS_MR_34_02,MB,SS_MR_35, 
+                QF__2_,QF__2_,SS_MR_36_01,ESextraction, 
+                ESextraction,ESextraction,ESextraction,SS_MR_36_02, 
+                QF__1_,QF__1_,SS_MR_37,MB, 
+                SS_MR_38,QD,QD,SS_MR_39, 
+                MB,SS_MR_40,QF__1_,QF__1_, 
+                SS_MR_01_01, MSextraction,MSextraction,MSextraction, 
+                MSextraction,SS_MR_01_02);
+
+
+USE, sequence=OPT_EXTR;
+
+/*******************************************************************************
+ * PTC 
+ ******************************************************************************/
+
+ptc_create_universe;
+ptc_create_layout,model=2,nst=5,method=6, exact=true;
+select, flag=ptc_twiss, clear;
+ptc_setswitch, debuglevel=2, exact_mis=true;
+ptc_twiss, closed_orbit, icase=56,no=2,file="ptc_output.twiss";
+select_ptc_normal, q1=1, q2=1;
+select_ptc_normal, dq1=1, dq2=1;
+select_ptc_normal, anhx=1,0,0; !dq1/dex
+!select_ptc_normal, anhx=2,0,0; !ddq1/ddex
+select_ptc_normal, anhy=1,0,0; !dq2/dex
+!select_ptc_normal, anhy=2,0,0; !ddq2/ddex
+!XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+select_ptc_normal, haml=1,0,0; !compare results for ANH variables when commenting/uncommenting this line
+!XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+PTC_NORMAL, icase=56, normal, no=3, closed_orbit;
+WRITE, table=normal_results, file="normal_results.txt";
+ptc_end;
+
+
+RETURN;

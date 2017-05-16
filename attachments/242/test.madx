@@ -1,0 +1,55 @@
+Option, warn,info,echo;
+Title, "Compiling Optics for the LHC 6.5 lattice with MADX";
+
+!---------------------------------------------------------------;
+!           CALL IN SELECTION, SEQUENCE and OPTICS FILES;
+!---------------------------------------------------------------;
+
+option, -echo, -warn;
+!call, file="../../madX/tests/share/LHC/LHCRing/V6.503/V6.5.seq";
+!call, file="../../madX/tests/share/LHC/LHCRing/V6.503/V6.5.inj.str";
+
+call, file="../../madX/tests/test-makethin-2/V6.5.thin.b1.seq";
+call, file="../../madX/tests/share/LHC/LHCRing/V6.503/V6.5.thin.inj.str";
+
+option, echo, warn;
+
+
+Beam, particle=proton, sequence=lhcb1, energy=450.0,
+      npart=1.15e11, ex=7.82e-9, ey=7.82e-9, et=5.302e-5;
+
+!--- first calculation with Twiss functions calculated at end of elements 
+
+use, period=lhcb1;
+
+! crossing angles ; will also introduce vertical dispersion
+! on_x1 = 1; on_x5 = 1; on_x2 = 1; on_x8 = 1;
+! on_alice= 1; on_lhcb = 1;
+
+! nominal RF
+! vrf400 = 8.;
+
+!makethin, sequence=lhcb1;
+
+twiss, chrom, table;
+
+// track particles
+track,file=track, onetable, dump;
+ start, x= 2e-3, px=0, y= 2e-3, py=0;
+ start, x= 4e-3, px=0, y= 4e-3, py=0;
+ start, x= 6e-3, px=0, y= 6e-3, py=0;
+ start, x= 8e-3, px=0, y= 8e-3, py=0;
+
+ run,turns=1024;
+endtrack;
+
+// plot trajectories
+option, debug;
+setplot, post=2; // 1: 'ps', 2 for 'eps' files
+title, "FODO phase-space test";
+plot, file=tt, table=trackone, noversion, multiple, 
+      haxis=x, vaxis=px, particle=1,2,3,4, 
+      colour=2, symbol=3, style=0;
+plot, file=tt, table=trackone, noversion, multiple, 
+      haxis=y, vaxis=py, particle=1,2,3,4, 
+      colour=2, symbol=3, style=0;

@@ -1,0 +1,162 @@
+// Elettra nominal Optics 
+
+circum=259.2; // define the total length
+ncell = 12; // define number of cells 
+lcell = circum/ncell;
+
+
+// magnets lengths
+
+lbe=1.44;
+l13=0.26;
+l2=0.498;
+lqd=0.26;
+lqf=0.409;
+ls1=0.116;
+lsfd=0.23;
+lcv=0.2;
+
+
+
+//  magnet strengths
+kqf =  2.23;
+kqd = -1.43;
+kq1 =  -1.943;
+kq2 =  2.22279;
+kq3 =  -1.26178;
+
+ksf = 40.78;//8.33/lsfd;  // seems that for MAD-x the sext strength is that of MAD8 / sex.length
+ksd = -32.78;//-7.2lsfd;
+ks1 = 20.68; //2.4/ls1;
+  
+
+// elements definition
+
+b : rbend, l:=lbe, angle=2.0*pi/(2*ncell),  k1=-0.42969037; // combined function dipole 
+
+
+q1:quadrupole,  k1:=kq1, l:=l13;
+q2:quadrupole,  k1:=kq2, l:=l2 ;
+q3:quadrupole,  k1:=kq3, l:=l13;
+qf:quadrupole,  k1:=kqf, l:=lqf;
+qd:quadrupole,  k1:=kqd, l:=lqd;
+
+SF: sextupole,  k2:=ksf, l:=lsfd; 
+SD: sextupole,  k2:=ksd, l:=lsfd;
+S1: sextupole,  k2:=ks1, l:=ls1;
+
+d1:drift;
+
+  m1: marker;
+  m2: marker;
+  m3: marker;
+
+ RFC: RFCAVITY,L=0.3, VOLT=2.6, HARMON=432, Lag=0.3;
+
+
+  bpm:monitor;
+  chv:kicker,l:=lcv;
+
+
+
+// sequence declaration;
+elettra: sequence,refer=centre, l=circum;
+   n = 1;
+
+   m1 : m1,  at=(n-1)*lcell; 
+   chv:chv,  at=(n-1)*lcell+1.722+lcv/2;
+   bpm: bpm, at=(n-1)*lcell+2.292;                   
+   q1: q1,   at=(n-1)*lcell+2.361+l13/2;                 
+   s1: s1,   at=(n-1)*lcell+2.844+ls1/2;                    
+   q2: q2,   at=(n-1)*lcell+3.243+l2/2;
+  bpm: bpm,  at=(n-1)*lcell+3.857;
+   q3: q3,   at=(n-1)*lcell+3.992+l13/2;
+  bpm: bpm,  at=(n-1)*lcell+4.367;
+  chv:chv,   at=(n-1)*lcell+4.422+lcv/2;
+
+    b:b,     at=(n-1)*lcell+4.759 +lbe/2;
+ 
+   qf: qf,   at=(n-1)*lcell+6.687+lqf/2;
+  bpm: bpm,  at=(n-1)*lcell+7.211;
+   sf: sf,   at=(n-1)*lcell+7.356+lsfd/2;
+  chv:chv,   at=(n-1)*lcell+7.726+lcv/2;
+  chv:chv,   at=(n-1)*lcell+9.1+lcv/2;
+   sd: sd,   at=(n-1)*lcell+9.43+lsfd/2;
+   qd: qd,    at=(n-1)*lcell+9.915+lqd/2;
+  bpm: bpm,  at=(n-1)*lcell+10.29;
+   sd: sd,   at=(n-1)*lcell+10.43+lsfd/2;
+
+  RFC:rfc,   at=(n-1)*lcell+11.3;
+
+  chv:chv,   at=(n-1)*lcell+12.164+lcv/2;
+   sf: sf,   at=(n-1)*lcell+12.504+lsfd/2;
+  bpm: bpm,  at=(n-1)*lcell+12.879;
+   qf: qf,   at=(n-1)*lcell+12.995+lqf/2;
+  chv:chv,   at=(n-1)*lcell+13.514+lcv/2;
+
+
+    b:b,     at=(n-1)*lcell+13.876 +lbe/2;
+
+
+   q3: q3,   at=(n-1)*lcell+15.839+l13/2;
+  bpm: bpm,  at=(n-1)*lcell+16.234;
+   q2: q2,   at=(n-1)*lcell+16.35+l2/2;
+   s1: s1,   at=(n-1)*lcell+17.131+ls1/2;
+   q1: q1,   at=(n-1)*lcell+17.47+l13/2;
+  bpm: bpm,  at=(n-1)*lcell+17.85;
+  chv:chv,   at=(n-1)*lcell+18.22+lcv/2; 
+
+ 
+ 
+ n = n + 1;
+ 
+
+
+  while (n <= ncell) 
+{
+   m1 : m1,  at=(n-1)*lcell; 
+   chv:chv,  at=(n-1)*lcell+1.722+lcv/2;
+   bpm: bpm, at=(n-1)*lcell+2.292;                   
+   q1: q1,   at=(n-1)*lcell+2.361+l13/2;                 
+   s1: s1,   at=(n-1)*lcell+2.844+ls1/2;                    
+   q2: q2,   at=(n-1)*lcell+3.243+l2/2;
+  bpm: bpm,  at=(n-1)*lcell+3.857;
+   q3: q3,   at=(n-1)*lcell+3.992+l13/2;
+  bpm: bpm,  at=(n-1)*lcell+4.367;
+  chv:chv,   at=(n-1)*lcell+4.422+lcv/2;
+
+    b:b,     at=(n-1)*lcell+4.759 +lbe/2;
+  
+   qf: qf,   at=(n-1)*lcell+6.687+lqf/2;
+  bpm: bpm,  at=(n-1)*lcell+7.211;
+   sf: sf,   at=(n-1)*lcell+7.356+lsfd/2;
+  chv:chv,   at=(n-1)*lcell+7.726+lcv/2;
+  chv:chv,   at=(n-1)*lcell+9.1+lcv/2;
+   sd: sd,   at=(n-1)*lcell+9.43+lsfd/2;
+   qd: qd,    at=(n-1)*lcell+9.915+lqd/2;
+  bpm: bpm,  at=(n-1)*lcell+10.29;
+   sd: sd,   at=(n-1)*lcell+10.43+lsfd/2;
+  chv:chv,   at=(n-1)*lcell+12.164+lcv/2;
+   sf: sf,   at=(n-1)*lcell+12.504+lsfd/2;
+  bpm: bpm,  at=(n-1)*lcell+12.879;
+   qf: qf,   at=(n-1)*lcell+12.995+lqf/2;
+  chv:chv,   at=(n-1)*lcell+13.514+lcv/2;
+
+    b:b,     at=(n-1)*lcell+13.876 +lbe/2;
+
+   q3: q3,   at=(n-1)*lcell+15.839+l13/2;
+  bpm: bpm,  at=(n-1)*lcell+16.234;
+   q2: q2,   at=(n-1)*lcell+16.35+l2/2;
+   s1: s1,   at=(n-1)*lcell+17.131+ls1/2;
+   q1: q1,   at=(n-1)*lcell+17.47+l13/2;
+  bpm: bpm,  at=(n-1)*lcell+17.85;
+  chv:chv,   at=(n-1)*lcell+18.22+lcv/2; 
+      
+  n = n + 1;
+       }
+
+
+
+
+endsequence;
+

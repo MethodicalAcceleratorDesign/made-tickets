@@ -1,0 +1,25 @@
+option -echo;
+ENERGY := 175;
+
+CALL, FILE = "FCCee.seq"; 
+
+BEAM, PARTICLE = electron, ENERGY=ENERGY, NPART=9e12,RADIATE=true;
+
+USE, SEQUENCE = L000004;
+
+VOLTCA1 = 206.10953283087;
+LAGCA1 = 3.19960e-01;
+
+call, file="BEFcomp_bis.taper";
+call, file="Qstrength_bis.taper";
+call, file="Sstrength_bis.taper";
+
+select, flag = twiss, clear;
+select,flag=twiss,column=name,s,betx,bety,mux,muy,dx,alfx,alfy,x,y,dy,pt;
+twiss, centre, file="twiss_tapered.twiss";
+
+SXFWRITE, FILE="fccee_werrors";
+
+STOP();
+
+

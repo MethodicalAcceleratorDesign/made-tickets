@@ -1,0 +1,15 @@
+
+System,"ln -fns /afs/cern.ch/eng/fcc/ee/IR/CERN-LM-21May14/ tlepdir";
+
+option, -warn,-info,-echo;
+call,file="tlepdir/FCCee.madx";
+call,file="tlepdir/FCCee_IR.madx";
+option,  warn,info,echo;
+
+use, sequence = RING10_Teil11;
+
+! cycle to start at IP
+seqedit, sequence=RING10_Teil11;
+  flatten; ! include all sequences in the sequence being edited
+  cycle,start=IP; ! start at IP
+endedit;

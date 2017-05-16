@@ -1,0 +1,63 @@
+TITLE,'PETRA III-Extension Lattice with 20 DWs as on 30.03.2012';
+set,format="14s","10d","22.12g";
+;
+OPTION, WARN, -INFO, -ECHO;
+call, file="quadsex_20wig_upv13.dat";
+call, file=petra3_upv13.geo;
+;
+SEQEDIT, SEQUENCE=RING;
+  SELECT, FLAG=SEQEDIT, CLASS=duu;
+  SELECT, FLAG=SEQEDIT, CLASS=dunl;
+  SELECT, FLAG=SEQEDIT, CLASS=duns;
+  remove, element=selected;
+  flatten;
+endedit;
+OPTION, WARN, INFO, ECHO;
+;
+BEAM, PARTICLE=POSITRON, ENERGY=6.0, kbunch=40, bcurrent=0.1/40,bunched, RADIATE, sequence=RING;
+USE, period=RING;
+;
+!**************************************************************************************************
+select,flag=TWISS,clear;
+select,flag=TWISS,column=name,s,x,y,betx,bety,mux,muy,dx,dy,k1l,k2l,l,angle,px,py,dpx,dpy,alfx,alfy,hkick,vkick,e1,e2,parent;
+!select,flag=TWISS,column=name,s,betx,bety,mux,muy,l;
+TWISS,deltap=0.0,file='twiss.out',sequence=RING;
+plot,table=twiss,haxis=s,vaxis=betx,bety, style=100,colour=100;
+plot,table=twiss,haxis=s,vaxis=dx,dy,     style=100,colour=100;
+plot,table=twiss,haxis=s,vaxis=x,y,       style=100,colour=100;
+plot,table=twiss,hmin=910, hmax=980, haxis=s,vaxis=betx,bety, style=100,colour=100;
+plot,table=twiss,hmin=1430, hmax=1500, haxis=s,vaxis=betx,bety, style=100,colour=100;
+plot,table=twiss,hmin=1490, hmax=1555, haxis=s,vaxis=betx,bety, style=100,colour=100;
+emit,deltap=0.0;
+!**************************************************************************************************
+BEAM, PARTICLE=POSITRON, ENERGY=6.0, RADIATE, sequence=RING;
+USE, period=RING;
+save, sequence=RING, file=p3ext_lattice_upv13.seq;
+!stop;
+;
+OPTION, WARN, INFO, -ECHO;
+USE, period=RING;
+!
+call, file=macro.ins; ! insertion of all MACRO declarations first
+
+! installation of all BPMs and Correctors with individual names
+;
+!call, file=only_wig.ins;
+call, file=bpmcor.ins;
+!call, file=bpm2bpmf_fast.ins;
+;
+OPTION, WARN, ECHO;
+;
+!***************************************************************************************************
+emit,deltap=0.0;
+select,flag=TWISS,clear;
+select,flag=TWISS,column=name,s,x,y,betx,bety,mux,muy,dx,dy,k1l,k2l,l,angle,px,py,dpx,dpy,alfx,alfy,hkick,vkick,e1,e2,parent;
+TWISS,deltap=0.0,chrom,file='myorbit.out',sequence=RING;
+plot,table=twiss,haxis=s,vaxis=betx,bety, style=100,colour=100;
+plot,table=twiss,haxis=s,vaxis=dx,dy,     style=100,colour=100;
+plot,table=twiss,haxis=s,vaxis=x,y,       style=100,colour=100;
+!***************************************************************************************************
+BEAM, PARTICLE=POSITRON, ENERGY=6.0, RADIATE, sequence=RING;
+USE, period=RING;
+save, sequence=RING, file=p3ext_lattice_upv13_AllCorrectors.seq;
+stop;

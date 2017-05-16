@@ -1,0 +1,124 @@
+TITLE, 'MESA lattice';
+
+!--------Beamparameter----------------!
+
+eh=2e-09;	           !!!... Horizontal...!!!
+ah= -1;
+bh= 3.2646;
+ev= 2e-09;	           !!!...Vertical...!!!
+av= -1;
+bv= 3.2646;
+el= 0.00001527;	           !!!...Longitudinal...!!!
+al= -0.636;
+bl= 4248.34;
+energy = 0.030+0.000511;   !!!... Energy in GeV...!!!
+
+R56:= -0.3;
+
+
+!----------Machine Description------------!
+
+CAVLENGTH := 1.2834;
+phase = 52.0/360.0;  ! 52 degree of crest
+VOLT := 15.813*1e-12;
+CAV: TWCAVITY,  L = CAVLENGTH, VOLT := 15.813*CAVLENGTH, LAG = phase, FREQ=1300;
+cav_m: marker;
+dri: drift, l = 0.1;
+
+
+cell_acc : line = (dri, CAV , dri);
+
+d1: drift, l=1;
+b1: rbend, l=1, angle= pi*20/180;
+b2: rbend, l=1, angle=-pi*20/180;
+
+after_first_chicane: marker ;
+after_acc: marker;
+
+call file = "cell_acc.seq";
+
+c_chicane : line = (d1, b1, d1, b2, d1,d1, b2, d1, b1, d1 );
+!                          11                  12,  13,14,15,   16,             27 
+beamline: line = (c_chicane, after_first_chicane, cell_acc, after_acc, c_chicane);
+
+
+!----------Machine Description------------!
+
+
+
+! calculate Twiss parameters 
+
+beam, PARTICLE=ELECTRON, ENERGY= 0.030d0;
+
+! Simple twiss 
+
+USE, sequence = beamline;
+twiss, file=betasNC.txt, rmatrix,alfx=ah, betx=bh, alfy=av,bety=bh;
+
+PLOT,  haxis=s, vaxis=betx,bety, colour=100, 
+      title="Standard TWISS";
+Plot, haxis=s, vaxis=RE56,  colour=100;
+
+select,flag=ptc_twiss,column=name,energy,s,beta11,beta21,beta12,beta22,disp1,disp3,rmatrix;
+
+!make beamline with cavities setup the active one
+
+USE, sequence = beamline;
+
+ptc_create_universe;
+ptc_create_layout, model=1, method=6, nst=20, exact=true, closed_layout=false;
+
+   
+   title,"PTC time=false, volt=0";
+
+   ptc_setswitch, debuglevel=0, maxacceleration=false, exact_mis=true, time=false, totalpath=true, fringe=true;
+   !calculate twiss parameters along the line, using initial parameters from the thin lense
+   ptc_twiss, icase=6, no=3, rmatrix, betx = bh, alfx = ah,  bety=bv, alfy=av, betz=bl, re56=-0.3;
+
+   PLOT,  ptc=true, haxis=s, vaxis=beta11,beta22, colour=100, title="PTC TWISS";
+   PLOT,  ptc = true, haxis=s, vaxis=RE56;
+
+   !write, table=PTC1, file="PTC1.txt";
+   write, table=ptc_twiss, file="ptc_twiss.txt";
+
+   PLOT, file="mesa", ptc=true, haxis=s, vaxis=energy, colour=100, title="";
+
+
+   !random set of particles distributed evenly in t (every ~1 deg from -10 to 10 deg)
+   tno = 0;
+   nt0 = 20;
+
+   while (tno < nt0)
+    {
+
+      t0 = 0.0001*(tno-(nt0-1)/2.0);
+
+
+      ptc_start, x=x0, px=0.0, y=0.0, py=0.0, pt=t0;
+
+      tno = tno + 1; 
+    }  
+
+   PTC_OBSERVE, place=beamline$start;
+   PTC_OBSERVE, place=after_first_chicane;
+   PTC_OBSERVE, place=after_acc;
+   PTC_OBSERVE, place=beamline$end;
+!   
+   ptc_trackline, turns=1, onetable=true;!, rootntuple;
+
+  
+   ptc_track_end;
+
+
+
+
+
+ptc_end;
+stop;
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!  SSSSS  TTTTT   OOO   PPP       !
+!  S        T    O   O  P  P      !
+!  SSSSS    T    O   O  PPP       !
+!      S    T    O   O  P         !
+!  SSSSS    T     OOO   P         !
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

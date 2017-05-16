@@ -1,0 +1,74 @@
+!! oblancog First twiss 20161123 
+option,echo,info,warn;
+
+! the beam 
+E0     := 45.000;![GeV]
+npar   := 1.9e10;
+emitx  := 5.73e-9;![m]
+emity  := 5.73e-11;![m] 
+blength:= 3.6e-3;![m]
+bcur   := 240e-3;![A]
+nbunch := 100;
+nparpb := 3.1e11;
+espread:= 1e-3;
+beam, PARTICLE=positron, ENERGY=E0,
+      ex=emitx, ey=emity, et=blength*espread,
+      sigt=blength, sige=espread, kbunch=nbunch,
+      NPART=nparpb, bcurrent=bcur, RADIATE=true;
+
+! The ring 
+call, file = "Pos_45GeV_Ring_8.mad.madx";
+use, sequence=Low_Emit_RING, range=#s/#e;
+SXT_ON := 1;
+
+! The cavity parameters
+RF_ON       := 1;
+RFc->LAG    := 0.5-0.17;
+RFc->FREQ   := 500.117256;
+RFc->HARMON := 10510;
+
+! Beam pipe
+Rpipe = 30e-3;![m]
+AngMax = 1.0; !maximum angle 1[rad]=
+
+! arcs twiss parameters definition (from last match in mad)
+KSF2 :=   1.95*sxt_on;
+KS1A :=  -2.17*sxt_on;
+KS1B :=  -1.56*sxt_on;
+KS1D :=  -1.56*sxt_on;
+KS1E :=  -2.17*sxt_on;
+KOF1 := -38.5;
+KDF1 := 150.0;
+KDD1 :=   0.0;
+KQD9 :=  -3.502004E-01;
+KQF8 :=   2.355622E-01;
+KQD7 :=  -3.659796E-01;
+KQF6 :=   2.317365E-01;
+KQD5 :=  -2.041680E-01;
+KQF4 :=   1.784162E-01;
+KQD3 :=  -2.234357E-01;
+KQD2 :=  -3.917201E-01;
+KQD1 :=  -3.801510E-01;
+KQF2 :=   2.048242E-01;
+KQF1 :=   1.977323E-01;
+
+! NO purpose tracking in MAD-X
+system, "rm -f track*";
+!makethin lenses
+select,flag=makethin,class=sbend,thick=false,slice=4;!
+select,flag=makethin,class=quadrupole,thick=false,slice=2;
+select,flag=makethin,class=sextupole,thick=false,slice=2;
+makethin, sequence=Low_Emit_RING,style=teapot,makedipedge;
+save, sequence=Low_Emit_RING,file="Low_Emit_RING.thin.seq";
+call, file="Low_Emit_RING.thin.seq";
+use, sequence=Low_Emit_RING;
+!set parameters
+track, onepass=true,aperture=true,onetable,recloss,dump;
+start, X=1e-3, PX=1e-3, Y=1e-4, PY=1e-4, T=0, PT=0;
+start, X=1e-3, PX=1e-3, Y=1e-4, PY=1e-4, T=1e-4, PT=0;
+start, X=1e-3, PX=1e-3, Y=1e-4, PY=1e-4, T=0, PT=1e-4;
+start, X=1e-3, PX=1e-3, Y=1e-4, PY=1e-4, T=1e-4, PT=1e-4;
+run,turns=1,maxaper={Rpipe,AngMax,Rpipe,AngMax,0.0,0.0};!run track
+endtrack;
+write, table=trackloss, file="trackloss";!write lost particles
+! End of NO purpose tracking in MAD-X

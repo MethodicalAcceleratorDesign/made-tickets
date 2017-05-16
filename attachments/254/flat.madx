@@ -1,0 +1,183 @@
+
+! Links definitions
+option, warn,info;
+
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
+system,"mkdir -p result"
+
+! Sequence definition
+Option, -echo,warn,-info;
+
+call, file="db5/V6.5.seq";
+
+! Aperture definition
+
+call, file="db5/aperture/aperture.b1.madx";
+call, file="db5/aperture/aperture.b2.madx";
+call, file="db5/aperture/aper_tol.b1.madx";
+call, file="db5/aperture/aper_tol.b2.madx";
+
+
+! Beam definition
+beam, sequence=lhcb1, bv= 1, energy= 450,  particle=proton,
+  npart=2,kbunch=5.00e10, ex=7.29555555556e-09,ey=7.29555555556e-09;
+beam, sequence=lhcb2, bv=-1, energy= 450,  particle=proton,
+  npart=2,kbunch=5.00e10, ex=7.29555555556e-09,ey=7.29555555556e-09;
+
+
+
+! Strength definition
+
+call, file="db5/V6.5.inj_special.str";
+
+! Knowbs definitions
+
+on_x1:=0; on_sep1:=0; on_o1:=0;
+on_x2:=0; on_sep2:=0; on_o2:=0;
+on_x5:=0; on_sep5:=0; on_o5:=0;
+on_x8:=0; on_sep8:=0; on_o8:=0;
+on_alice:=0;
+on_lhcb :=0;
+
+
+!set,format="22.15e";
+select,flag=twiss,clear;
+select,flag=twiss,column=name,s,l,angle,k1l,k2l,k3l,hkick,vkick,kick,betx,bety,alfx,alfy,dx,dpx,dy,dpy,mux,muy,x,y,px,py,wx,wy,phix,phiy,n1,ddx,ddy,ddpx,ddpy;
+
+if ( qxb1 == 0 ) {
+  qxb1=qx1; qxb2=qx2; qyb1=qy1; qyb2=qy2;
+  Qpxb1=qprime; Qpyb1=qprime; Qpxb2=qprime; Qpyb2=qprime;
+};
+
+
+seqedit,sequence=lhcb1;flatten;cycle,start=s.ds.l8.b1;endedit;
+seqedit,sequence=lhcb2;flatten;cycle,start=s.ds.l8.b2;endedit;
+
+NRJ=beam%lhcb1->energy;
+if(NRJ <3499.99)
+  { COmax:=0.004; dPmax=0.00150; VMAXI=30; SPECIF=7; };
+if(NRJ >3499.99)
+  { COmax:=0.003; dPmax=0.00086; VMAXI=30; SPECIF=7;  };
+
+emittance_norm=3.75e-6;
+apbbeat=1.1;
+halor=8.4;
+halox=7.3;
+haloy=7.3;
+DParcx=0.273;
+DParcy=0.273;
+
+value,COmax,dPmax,emittance_norm,apbbeat,halor,halox,haloy,DParcx,DParcy;
+
+! --------------------------------------------------------------------------------
+! Aperture calculations (was exec,mk_apir(4,b2);)
+
+seqedit,sequence=lhcb2;flatten;cycle,start=s.ds.l4.b2;endedit;
+
+use,sequence=lhcb2,range=s.cell.34.b2/e.cell.34.b2;
+savebeta,label=baux,place=s.cell.34.b2;
+twiss;
+
+use,sequence=lhcb2,range=e.cell.34.b2/s.ds.l4.b2;
+savebeta,label=bir4b2,place=s.ds.l4.b2;
+twiss,beta0=baux;
+bir4b2->mux=0;bir4b2->muy=0;
+
+use,sequence=lhcb2,range=s.cell.45.b2/e.cell.45.b2;
+savebeta,label=baux,place=s.cell.45.b2;
+twiss;
+betxaux=baux->betx;betyaux=baux->bety;
+alfxaux=baux->alfx;alfyaux=baux->alfy;
+dxaux=baux->dx;dpxaux=baux->dpx;
+
+use,sequence=lhcb2,range=e.ds.r4.b2/s.cell.45.b2;
+savebeta,label=eir4b2,place=e.ds.r4.b2;
+twiss,rmatrix,betx=1,bety=1;
+r11=table(twiss,s.cell.45.b2,Re11);r12=table(twiss,s.cell.45.b2,Re12);
+r21=table(twiss,s.cell.45.b2,Re21);r22=table(twiss,s.cell.45.b2,Re22);
+r33=table(twiss,s.cell.45.b2,Re33);r34=table(twiss,s.cell.45.b2,Re34);
+r43=table(twiss,s.cell.45.b2,Re43);r44=table(twiss,s.cell.45.b2,Re44);
+r16=table(twiss,s.cell.45.b2,Re16);r26=table(twiss,s.cell.45.b2,Re26);
+eir4b2->betx=r22^2*betxaux+2.*r22*r12*alfxaux+r12^2*(1.+alfxaux^2)/betxaux;
+eir4b2->alfx=r22*r21*betxaux+(r11*r22+r12*r21)*alfxaux+r12*r11*(1.+alfxaux^2)/betxaux;
+eir4b2->bety=r44^2*betyaux+2.*r44*r34*alfyaux+r34^2*(1.+alfyaux^2)/betyaux;
+eir4b2->alfy=r44*r43*betyaux+(r33*r44+r34*r43)*alfyaux+r34*r33*(1.+alfyaux^2)/betyaux;
+eir4b2->dx=r22*(dxaux-r16)-r12*(dpxaux-r26);
+eir4b2->dpx=-r21*(dxaux-r16)+r11*(dpxaux-r26);
+
+use,sequence=lhcb2;
+select,flag=twiss,clear;
+select,flag=twiss,column=name,s,l,angle,k1l,k2l,hkick,vkick,kick,betx,bety,dx,dy,x,y,px,py,apertype,aper_1,aper_2,aper_3,aper_4,rtol,xtol,ytol,
+       range=s.ds.l4.b2/e.ds.r4.b2;
+twiss,file=result/twiss_ir4b2.tfs;
+
+select,flag=aperture,clear;
+select,flag=aperture,column=name,s,betx,bety,dx,dy,x,y,px,py,n1,apertype,Rtol,xtol,ytol,k1l,k1sl,k2l,k2sl,k3l,k3sl;
+aperture,range=s.ds.l4.b2/e.ds.r4.b2,
+!         offsetelem=offsets/offset.IP4.b2.tfs,
+!         offsetelem=offsets/test,
+         cor=COmax, dp=dPmax, spec=SPECIF,interval=1.0,
+         exn=emittance_norm,eyn=emittance_norm,
+         halo={6,halor,halox,haloy},bbeat=apbbeat,
+         dparx=DParcx,dpary=DParcy,
+         file=result/ap_ir4b2.tfs;
+
+
+!--------------------------------------------------------------------------------
+! Aperture calculations (was exec,mk_apir(3,b2);)
+
+seqedit,sequence=lhcb2;flatten;cycle,start=s.ds.l3.b2;endedit;
+
+use,sequence=lhcb2,range=s.cell.23.b2/e.cell.23.b2;
+savebeta,label=baux,place=s.cell.23.b2;
+twiss;
+
+use,sequence=lhcb2,range=e.cell.23.b2/s.ds.l3.b2;
+savebeta,label=bir3b2,place=s.ds.l3.b2;
+twiss,beta0=baux;
+bir3b2->mux=0;bir3b2->muy=0;
+
+use,sequence=lhcb2,range=s.cell.34.b2/e.cell.34.b2;
+savebeta,label=baux,place=s.cell.34.b2;
+twiss;
+betxaux=baux->betx;betyaux=baux->bety;
+alfxaux=baux->alfx;alfyaux=baux->alfy;
+dxaux=baux->dx;dpxaux=baux->dpx;
+
+use,sequence=lhcb2,range=e.ds.r3.b2/s.cell.34.b2;
+savebeta,label=eir3b2,place=e.ds.r3.b2;
+twiss,rmatrix,betx=1,bety=1;
+r11=table(twiss,s.cell.34.b2,Re11);r12=table(twiss,s.cell.34.b2,Re12);
+r21=table(twiss,s.cell.34.b2,Re21);r22=table(twiss,s.cell.34.b2,Re22);
+r33=table(twiss,s.cell.34.b2,Re33);r34=table(twiss,s.cell.34.b2,Re34);
+r43=table(twiss,s.cell.34.b2,Re43);r44=table(twiss,s.cell.34.b2,Re44);
+r16=table(twiss,s.cell.34.b2,Re16);r26=table(twiss,s.cell.34.b2,Re26);
+eir3b2->betx=r22^2*betxaux+2.*r22*r12*alfxaux+r12^2*(1.+alfxaux^2)/betxaux;
+eir3b2->alfx=r22*r21*betxaux+(r11*r22+r12*r21)*alfxaux+r12*r11*(1.+alfxaux^2)/betxaux;
+eir3b2->bety=r44^2*betyaux+2.*r44*r34*alfyaux+r34^2*(1.+alfyaux^2)/betyaux;
+eir3b2->alfy=r44*r43*betyaux+(r33*r44+r34*r43)*alfyaux+r34*r33*(1.+alfyaux^2)/betyaux;
+eir3b2->dx=r22*(dxaux-r16)-r12*(dpxaux-r26);
+eir3b2->dpx=-r21*(dxaux-r16)+r11*(dpxaux-r26);
+
+use,sequence=lhcb2;
+select,flag=twiss,clear;
+select,flag=twiss,column=name,s,l,angle,k1l,k2l,hkick,vkick,kick,betx,bety,dx,dy,x,y,px,py,apertype,aper_1,aper_2,aper_3,aper_4,rtol,xtol,ytol,
+       range=s.ds.l3.b2/e.ds.r3.b2;
+twiss,file=result/twiss_ir3b2.tfs;
+
+select,flag=aperture,clear;
+select,flag=aperture,column=name,s,betx,bety,dx,dy,x,y,px,py,n1,apertype,Rtol,xtol,ytol,k1l,k1sl,k2l,k2sl,k3l,k3sl;
+aperture,range=s.ds.l3.b2/e.ds.r3.b2,
+!          offsetelem=offsets/offset.IP3.b2.tfs,
+          cor=COmax, dp=dPmax, spec=SPECIF,interval=1.0,
+          exn=emittance_norm,eyn=emittance_norm,
+          halo={6,halor,halox,haloy},bbeat=apbbeat,
+          dparx=DParcx,dpary=DParcy,
+          file=result/ap_ir3b2.tfs;
+
+
+
+exit;
+
+
+

@@ -1,0 +1,13 @@
+DUMMY_CAVITY :  RFCAVITY,  L=1, VOLT=10,  HARMON=1;!, no_cavity_totalpath;
+
+SEQ: SEQUENCE, L= 1;
+	DUMMY_CAVITY , AT=0.5;
+ENDSEQUENCE;
+
+beam, particle=PROTON, pc=1;
+use, sequence=SEQ;
+
+ptc_create_universe;
+ptc_create_layout, time=false, model=2, exact=true, method=2, nst=1;
+ptc_script, file="print_flat.ptc";
+ptc_end;

@@ -1,0 +1,94 @@
+
+  +++++++++++++++++++++++++++++++++++++++++++
+  +    MAD-X 5.00.15  (32 bit, Windows)     +
+  +    DEBUG Version - use at own risk!     +
+  + Code Modification Date: 2012.03.28      +
+  + Execution Time Stamp: 04.04.12 10.44.28 +
+  +++++++++++++++++++++++++++++++++++++++++++
+X: ==>
+TITLE,'PETRA III-Extension Lattice with 20 DWs as on 30.03.2012';
+
+X: ==>
+set,format="14s","10d","22.12g";
+
+X: ==>
+;
+
+X: ==>
+OPTION, WARN, -INFO, -ECHO;
+
+X: ==>
+**** INFO **** Loading PETRA III Optics with Magnet effective lengths.
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+X: ==>
+;
+
+X: ==>
+BEAM, PARTICLE=POSITRON, ENERGY=6.0, kbunch=40, bcurrent=0.1/40,bunched, RADIATE, sequence=RING;
+
+X: ==>
+USE, period=RING;
+
+X: ==>
+;
+
+X: ==>
+!**************************************************************************************************
+
+select,flag=TWISS,clear;
+
+X: ==>
+select,flag=TWISS,column=name,s,x,y,betx,bety,mux,muy,dx,dy,k1l,k2l,l,angle,px,py,dpx,dpy,alfx,alfy,hkick,vkick,e1,e2,parent;
+
+X: ==>
+!select,flag=TWISS,column=name,s,betx,bety,mux,muy,l;
+
+TWISS,deltap=0.0,file='twiss.out',sequence=RING;
+
+enter Twiss module
+  
+iteration:   1 error:   2.495814E-04 deltap:   0.000000E+00
+orbit:  -1.229570E-06  6.712056E-08  1.089238E-22  3.836213E-24  6.012095E-03  6.459458E-05
+  
+iteration:   2 error:   1.708458E-07 deltap:   0.000000E+00
+orbit:  -1.310429E-06  7.712839E-08 -5.821873E-21  2.596640E-22  6.017066E-03  6.461585E-05
+ ++++++ warning: TWCPGO: 
+ TWISS uses the RF system or synchrotron radiation only to find the closed orbit
+ , for optical calculations it ignores both.        
+
+++++++ table: summ
+
+                length                 orbit5                   alfa                gammatr 
+         2303.95249302         -0.00601706575       0.00111429996377          29.9570429311 
+
+                    q1                    dq1                betxmax                  dxmax 
+         37.2099428973         0.885166352521          44.0588736493          0.83141785592 
+
+                 dxrms                 xcomax                 xcorms                     q2 
+        0.356115922667       0.00010294872819     2.72769395649e-005          30.3711349563 
+
+                   dq2                betymax                  dymax                  dyrms 
+         1.29192638197          42.9887659637     8.39458097755e-019     2.55638085392e-019 
+
+                ycomax                 ycorms                 deltap                synch_1 
+    1.12069937343e-020     4.59520667252e-021                      0                      0 
+
+               synch_2                synch_3                synch_4                synch_5 
+                     0                      0                      0                      0 
+X: ==>
+plot,table=twiss,haxis=s,vaxis=betx,bety, style=100,colour=100;
+
+
+ specify bounding box size (default: 27(x) by 19(y) cm)?
+ (<CR>=no):
+
+  Error on Input, stop.

@@ -1,0 +1,164 @@
+!TME
+
+!Constants
+phi:=2*RADDEG;
+Ldipole:=2.5;
+
+!PARAMETERS
+betx0 =            3.431604904144104 ;
+alfx0 =        1.498600382198349e-15 ;
+bety0 =            0.417071382971861 ;
+alfy0 =        1.001662577103089e-15 ;
+disx0 =          0.02597503545755087 ;
+dispx0 =       -2.818925648462312e-18 ;
+vd1 =             0.36032590205233 ;
+vd2 =            0.415360096159887 ;
+vd3 =             1.13679782858245 ;
+vd4 =             0.78411739039101 ;
+vd5 =            0.804546176433817 ;
+vd6 =            0.415640140610329 ;
+vd7 =             1.10405943283901 ;
+vds1 =            0.415640140610329 ;
+vds2 =            0.326437757201018 ;
+kq1 =           -0.428836234890593 ;
+kq2 =             2.21491910127624 ;
+kq3 =            -2.01718370502435 ;
+kq4 =            0.284553435255189 ;
+kq5 =           0.0523894121056854 ;
+kq6 =            -2.24997031585451 ;
+vd1r =             0.36032590205233 ;
+vd2r =            0.415360096159887 ;
+vd3r =             1.13679782858245 ;
+vd4r =             0.78411739039101 ;
+vd5r =            0.804546176433817 ;
+vd6r =            0.415640140610329 ;
+kq1r =           -0.326966947252935 ;
+kq2r =            2.150189604978663 ;
+kq3r =           -2.118696636477584 ;
+kq4r =           0.4931784873757608 ;
+kq5r =           0.2105661570332148 ;
+phir =          0.02468648290668517 ;
+
+
+!QUADRUPOLES
+Q1     : QUADRUPOLE, L=0.4, K1:=KQ1;
+Q2     : QUADRUPOLE, L=0.4, K1:=KQ2;
+Q3     : QUADRUPOLE, L=0.4, K1:=KQ3;
+Q4     : QUADRUPOLE, L=0.4, K1:=KQ4;
+Q5     : QUADRUPOLE, L=0.4, K1:=KQ5;
+Q6     : QUADRUPOLE, L=0.4, K1:=KQ6;
+
+Q1r	 : QUADRUPOLE, L=0.4, K1:=KQ1r;
+Q2r	 : QUADRUPOLE, L=0.4, K1:=KQ2r;
+Q3r	 : QUADRUPOLE, L=0.4, K1:=KQ3r;
+Q4r	 : QUADRUPOLE, L=0.4, K1:=KQ4r;
+Q5r	 : QUADRUPOLE, L=0.4, K1:=KQ5r;
+
+!SEXTUPOLES
+SSX1	  : SEXTUPOLE, L=0.2, K2:=KSX1;
+SSX2	  : SEXTUPOLE, L=0.2, K2:=KSX2;
+SSX3	  : SEXTUPOLE, L=0.2, K2:=KSX3;
+SSX4	  : SEXTUPOLE, L=0.2, K2:=KSX4;
+SSX5	  : SEXTUPOLE, L=0.2, K2:=KSX5;
+SSX6	  : SEXTUPOLE, L=0.2, K2:=KSX6;
+SSX7	  : SEXTUPOLE, L=0.2, K2:=KSX7;
+SSX8	  : SEXTUPOLE, L=0.2, K2:=KSX8;
+
+SSY1	  : SEXTUPOLE, L=0.2, K2:=KSY1;
+SSY2	  : SEXTUPOLE, L=0.2, K2:=KSY2;
+SSY3	  : SEXTUPOLE, L=0.2, K2:=KSY3;
+SSY4	  : SEXTUPOLE, L=0.2, K2:=KSY4;
+SSY5	  : SEXTUPOLE, L=0.2, K2:=KSY5;
+SSY6	  : SEXTUPOLE, L=0.2, K2:=KSY6;
+SSY7	  : SEXTUPOLE, L=0.2, K2:=KSY7;
+SSY8	  : SEXTUPOLE, L=0.2, K2:=KSY8;
+
+SX1r	  : SEXTUPOLE, L=0.2, K2:=KSX1r;
+SX2r	  : SEXTUPOLE, L=0.2, K2:=KSX2r;
+SY1r	  : SEXTUPOLE, L=0.2, K2:=KSY1r;
+SY2r	  : SEXTUPOLE, L=0.2, K2:=KSY2r;
+
+KSX2:=KSX1;
+KSY2:=KSY1;
+
+KSX2r:=KSX1r;
+KSY2r:=KSY1r;
+
+!MARKERS
+MM     :MARKER;
+M1     :MARKER;
+M2     :MARKER;
+MMr    :MARKER;
+M1r    :MARKER;
+M2r    :MARKER;
+
+!BENDS
+B1  : SBEND, L:=Ldipole/2, ANGLE:=phi/2;
+B1r : SBEND, L:=Ldipole/2, ANGLE:=phir/2;
+
+!RF CAVITY
+RFC: RFCAVITY, L=0e-10,VOLT=100,LAG=0.5,HARMON=1;
+
+!**************************************************************
+
+cell_length:=2*(B1->L+VD1+Q1->L+VD2+Q2->L+VD3+Q3->L+VD4+Q4->L+VD5+Q5->L+VD6);
+
+half_cell_seq: sequence,refer=centre, l:= cell_length/2;
+MM,       at := 0;
+B1,  at := B1->L/2             , from=MM;
+Q1,  at := B1->L/2+VD1+Q1->L/2 , from=B1;
+Q2,  at := Q1->L/2+VD2+Q2->L/2 , from=Q1;
+Q3,  at := Q2->L/2+VD3+Q3->L/2 , from=Q2;
+Q4,  at := Q3->L/2+VD4+Q4->L/2 , from=Q3;
+Q5,  at := Q4->L/2+VD5+Q5->L/2 , from=Q4;
+M2,       at := Q5->L/2+VD6        , from=Q5;
+endsequence;
+
+cell_seq: sequence,refer=centre, l:= cell_length;
+M1,       at := 0;
+Q5,  at := VD6+Q5->L/2        , from=M1;
+Q4,  at := Q5->L/2+VD5+Q4->L/2 , from=Q5;
+Q3,  at := Q4->L/2+VD4+Q3->L/2 , from=Q4;
+Q2,  at := Q3->L/2+VD3+Q2->L/2 , from=Q3;
+Q1,  at := Q2->L/2+VD2+Q1->L/2 , from=Q2;
+B1,  at := Q1->L/2+VD1+B1->L/2 , from=Q1;
+MM,   at := B1->L/2             , from=B1;
+B1,  at := B1->L/2             , from=MM;
+Q1,  at := B1->L/2+VD1+Q1->L/2 , from=B1[2];
+Q2,  at := Q1->L/2+VD2+Q2->L/2 , from=Q1[2];
+Q3,  at := Q2->L/2+VD3+Q3->L/2 , from=Q2[2];
+Q4,  at := Q3->L/2+VD4+Q4->L/2 , from=Q3[2];
+Q5,  at := Q4->L/2+VD5+Q5->L/2 , from=Q4[2];
+M2,       at := Q5->L/2+VD6        , from=Q5[2];
+endsequence;
+
+ds_cell_length:=2*(B1r->L+VD1r+Q1r->L+VD2r+Q2r->L+VD3r+Q3r->L+VD4r+Q4r->L+VD5r+Q5r->L+VD6r);
+
+ds_cell_seq: sequence,refer=centre, l:= cell_length;
+M1r,        at := 0;
+Q5r,  at := VD6r+Q5r->L/2          , from=M1r;
+Q4r,  at := Q5r->L/2+VD5r+Q4r->L/2 , from=Q5r;
+Q3r,  at := Q4r->L/2+VD4r+Q3r->L/2 , from=Q4r;
+Q2r,  at := Q3r->L/2+VD3r+Q2r->L/2 , from=Q3r;
+Q1r,  at := Q2r->L/2+VD2r+Q1r->L/2 , from=Q2r;
+B1r,  at := Q1r->L/2+VD1r+B1r->L/2 , from=Q1r;
+MMr,   at := B1r->L/2               , from=B1r;
+B1r,  at := B1r->L/2               , from=MMr;
+Q1r,  at := B1r->L/2+VD1r+Q1r->L/2 , from=B1r[2];
+Q2r,  at := Q1r->L/2+VD2r+Q2r->L/2 , from=Q1r[2];
+Q3r,  at := Q2r->L/2+VD3r+Q3r->L/2 , from=Q2r[2];
+Q4r,  at := Q3r->L/2+VD4r+Q4r->L/2 , from=Q3r[2];
+Q5r,  at := Q4r->L/2+VD5r+Q5r->L/2 , from=Q4r[2];
+M2r,        at := Q5r->L/2+VD6r          , from=Q5r[2];
+endsequence;
+
+super_cell_seq: sequence,refer=centre, l:= 5*cell_length+ds_cell_length;
+cell_seq,    at :=0*cell_length;
+cell_seq,    at :=1*cell_length;
+cell_seq,    at :=2*cell_length;
+cell_seq,    at :=3*cell_length;
+cell_seq,    at :=4*cell_length;
+ds_cell_seq, at :=5*cell_length;
+endsequence;
+
+RETURN;

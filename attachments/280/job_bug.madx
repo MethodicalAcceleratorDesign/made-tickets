@@ -1,0 +1,15 @@
+option, warn,info;
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/HLLHCV1.0 slhc";
+system,"ln -fns /afs/cern.ch/eng/lhc/optics/V6.503 db5";
+option,-echo,-info,-warn;
+
+call,file="slhc/toolkit/macro.madx";
+
+call,file="slhc/hllhc_thin.seq";
+exec,mk_beam(7000);
+
+call,file="slhc/opt_round_thin.madx";
+exec,crossing_disable;
+seqedit,sequence=lhcb1; cycle,start=IP3; endedit;
+
+while( 1==1) { exec,cellphase(3,4,34,b1);};

@@ -1,0 +1,116 @@
+!--------1---------2---------3---------4---------5---------6---------7---------8
+!-- This job should be run with MadX
+!   Derived from jun24n.txt in 2011
+setplot,ascale=1,lscale=1.5,sscale=3,rscale=1.5,xsize=28,ysize=20,
+        post=1,font=-4,lwidth=5;
+setplot,ascale=2,lscale=2,sscale=1.5,rscale=2,xsize=28,ysize=20,
+        post=2,font=-4,lwidth=10;
+
+!-- Define triplet lattice for gantry
+option,rbarc=false;
+BF: RBEND, L=0.5, ANGLE:=FANG, K1:=FK1;
+BD: RBEND, L=0.5, ANGLE:=DANG, K1:=DK1;
+RF: RBEND, L=0.5, ANGLE:=-FANG, K1:=FK1;
+RD: RBEND, L=0.5, ANGLE:=-DANG, K1:=DK1;
+D1: DRIFT, L=0.06;
+COL: ECOLLIMATOR, XSIZE=0.1, YSIZE=0.1;
+MARK: MARKER;
+QF: QUADRUPOLE, L=0.100000037761, K1:=QFK1;
+QD: QUADRUPOLE, L=0.102870968475, K1:=QDK1;
+D1I: DRIFT, L=0.05;
+D3I: DRIFT, L=0.050009708435;
+D4I: DRIFT, L=0.0;
+MID: MARKER;
+D3: DRIFT, L=4.963444;
+CELL: LINE=(bf,d1,bd,d1);
+RCELL: LINE=(rf,d1,rd,d1);
+INS: LINE=(D3I,QF,D1I,QD);
+!GANTRY: LINE=(DTRI,D2,DCELL,D2,-DTRI,8*CELL,MID,QTRI,D2,QCELL,D2,-QTRI,18*RCELL,RDTRI,D2,RDCELL,D2,RDTRI);
+GANTRY: LINE=(4*CELL,8*RCELL);
+INS2: LINE=(INS,-INS);
+PERIODL := 0.92;
+PERIODN := 16.0;
+FANG := PI/(PERIODN);
+DANG := FANG;
+FK1 := 3;
+DK1 := -3;
+QX := 0.190184157474;
+QY := 0.096976707038;
+QS := 0.0;
+QX' := -0.163247945453;
+QY' := -0.18393605486;
+ALFX := 0.0;
+ALFY := 0.193989082742E-15;
+BETX := 0.734826363803;
+BETY := 0.734826363798;
+X0 := 0.0;
+PX0 := 0.0;
+Y0 := 0.0;
+PY0 := 0.0;
+T0 := 0.0;
+PT0 := 0.0;
+QFK1 := 26.948730866925;
+QDK1 := -21.917714109902;
+BETA := 0.734826363802;
+title,"FODO lattice for gantry - jun24q";
+beam,ex=3.6692e-6,ey=3.6692e-6,sige=0.03;
+
+!-- Check geometry
+ring: line=(24*cell);
+use,period=ring;
+survey,file="jun24q.ring.srv.lis";
+use,period=gantry;
+survey,table,file="jun24q.gantry.srv.lis";
+plot,table=survey,file="jun24q",haxis=z,vaxis=x,interpolate,noversion;
+
+!-- Match CELL
+use,period=cell;
+match,sequence=cell; 
+vary,name=fk1,step=0.001,lower=0,upper=100;
+vary,name=dk1,step=0.001,lower=-100,upper=0;
+constraint,range=#e,mux=0.25,muy=0.25;
+lmdif,calls=100,tolerance=1e-20; 
+endmatch; 
+
+!-- Analyse matching result
+select,flag=twiss,column=name,s,betx,alfx,mux,dx,dpx,x,px, 
+bety,alfy,muy,dy,dpy,y,py,t,pt,alfa; 
+system,"erase jun24q_cell.lis"; 
+savebeta,label=atc,place=#s,sequence=cell;
+twiss,rmatrix,table,file="jun24q.lis"; 
+title," "; 
+plot,file="jun24q",haxis=s,vaxis1=betx,bety,vaxis2=dx,colour=100,interpolate, 
+noversion,notitle;
+
+!-- Match INS
+use,period=ins;
+bet:=1;
+alf:=-2;
+value,bet,atc->betx;
+system,"erase twiss.lis";
+match,betx=bet,bety=bet,alfx=alf,alfy=-alf;
+vary,name=qfk1,step=0.1;
+vary,name=qdk1,step=0.1;
+vary,name=bet,step=0.1,lower=0;
+vary,name=alf,step=0.1,lower=-10,upper=10;
+!vary,name=d1i->l,step=0.01,lower=0.02;
+!vary,name=d3i->l,step=0.01,lower=0.02;
+!vary,name=qf->l,step=0.01,lower=0.1;
+!vary,name=qd->l,step=0.01,lower=0.1;
+constraint,sequence=ins,range=#e,betx=atc->betx,bety=atc->bety,alfx=atc->alfx,alfy=atc->alfy;
+jacobian,calls=10000,tolerance=1e-20;
+endmatch;
+twiss,rmatrix,table,betx=bet,bety=bet,alfx=alf,alfy=-alf,file="twiss.lis";
+system,"copy /y jun24q.lis+twiss.lis jun24q.lis";
+plot,filename="jun24q",haxis=s,vaxis=betx,bety,colour=100,interpolate,
+noversion,notitle;
+
+!-- Check INS2
+use,period=ins2;
+system,"erase twiss.lis";
+twiss,table,rmatrix,file="twiss.lis";
+plot,filename="jun24q",haxis=s,vaxis=betx,bety,colour=100,interpolate,
+noversion,notitle;
+system,"copy /y jun24q.lis+twiss.lis jun24q.lis";
+
+stop;

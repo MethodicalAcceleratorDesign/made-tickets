@@ -1,0 +1,12 @@
+@ NAME             %14s "NORMAL_RESULTS"
+@ TYPE             %10s "NORMAL_RES"
+@ TITLE            %20s "OPT_EXTR 10:54:37 AM"
+@ ORIGIN           %19s "MAD-X 5.00.00 Win32"
+@ DATE             %08s "11/12/12"
+@ TIME             %08s "15.11.11"
+* NAME                   ORDER1     ORDER2     ORDER3     ORDER4              VALUE 
+$ %s                         %d         %d         %d         %d                %le 
+ "Q1"                         1          0          0          0                  0
+ "Q2"                         1          0          0          0        0.666600245
+ "DQ1"                        1          0          0          0        19.21335601
+ "DQ2"                        1          0          0          0        -3.69740385

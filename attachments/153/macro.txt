@@ -1,0 +1,5 @@
+FILE QUARANTINED
+
+Microsoft Forefront Security has identified that the attachment called "macro.ins" is potentially dangerous and has been replaced by this message. (reference CERNMX30:macro.ins)
+For more information see: [http://cern.ch/mmmservices/Help/?kBID=171010]
+The CERN Antivirus Service

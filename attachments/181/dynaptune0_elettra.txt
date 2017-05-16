@@ -1,0 +1,9 @@
+@ NAME             %09s "DYNAPTUNE"
+@ TYPE             %09s "DYNAPTUNE"
+@ TITLE            %01s "s"
+@ ORIGIN           %19s "MAD-X 3.04.46 Win32"
+@ DATE             %08s "17/10/12"
+@ TIME             %08s "14.25.46"
+*                  X                  Y               TUNX               TUNY              DTUNE 
+$                %le                %le                %le                %le                %le 
+             0.0001            -0.0001      0.01041523661       0.1943679234   9.507743656e-005

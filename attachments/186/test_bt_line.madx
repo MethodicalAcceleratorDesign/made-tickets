@@ -1,0 +1,475 @@
+/***********************************************************
+ * test_bt_line.madx
+ *
+ * Call this program by: >madx < test_bt_line.madx
+ *
+ * This program illustrates that the same optical functions
+ * can be obtained in two cases
+ *
+ ***********************************************************/
+
+
+
+/**********************************************************************************************************************
+ **********************************************************************************************************************
+ * CALCULATE for B_QB_B
+ **********************************************************************************************************************
+ **********************************************************************************************************************/
+
+
+/***********************************************************
+ * Element definitions for standard calculation
+ ***********************************************************/
+ !option, RBARC=FALSE;  ! the length of a rectangular magnet
+                        ! is the distance between the polefaces
+                        ! and not the arc length
+ anglebend=0.2;
+
+ kicker1  : RBEND,     L=1, ANGLE= anglebend;
+ quadbend : RBEND,     L=1, ANGLE=-anglebend*2, K1=0.1;
+ quad     : quadrupole,   L=1, K1=0.1;
+ kicker2  : RBEND,     L=1, ANGLE= anglebend;
+
+
+/***********************************************************
+ * sequence definition: seqa
+ ***********************************************************/
+ seqa   : SEQUENCE   , L  =  6.0;
+ kicker1             , at =  1.0;
+ quadbend            , at =  3.0;
+ kicker2             , at =  5.0;
+ ENDSEQUENCE;
+
+
+/***********************************************************
+ * Initial parameters
+ ***********************************************************/
+BETX00  :=  1.0;
+ALFX00  :=  0.0;
+MUX00   :=  0.0;
+BETY00  :=  1.0;
+ALFY00  :=  0.0;
+MUY00   :=  0.0;
+X00     :=  0.0;
+PX00    :=  0.0;
+Y00     :=  0.0;
+PY00    :=  0.0;
+T00     :=  0.0;
+PT00    :=  0.0;
+DX00    :=  0.0;
+DPX00   :=  0.0;
+DY00    :=  0.0;
+DPY00   :=  0.0;
+
+
+/***********************************************************
+ * Store initial parameters in memory block
+ ***********************************************************/
+INITBETA0: BETA0,
+  BETX=BETX00,
+  ALFX=ALFX00,
+  MUX=MUX00,
+  BETY=BETY00,
+  ALFY=ALFY00,
+  MUY=MUY00,
+  X=X00,
+  PX=PX00,
+  Y=Y00,
+  PY=PY00,
+  T=T00,
+  PT=PT00,
+  DX=DX00,
+  DPX=DPX00,
+  DY=DY00,
+  DPY=DPY00;
+
+
+
+
+/***********************************************************
+ * beam and use
+ ***********************************************************/
+beta = 0.99999999999;
+!beta   = 0.99999987; ! the requested relativistic beta
+!beta = 0.999999999999;
+m0     = 0.000510998902; ! positron mass in GeV. Positrons are the default particles
+energy = m0 / sqrt(1-beta*beta);
+beam, energy=energy, particle=positron;
+use, sequence=seqa;
+
+
+/***********************************************************
+ * DELTAP
+ ***********************************************************/
+PSHIFT=0.0;
+
+
+/***********************************************************
+ * output format
+ ***********************************************************/
+set,  format="12.8f"; ! format twiss output file
+
+
+
+
+/***********************************************************
+ ***********************************************************
+ * CALCULATE for standard
+ ***********************************************************
+ ***********************************************************/
+
+b=beam->beta;
+value, beam->beta,b;
+value, 1/b - sqrt((1+PSHIFT)*(1+PSHIFT)+(1-b*b)/(b*b));
+
+
+title,"Bend - comb fun bend";
+
+select, flag=twiss,clear;
+select, flag=twiss,column=name, s, l, x, px, alfa11, alfa22, beta11, beta22, disp1, disp2;
+
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=5,time=true,exact;
+
+ptc_printframes, file="b_qb_b.C",format=rootmacro;
+
+ptc_twiss, table=twiss, icase=5, no=2, BETA0=INITBETA0
+         , DELTAP = PSHIFT
+         , file=optics_B_QB_B_PTC.out;
+!ptc_normal,no=3,icase=5,maptable; ! no = number of orders, inside the fort.18 table
+
+ptc_end;
+
+plot, noversion=true, colour=100, haxis=s, vaxis=beta11, beta22;
+plot, noversion=true, colour=100, haxis=s, vaxis=disp1, disp2;
+plot, noversion=true, colour=100, haxis=s, vaxis=x,px;
+
+/***********************************************************
+ ***********************************************************
+ * TWISS for BT_LINE
+ ***********************************************************
+ ***********************************************************/
+
+ use, sequence=seqa;
+
+ b=beam->beta;
+ value, beam->beta,b;
+ value, 1/b - sqrt((1+PSHIFT)*(1+PSHIFT)+(1-b*b)/(b*b));
+
+ select, flag=twiss, clear;
+ select, flag=twiss,column=name, s, l, x, px, alfx, alfy, betx, bety, dx, dpx;
+
+ twiss , BETA0=INITBETA0
+       , DELTAP = PSHIFT
+       , file=optics_B_QB_B_MADX.out;
+
+
+/***********************************************************
+ ***********************************************************
+ * survey
+ ***********************************************************
+ ***********************************************************/
+ a1=0;
+ sura : macro={
+        use, sequence=seqa;
+        select, flag=survey,clear;
+        select, flag=survey, column=name,s,l,z,x,y;
+        survey, z0=0, x0=0, y0=0
+              , theta0:=a1
+              , file="survey_b_qb_b.sur";
+              }
+ exec, sura; ! NB: The result of the survey is in the file: "survey_b_qb_b.sur"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**********************************************************************************************************************
+ **********************************************************************************************************************
+ * CALCULATE for BE_QO_BE
+ **********************************************************************************************************************
+ **********************************************************************************************************************/
+
+
+/***********************************************************
+ * Element definitions
+ ***********************************************************/
+ kickere1  : RBEND,     L=1, ANGLE=0;
+ quado     : QUAD,      L=1,  K1=0.1;
+ kickere2  : RBEND,     L=1, ANGLE=0;
+
+
+/***********************************************************
+ * sequence definition:  seqb (like bt line)
+ ***********************************************************/
+ seqb   : SEQUENCE   , L  =  6.0;
+ kickere1            , at =  1.0;
+ quado               , at =  3.0;
+ kickere2            , at =  5.0;
+ ENDSEQUENCE;
+
+
+
+/***********************************************************
+ * Initial parameters
+ ***********************************************************/
+
+ BETX00  :=  1.0;
+ ALFX00  :=  0.0;
+ MUX00   :=  0.0;
+ BETY00  :=  1.0;
+ ALFY00  :=  0.0;
+ MUY00   :=  0.0;
+ X00     :=  0.2;
+ PX00    :=  0.0;
+ Y00     :=  0.0;
+ PY00    :=  0.0;
+ T00     :=  0.0;
+ PT00    :=  0.0;
+ DX00    :=  0.0;
+ DPX00   :=  0.0;
+ DY00    :=  0.0;
+ DPY00   :=  0.0;
+
+
+
+/***********************************************************
+ * Store initial parameters in memory block
+ ***********************************************************/
+
+INITBETA0: BETA0,
+  BETX=BETX00,
+  ALFX=ALFX00,
+  MUX=MUX00,
+  BETY=BETY00,
+  ALFY=ALFY00,
+  MUY=MUY00,
+  X=X00,
+  PX=PX00,
+  Y=Y00,
+  PY=PY00,
+  T=T00,
+  PT=PT00,
+  DX=DX00,
+  DPX=DPX00,
+  DY=DY00,
+  DPY=DPY00;
+
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+/***********************************************************
+ * beam and use
+ ***********************************************************/
+beta = 0.99999999999;
+!beta   = 0.99999987; ! the requested relativistic beta
+!beta = 0.999999999999;
+m0     = 0.000510998902; ! positron mass in GeV. Positrons are the default particles
+energy = m0 / sqrt(1-beta*beta);
+beam, energy=energy, particle=positron;
+use, sequence=seqb;
+
+
+
+/***********************************************************
+ * DELTAP
+ ***********************************************************/
+PSHIFT=0.0;
+
+
+/***********************************************************
+ * output format
+ ***********************************************************/
+set,  format="12.8f"; ! format twiss output file
+
+
+
+
+/***********************************************************
+ ***********************************************************
+ * PTC for BT_LINE
+ ***********************************************************
+ ***********************************************************/
+
+ DXoffset := 3.86106867+0.01;
+ calculatetwiss : macro={
+
+/***********************************************************
+ * EFCOMP. Make field error for dipole
+ * EALIGN. Make offset error for quadrupole
+ ***********************************************************/
+SELECT, FLAG=ERROR,RANGE=kickere1;
+EFCOMP, DKN={anglebend};
+SELECT, FLAG=ERROR, CLEAR; !Clear kicker1
+
+SELECT, FLAG=ERROR,RANGE=kickere2;
+EFCOMP, DKN={anglebend};
+SELECT, FLAG=ERROR, CLEAR; !Clear kicker2
+
+SELECT, FLAG=ERROR, RANGE=quado;
+EALIGN, DX= DXoffset;
+SELECT, FLAG=ERROR, CLEAR; !Clear quad
+
+EPRINT;
+
+
+/***********************************************************
+ * PTC
+ ***********************************************************/
+b=beam->beta;
+value, beam->beta,b;
+value, 1/b - sqrt((1+PSHIFT)*(1+PSHIFT)+(1-b*b)/(b*b));
+
+title,"B w/bfield err - Q w/pos error";
+
+select, flag=twiss,clear;
+select, flag=twiss,column=name, s, l, x, px, alfa11, alfa22, beta11, beta22, disp1, disp2;
+
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=5,time=true,exact;
+ptc_align;
+
+ptc_printframes, file="be_qo_be.C",format=rootmacro;
+
+ptc_twiss, table=twiss, icase=5, no=2, BETA0=INITBETA0
+         , DELTAP = PSHIFT
+         , file=optics_BE_QO_BE_PTC.out;
+
+ptc_end;
+ }; // End of macro
+
+ exec, calculatetwiss;  ! The macro must be run before matching
+
+
+/***********************************************************
+ * MATCH
+ ***********************************************************/
+ match,use_macro;
+ use_macro,name=calculatetwiss;
+
+ constraint, range="KICKERE2", X  =0.2;
+
+ vary, name=DXoffset,  step=1e-0; ! Only "simplex" is concerned with step
+
+ jacobian, calls= 10, tolerance=1.0E-12, bisec=9;
+!simplex, calls=400, tolerance=1e-12;
+!lmdif, tolerance=1e-12, calls=40000;
+ endmatch;
+
+ /***********************************************************/
+
+exec, calculatetwiss;
+value, DXoffset;
+
+
+/***********************************************************
+ * plot
+ ***********************************************************/
+plot, noversion=true, colour=100, haxis=s, vaxis=beta11, beta22;
+plot, noversion=true, colour=100, haxis=s, vaxis=disp1, disp2;
+plot, noversion=true, colour=100, haxis=s, vaxis=x,px;
+
+
+/***********************************************************
+ ***********************************************************
+ * survey
+ ***********************************************************
+ ***********************************************************/
+ a1=0;
+ surb : macro={
+        use, sequence=seqb;
+        select, flag=survey,clear;
+        select, flag=survey, column=name,s,l,z,x,y;
+        survey, z0=0, x0=0, y0=0
+              , theta0:=a1
+              , file="survey_be_qo_be.sur";
+              }
+ exec, surb; ! NB: The result of the survey is in the file: "survey_be_qo_be.sur"
+
+
+
+
+
+
+
+
+
+
+
+
+/**********************************************************************************************************************
+ **********************************************************************************************************************
+ * CALCULATE for BE_QO_BE
+ **********************************************************************************************************************
+ **********************************************************************************************************************/
+title,"KCK -  Q displaced  - KCK";
+
+
+/***********************************************************
+ * Element definitions
+ ***********************************************************/
+ kck1  : kicker,    L=1,  hkick=-anglebend;
+ kck2  : kicker,    L=1, hkick=-anglebend;
+
+
+/***********************************************************
+ * sequence definition:  seqc
+ ***********************************************************/
+ seqc   : SEQUENCE   , L  =  6.0;
+ kck1            , at =  1.0;
+ quado               , at =  3.0;
+ kck2            , at =  5.0;
+ ENDSEQUENCE;
+
+use, sequence=seqc;
+
+select, flag=twiss,clear;
+select, flag=twiss,column=name, s, l, x, px, alfa11, alfa22, beta11, beta22, disp1, disp2;
+
+ptc_create_universe;
+ptc_create_layout,model=2,method=6,nst=5,time=true,exact;
+
+ptc_eplacement, range=quado, x=DXoffset, y=0, z=0, onlyposition, refframe=current, autoplacedownstream=false;
+ptc_printframes, file="kck_qo_kck.C",format=rootmacro;
+
+ptc_twiss, table=twiss, icase=5, no=2, BETA0=INITBETA0
+         , DELTAP = PSHIFT
+         , file=optics_kck_QO_kck_PTC.out;
+
+ptc_end;
+
+plot, noversion=true, colour=100, haxis=s, vaxis=beta11, beta22;
+plot, noversion=true, colour=100, haxis=s, vaxis=disp1, disp2;
+plot, noversion=true, colour=100, haxis=s, vaxis=x,px;
+
+
+/***********************************************************
+ ***********************************************************
+ * survey
+ ***********************************************************
+ ***********************************************************/
+ a1=0;
+ surc : macro={
+        use, sequence=seqc;
+        select, flag=survey,clear;
+        select, flag=survey, column=name,s,l,z,x,y;
+        survey, z0=0, x0=0, y0=0
+              , theta0:=a1
+              , file="survey_kck_qo_kck.sur";
+              }
+ exec, surc; ! NB: The result of the survey is in the file: "survey_kck_qo_kck.sur"
+
+
+stop;
+

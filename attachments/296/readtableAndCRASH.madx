@@ -1,0 +1,49 @@
+
+
+beam,particle=ion_proton,bunched=true,radiate=false,mass:= 9.3828131999999997e-01,charge:= 1.0000000000000000e+00,energy:= 4.9382813199999998e+00,pc:= 4.8483245105912616e+00,gamma:= 5.2631137535595398e+00,brho:= 1.6172269786023975e+01,ex:=
+ 3.2499999999999998e-06,exn:= 6.7174116434169656e-05,ey:= 9.9999999999999995e-07,eyn:= 2.0668958902821434e-05,et:= 1.0000000000000000e+00,sigt:= 0.0000000000000000e+00,sige:= 0.0000000000000000e+00,kbunch:= 1.0000000000000000e+00,npart:=
+ 3.3580990262598681e+14,bcurrent:= 1.4614078442245207e+01,freq0:= 2.7162363714449911e-01,circ:= 1.0835999999999999e+03,dtbyds:= 0.0000000000000000e+00,deltap:= 0.0000000000000000e+00,beta:= 9.8178378193149629e-01,alfa:= 3.6100605536288008e
+-02,u0:= 0.0000000000000000e+00,qs:= 0.0000000000000000e+00,arad:= 1.5346831002076388e-18,bv:= 1.0000000000000000e+00,pdamp:={1 ,1 ,2 },n1min:= -1.0000000000000000e+00;
+
+CALL FILE=spch.seqx;
+
+USE, PERIOD= ring;
+
+
+emix=1e-6;
+dpp=1e-3;
+bsizeDX := bb_disp*dpp;
+bsizeDX2 := bsizeDX*bsizeDX;
+
+bbsigmax := sqrt(emix*bb_betax + bsizeDX2);
+
+
+readmytable, table=bbtwiss, file="SIS100.bb.twiss";
+
+i_elem = 0;
+n_elem = table(bbtwiss, tablelength);
+value, n_elem;
+
+option, -info;
+
+calcul(elem_name) : macro = {
+     bb_betax  = table(bbtwiss,  elem_name, beta11);
+     bb_disp = table(bbtwiss,  elem_name, disp1);
+     
+     print, text="======================";
+     value, bb_betax, bb_disp;
+     
+     elem_name: beambeam, sigx = bbsigmax;
+ }
+ 
+one_elem(j_elem) : macro = {
+     
+     exec,  calcul(tabstring(bbtwiss, name, j_elem));     
+ }
+
+
+while (i_elem < n_elem) { i_elem = i_elem + 1; exec,  one_elem($i_elem); }
+
+
+twiss;
+

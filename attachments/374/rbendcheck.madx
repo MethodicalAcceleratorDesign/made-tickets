@@ -1,0 +1,136 @@
+alpha:=(pi/4);
+
+critical_dp = (sin(alpha/2)-1)/(sin(alpha/2)+1);
+
+value, critical_dp;
+
+L:=2; 
+!dp = -0.509279; closest approach
+
+dp = -0.4;
+
+R0:= (L/2)/sin(alpha/2);
+
+value, R0;
+
+r:=R0*(1+dp);
+
+value, r;
+
+y0_ := (L/2)/tan(alpha/2);
+x0 = 0;
+!stick to convention on my drawing
+y0 := -y0_;
+value, x0,y0;
+
+xr_ := (L/2) - r*sin(alpha/2); !reduces to L/2*(1-dp)
+yr_ :=         r*cos(alpha/2);
+
+!stick to convention on my drawing
+xr := -xr_;
+yr := -yr_;
+value, xr, yr;
+
+!when r is begger then xr beam starts tu circle in the bend
+value, r, L/2-xr, r - (L/2-xr); 
+ 
+
+a := 1;
+b :=-2*yr;
+c := xr*xr  + yr*yr - r*r + L*L/4 - L*xr;
+
+delta := b*b - 4*a*c;
+
+value, delta;
+
+y2 := (-b - sqrt(delta) ) / (2*a) ;
+y  := (-b + sqrt(delta) ) / (2*a) ;
+
+
+value, y, y2;
+
+
+
+meany := (y+y2)/2; ! this must be yr
+
+value, y, y2, (y+y2)/2, meany -  yr;
+
+value, (y-y2)/2;
+
+value, yr ,y, yr-y;
+
+
+tanphi := abs(yr - y)/(L/2 + abs(xr));
+value, tanphi;
+
+
+value, tan(pi/2 - alpha/2);
+
+
+tantheta = -1/tanphi;
+value, tantheta;
+
+theta = atan(tantheta);
+value, theta;
+
+px_final = theta - (-alpha/2);
+value, px_final;
+
+GB := y*cos(alpha/2);
+GD := y*sin(alpha/2);
+
+value, GB, GD;
+
+GH =  GD * tan(px_final);
+
+x_final = GB + GH;
+
+value, GH, x_final;
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+! add a drift
+LD = 1;
+
+x2 = (LD - s_final)*tantheta;
+
+x_drift = x_final + x2;
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
+rb: rbend, l:=L, angle :=alpha, truerbend, ptcrbend, kill_ent_fringe, kill_exi_fringe ;
+dr: drift, l:=LD;
+myl: line=(rb,dr);
+
+beam, particle=electron;
+use, period=myl;
+
+!select,flag=twiss,column=name,s,x,t;
+
+  twiss, betx=1,bety=1,  t=0.0, deltap=dp;
+  x_tw = table(twiss,rb,x);
+  x_dr_tw = table(twiss,dr,x);
+
+!  write, table=twiss, file="twiss.out";
+
+ptc_create_universe;
+  ptc_create_layout, nst=100, model=1, method=6, exact=true, closed_layout=true;
+
+  ptc_twiss, table=twiss, icase=56, betx=1,bety=1, betz=1, t=0.0, deltap:=dp;
+  
+  !write, table=twiss, file="ptc.out";
+
+ value, table(twiss,rb,x), x_final, x_tw;
+ print, text="PTC error is";
+ value, table(twiss,rb,x) -  x_final;
+ print, text="TWISS error is";
+ value, x_tw -  x_final;
+
+
+ptc_end;

@@ -1,0 +1,76 @@
+//======================================================//
+//              File to test bug in MADX 5.0		//
+//======================================================//
+//   Date:	28-APR-2011				//
+//   Author:	C. Hessler				//
+//======================================================//
+
+OPTION, -ECHO, WARN, -INFO;
+
+SET,	FORMAT="18.10f";
+
+// read in sequence file (real beam direction)
+CALL,	FILE = "test.seq";
+
+BEAM,	PARTICLE= PROTON,
+	ENERGY	= 440.0, 
+	EXN	= 3.5e-6*4,//= 4 sigma
+	EYN	= 3.5e-6*4,//= 4 sigma
+	;
+
+//--------------------- Boundary conditions (Twiss) ---------------------------
+
+// read in initial TT60 Twiss parameters (from the SPS)
+// (real beam direction)
+call, file = "sps-twiss.inBeam.ini.madx";
+PSHIFT	= 0.0006;
+BETX0	= sps.BETX0;
+ALFX0	= sps.ALFX0;
+DX0 	= sps.DX0  ;
+DPX0	= sps.DPX0 ;
+BETY0	= sps.BETY0;
+ALFY0	= sps.ALFY0;
+DY0 	= sps.DY0  ;
+DPY0	= sps.DPY0 ;
+
+// read in strengths file
+CALL,	FILE = "out.tt66-v10.2-0_20mm-0_20mm.str";
+
+USE,	SEQUENCE = TT66; 
+
+SELECT,	FLAG=TWISS, COLUMN=NAME,S,X,Y,PX,PY,BETX,BETY,ALFX,ALFY,DX,DPX,DY,DPY,MUX,MUY;
+TWISS,	FILE="twiss", 
+	!DELTAP	= PSHIFT,
+	BETX	= BETX0,	ALFX	= ALFX0,
+	DX 	= DX0,		DPX	= DPX0,
+	BETY	= BETY0,	ALFY	= ALFY0,
+	DY 	= DY0,		DPY	= DPY0;
+
+//----------------------------- Aperture calculation --------------------------
+
+!SELECT,	FLAG=APERTURE, COLUMN=NAME,S,N1,N1X_M,N1Y_M,APER_1,APER_2,APER_3,APER_4,BETX,BETY,DX,DY,X,Y,RTOL,XTOL,YTOL;
+APERTURE,	SPEC=6,
+		offsetelem="offset.tt66.tfs",
+		COR=5e-3, BBEAT=1.1, DP=PSHIFT, DPARX=0, DPARY=0,
+		INTERVAL=0.2, HALO={1.0, 1.0, 1.0, 1.0}, EXN=3.5e-6, EYN=3.5e-6, 
+		FILE="aperture-n1"
+		;
+
+PLOT, COLOUR=100,     TABLE=aperture,noline,vmin=0,vmax=50,
+      haxis=s,vaxis=n1,spec,on_elem,style=100;
+
+
+//----------------------- Calculate survey coordinates ------------------------
+
+!SELECT, FLAG=SURVEY,
+!	COLUMN=NAME,S,L,ANGLE,X,Y,Z,THETA,PHI,PSI,GLOBALTILT,APER_1,APER_2;
+SURVEY,	x0	=-2083.527880, 
+	y0	= 2402.179520, 
+	z0	= 2586.131300, 
+	theta0	= 2.011786673, 
+	phi0	= 0.000045000-1.6e-6, // change due to change in ref. altitude
+	psi0	= 0.000000000,
+	FILE="survey";
+
+STOP;
+

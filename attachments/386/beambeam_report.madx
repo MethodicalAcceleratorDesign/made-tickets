@@ -1,0 +1,67 @@
+option, echo, info, warn;
+
+twissmacro(ii,jj): macro = {
+
+	use, sequence = bbseq;
+	select, flag = twiss, clear;
+	twiss, betx = 2.99098698, bety = 2.940854601, x = 0.0, y = 0.0, sectormap; 
+
+}
+
+on_ho2 = 1.0;
+
+beam, particle = proton, bunched = true, radiate = false,
+      energy:= 7000, ex:= 5.026457389e-10, exn := 1.499999987e-05,
+      ey := 5.026457389e-10, eyn := 1.499999987e-05, et := 1, sigt := 0.0755, sige := 0.00011,
+      npart := 1.3e+11, bcurrent:= 0.000234224583, freq0 := 0.01124549941,
+      circ := 26658.8832, dtbyds := 0, deltap := 0, alfa := 1.796641699e-08,
+      u0 := 0, qs := 0, arad := 1.534698269e-18, pdamp := {1,1 ,2 }, n1min := -1;
+
+nsteps  = 18;
+fstep   = 10;
+stepmin = 1e-18;
+
+ii  = 0;
+xii = 0.0;
+
+create, table = mytable, column = ii, xii, jj, yjj, re21, re41;
+
+while (ii < nsteps) {
+
+	jj  = 0;
+	yjj = 0.0;
+
+	while (jj < nsteps) {
+
+		value, xii, yjj; 
+
+		bb: beambeam, sigx := 3.883216731e-05, sigy := 3.883216724e-05, xma:= xii, yma:= yjj, charge :=  on_ho2;
+
+		bbseq: sequence, l = 1e-9;
+		bb, at = 0.0;
+		endsequence;
+
+		exec, twissmacro($ii, $jj);
+
+		re21 = table(sectortable, bb, r21);
+		re41 = table(sectortable, bb, r41);
+
+		value, re21; 
+		value, re41; 
+
+		fill, table = mytable;
+
+		if (jj == 0) { yjj = stepmin; }
+		else         { yjj = yjj*fstep; }
+
+		jj = jj + 1;
+
+	}
+
+	if (ii == 0) { xii = stepmin; }
+	else         { xii = xii*fstep; }
+
+	ii = ii + 1;
+}
+
+write, table = mytable, file = "mytable.tfs";

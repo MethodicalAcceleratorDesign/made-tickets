@@ -1,0 +1,21 @@
+call,file=foborodobo8.lat;
+use, sequence=model;
+
+ptc_create_universe;
+ptc_create_layout,model=2,method=2,nst=4,exact,time=false;
+ptc_align;
+select, flag=sectormap, clear;
+set, format="30.26g";
+select,flag=ptc_twiss,column=name,keyword,s,pos,k1,k2,k3,k4,k5,k6,
+    re11,re21,re31,re41,re51,re61,
+    re12,re22,re32,re42,re52,re62,
+    re13,re23,re33,re43,re53,re63,
+    re14,re24,re34,re44,re54,re64,
+    re15,re25,re35,re45,re55,re65,
+    re16,re26,re36,re46,re56,re66;
+ptc_twiss,closed_orbit,icase=6,file=map_compare_madx_output;
+ptc_twiss,closed_orbit,icase=5,no=2,file=map_compare_madx_output5;
+ptc_end;
+twiss,chrom;
+emit;
+stop;

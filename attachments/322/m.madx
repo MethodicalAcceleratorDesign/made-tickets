@@ -1,0 +1,93 @@
+
+
+d1: drift, l=1;
+d01: drift, l=0.1;
+
+mpp: multipole,  knl={0,0,0.0,0,0,0},ksl={0,0.0,4,0,0,0};
+mp:  multipole,  knl={0,0,0,0,0,0},ksl={0,0,0,0,0,00,};
+
+b: rbend, l=0.6, angle=0.05;
+m: marker;
+
+qf: quadrupole, l=0.6, k1= 1.11;
+qd: quadrupole, l=0.6, k1=-1.11;
+
+dm: line=(d01,m,mp);
+beam;
+
+mp0: line=(d01,mp);
+
+lm1: line=(   d1, b,   d1,  qf,       d1, b,    d1, qd,mpp);
+lmp1:line=(10*dm, b,10*dm,  qf,    10*dm, b, 10*dm, qd,mpp);
+
+
+use, period=lm1;
+twiss;
+write, table=twiss, file="tmp";
+value, table(summ,q1);
+value, table(summ,q2);
+
+plot, haxis=s,vaxis=betx,bety;
+!stop;
+
+lm:  line=(100*lm1);
+lmp: line=(100*lmp1);
+
+
+
+
+select,flag=twiss,clear;
+select, flag=twiss, column=name,s,energy,
+                           beta11,beta22,beta33,
+	       alfa11,alfa22,beta33,
+	       mu1,mu2,
+	       disp1,disp2,
+	       re11,re12,re13,re14,re15,re16,
+	       re21,re22,re23,re24,re25,re26,
+	       re31,re32,re33,re34,re35,re36,
+	       re41,re42,re43,re44,re45,re46,
+	       re51,re52,re53,re54,re55,re56,
+	       re61,re62,re63,re64,re65,re66;
+
+use, period=lm;
+
+
+
+PTCNSTEPS=2;
+
+ptc_create_universe;
+   ptc_create_layout, model=2, method=6, nst=PTCNSTEPS, exact=true, closed_layout=false;
+   ptc_setswitch, debuglevel=0, nocavity=false, 
+                  maxacceleration=true, fringe=true, exact_mis=true, time=true, totalpath=true;
+ 
+! PTC_TWISS, table=twiss, icase=5, no=2, x=0.1, y=0.0, px=0, py=0, betz=1.0, betx=10, bety=10, writetmap;
+! write, table=twiss, file="m.ptctwiss";
+! copyfile, file="transfer.map", to="m.map";
+
+ ptc_start, x=2.42131e-3, px=-1e-6, y=0, py=0, t=0;
+ ptc_track,icase=6, norm_no=4, dump, element_by_element, turns=100,ffile=1;
+ ptc_track_end;
+
+
+ptc_end;
+
+copyfile, file="track.obs0001.p0001", to="m.track";
+
+use, period=lmp;
+
+ptc_create_universe;
+   ptc_create_layout,model=2, method=6, nst=PTCNSTEPS, exact=true, closed_layout=false;
+   ptc_setswitch, debuglevel=0, nocavity=false, 
+                  maxacceleration=true, fringe=true, exact_mis=true, time=true, totalpath=true;
+
+! PTC_TWISS, table=twiss, icase=5, no=2, x=0.1, y=0.0, px=0, py=0, betz=1.0, betx=10, bety=10, writetmap;
+! write, table=twiss, file="mp.ptctwiss";
+! copyfile, file="transfer.map", to="mp.map";
+
+ ptc_start, x=2.42131e-3, px=-1e-6, y=0, py=0, t=0;
+ ptc_track,icase=6, norm_no=4, dump, element_by_element, turns=100,ffile=1;
+ ptc_track_end;
+
+ptc_end;
+
+copyfile, file="track.obs0001.p0001", to="mp.track";

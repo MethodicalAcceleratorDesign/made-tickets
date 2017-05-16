@@ -1,0 +1,12 @@
+Title, "Twiss of CRYRING";
+Option, -echo,-info,-warn;
+call, file="CRYRING_CO_v1.1.opt";
+
+Option, echo,info,warn;
+Beam,sequence=CRYRING, particle = proton, energy=1, bv=+1;
+
+use,sequence=CRYRING;
+twiss, sequence=CRYRING;
+save, sequence=CRYRING, file="CRYRING_CO_v1.1.seq";
+
+STOP;

@@ -1,0 +1,240 @@
+/***********************************************************
+ * test_polefaceangle_2.madx
+ *
+ * Call this program by: >madx < test_polefaceangle_2.madx
+ *
+ * This program illustrates that the same optical functions
+ * can be obtained in two cases
+ *
+ ***********************************************************/
+
+
+ option, -info;
+
+
+
+
+/***********************************************************
+ * Element definitions
+ ***********************************************************/
+ LBM:=0.927*Pi/3;
+ BMH2 :   SBEND,     L=LBM/2,ANGLE=PI/6,E1=0,E2=PI*17/180,FINT=0,HGAP=0.076/2,FINTX=0.424;
+
+
+/***********************************************************
+ * sequence definition
+ ***********************************************************/
+ seq             : SEQUENCE                  , L  = 0.7854;
+ BMH2                                        , at =  LBM/4;
+ END             : MARKER                    , at =  0.7854;
+ ENDSEQUENCE;
+
+
+!seq             : SEQUENCE                  , L  = 10.0;
+!BMH2                                        , at =  5.0;
+!ENDSEQUENCE;
+
+
+/***********************************************************
+ * Initial parameters
+ ***********************************************************/
+ a=0.01;b= 0.851026175/1000;
+ BETX0=a/b;
+ ax=(1+ALFX0^2)/BETX0; ! gamma
+ bx=BETX0; ! betax
+ cx=2*ALFX0;
+ fx=-a*b; ! -Emittance
+
+ a=0.01;b= 0.851026175/1000;
+ BETY0=a/b;
+ ay=(1+ALFY0^2)/BETY0; ! gamma
+ by=BETY0; ! betay
+ cy=2*ALFY0;
+ fy=-a*b; ! -Emittance
+
+ BETX0  :=   bx; ! 11.7505198944;
+ ALFX0  :=  0.0;
+ MUX0   :=  0.0;
+ BETY0  :=   bx; ! 11.7505198944;
+ ALFY0  :=  0.0000000000;
+ MUY0   :=  0.0000000000;
+ X0     :=  0.0100000000;
+ PX0    :=  0.0000000000;
+ Y0     :=  0.0000000000;
+ PY0    :=  0.0000000000;
+ T0     :=  0.0000000000;
+ PT0    :=  0.0000000000;
+ DX0    :=  0.0000000000;
+ DPX0   :=  0.0000000000;
+ DY0    :=  0.0000000000;
+ DPY0   :=  0.0000000000;
+
+
+
+/***********************************************************
+ * Store initial parameters in memory block
+ ***********************************************************/
+INITBETA0: BETA0,
+  BETX=BETX0,
+  ALFX=ALFX0,
+  MUX=MUX0,
+  BETY=BETY0,
+  ALFY=ALFY0,
+  MUY=MUY0,
+  X=X0,
+  PX=PX0,
+  Y=Y0,
+  PY=PY0,
+  T=T0,
+  PT=PT0,
+  DX=DX0,
+  DPX=DPX0,
+  DY=DY0,
+  DPY=DPY0;
+
+
+
+/***********************************************************
+ * beam and use
+ ***********************************************************/
+
+/***********************************************************
+ * BEAM and USE
+ ***********************************************************/
+ BEAM, PARTICLE=ANTIPROTON, PC= 0.013700 ;
+ use, sequence=seq;
+
+
+
+/***********************************************************
+ * DELTAP
+ ***********************************************************/
+ PSHIFT=0.0;
+
+
+/***********************************************************
+ * output format
+ ***********************************************************/
+ set,  format="12.8f"; ! format twiss output file
+
+
+
+/***********************************************************
+ * PTC
+ ***********************************************************/
+ b=beam->beta;
+ value, beam->beta,b;
+ value, 1/b - sqrt((1+PSHIFT)*(1+PSHIFT)+(1-b*b)/(b*b));
+
+ calculatetwiss : macro={
+
+     select, flag=twiss,clear;
+     select, flag=twiss,column=name, s, l, x, px, alfa11, alfa22, beta11, beta22, disp1, disp2;
+
+     ptc_create_universe;
+     ptc_create_layout,model=2,method=6,nst=5,time=true,exact;
+     ptc_align;
+
+     ptc_twiss, table=twiss, icase=5, no=2, BETA0=INITBETA0, X=X0, PX=PX0, Y=Y0, PY=PY0
+              , DELTAP = PSHIFT
+              , file=optics.out;
+
+     ptc_end;
+ }; // End of macro
+
+
+
+
+
+
+
+
+
+
+
+
+/**********************************************************************************************************************
+ **********************************************************************************************************************
+ * CALCULATE optics functions with PTC
+ **********************************************************************************************************************
+ **********************************************************************************************************************/
+ exec, calculatetwiss;
+ system,"mv optics.out optics_1.out";
+
+
+
+
+
+
+
+
+
+
+
+/**********************************************************************************************************************
+ **********************************************************************************************************************
+ * CALCULATE optics functions with phase space ellipse for BE_QO_BE
+ **********************************************************************************************************************
+ **********************************************************************************************************************/
+
+/***********************************************************
+ * INITIALIZATION
+ ***********************************************************/
+ value, ax,bx,cx,fx;
+ value, ay,by,cy,fy;
+
+ system,"rm END";
+ system,"rm START";
+
+ create, table=START,column=x,px,y,py;
+ create, table=END,  column=x,px,y,py;
+
+
+/***********************************************************
+ * CALULATION OF ELLIPSE
+ ***********************************************************/
+ NN=1;
+ n=-NN;
+!while(n<NN+1)
+ n=1;
+ while(n<2)
+ {
+       X0  = Sqrt(abs(fx)*BETX0)*n/NN;   ! When these 4 lines are commented out, then all is fine!
+       Y0  = Sqrt(abs(fy)*BETY0)*n/NN;
+       PX0 = (-cx*X0 - Sqrt((cx*X0)^2 - 4*bx*(fx + ax*(X0^2))))/(2*bx);
+       PY0 = (-cy*Y0 - Sqrt((cy*Y0)^2 - 4*by*(fy + ay*(Y0^2))))/(2*by);
+
+       X0     :=  0.0100000000;
+       PX0    :=  0.0000000000;
+       value, X0, PX0;
+       value, Y0, PY0;
+
+     ! twiss ---------------------------
+       exec, calculatetwiss;
+       system,"mv optics.out optics_2.out";
+
+
+     ! save ----------------------------
+       x=X0;  px=PX0;
+       y=Y0;  py=PY0;
+       fill, table=START;
+       x=table(twiss,SEQ$END,x);    px=table(twiss,SEQ$END,px);
+       y=table(twiss,SEQ$END,y);    py=table(twiss,SEQ$END,py);
+       fill, table=END;
+       value, x, px;
+       value, y, py;
+
+       n=n+1;
+ }
+
+ write,table=START, file="START.CVS";
+ write,table=END, file="END.CVS";
+
+
+
+/***********************************************************
+ * STOP
+ ***********************************************************/
+ system,"rm Maxwellian_bend_for_ptc.txt";
+ stop;
+

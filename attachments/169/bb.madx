@@ -1,0 +1,52 @@
+
+
+bb: beambeam,sigx=2.e-3,sigy=2.e-3,charge=1., xma=0.0041, yma=0.02;
+d1: drift, l = 1 ;
+
+qf: quadrupole, l=1, k1= 0.2;
+qd: quadrupole, l=1, k1=-0.2;
+
+!myline : LINE = (d1, qf, d1, bb, d1,qd, d1) ;
+myline : LINE = (d1, bb, d1) ;
+beam, particle=positron,npart=1.e12,energy=50.0,ex=2.e-3,ey=2.e-3;
+use, sequence=myline;
+
+TRACK, deltap= 0.00, onepass,dump, onetable;
+START, x= 0.001, y= 0.002;
+RUN, turns= 1;
+ENDTRACK;
+
+
+select, flag=twiss, column=name, s, l,x,px,y,py;! , disp1, disp2, beta11, beta22, alfa11, alfa22;
+
+
+
+ptc_create_universe;
+
+!  ptc_create_layout,model=1,method=6,nst=10,exact=true;
+  ptc_setswitch, debuglevel=0, nocavity=false, fringe=true, exact_mis=true, time=true, totalpath=true;
+
+  ptc_create_layout, model=2, method=6, nst=10, exact=true, closed_layout=true;
+
+  ptc_twiss, table=twiss, betx=10, bety=10, x=0.001, y= 0.002;
+  write, table=twiss;
+  plot,noversion,colour = 100, vaxis=beta11,beta22,haxis=s, title="No Beam-Beam";
+  plot,noversion,colour = 100, vaxis1=x,vaxis2=px, haxis=s, title="No Beam-Beam";
+
+  ptc_twiss, table=twiss, slice_magnets, betx=10, bety=10, x=0.001, y= 0.002;
+  write, table=twiss;
+  plot,noversion,colour = 100, vaxis=beta11,beta22,haxis=s, title="With Beam-Beam";
+  plot,noversion,colour = 100, vaxis1=x,vaxis2=px, haxis=s, title="With Beam-Beam";
+  
+  ptc_start, x=0.001, y= 0.002;
+  ptc_trackline, onetable, everystep, turns=1;
+  write, table=trackone;
+  ptc_track_end;
+ptc_end;
+
+
+
+stop;
+
+
+!

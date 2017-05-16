@@ -1,0 +1,17 @@
+option, info=false, echo=false;
+    call, file = "fcc-ee_lin-rt9060-1m2mm.str"; ! Default magnet strengths
+    call, file = "fcc-ee_lin-elements.madx";    ! Element definitions
+    call, file = "fcc-ee_lin.seq";              ! Sequence definitions
+option, info=true, echo=true;
+
+beam, particle = electron, energy=175, npart=9e12,radiate=false;
+
+select, flag = twiss, clear;
+select, flag = twiss, column=name, s, betx, bety, alfx, alfy, dx, dpx, k1l, k2l;
+
+use, sequence = FCCeeRacetrack;
+twiss, save, chrom, centre, file=twiss_linear-chrom.txt;
+twiss, save,        centre, file=twiss_linear.txt;
+twiss, save, chrom, centre, file=twiss_linear-chrom2.txt;
+
+stop;

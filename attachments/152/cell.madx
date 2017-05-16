@@ -1,0 +1,36 @@
+title, s="simple_cyclotron";
+!-------------------------------------------------------------------------------
+!--- bending magnet ------------------------------------------------------------
+!-------------------------------------------------------------------------------
+b:   sbend, angle=72.*raddeg, e1=0.*raddeg, e2=0.*raddeg, k1=-.00197392, fint=0., fintx=0., hgap=0., l=20.0;
+!-------------------------------------------------------------------------------
+! define the cell as a sequence:
+!-------------------------------------------------------------------------------
+sequ:  sequence,refer=exit,l=100.000000;
+   B1:    B,   at=20.000000;
+   B2:    B,   at=40.000000;
+   B3:    B,   at=60.000000;
+   B4:    B,   at=80.000000;
+   B5:    B,   at=100.000000;
+endsequence;
+!-------------------------------------------------------------------------------
+! mad-X
+!-------------------------------------------------------------------------------
+option,-echo;
+beam, particle=proton, energy=1.168272;
+use, sequence=sequ;
+select, flag=twiss, column=name,s,betx;
+twiss,save,centre,deltap=-0.0331;
+!-------------------------------------------------------------------------------
+! Initialize PTC
+!-------------------------------------------------------------------------------
+ptc_create_universe,ntpsa=false;
+ptc_create_layout,time=false,model=1,method=6,nst=3,exact=true;
+ptc_setswitch,debuglevel=0,totalpath=true,fringe=true,time=false;
+ptc_normal,icase=5,no=4,closed_orbit,deltap=-0.033000,x=-1.0,px=0;
+select,flag=ptc_twiss,column=name,s,betx,bety,dx,dpx,dy,dpy;
+ptc_end;
+!-------------------------------------------------------------------------------
+! Initialize PTC
+!-------------------------------------------------------------------------------
+stop;

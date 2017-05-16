@@ -1,0 +1,853 @@
+!#MADX
+!
+! "CTF3 DELAY Loop - april 2005"
+!  assign, echo="ctf3.out";
+!  assign, print="print.out";
+
+! MAD-X RBEND from manual
+!its length is the arc length by default - to define an RBEND with a
+!straight length as in the Figure, the option RBARC=FALSE has to be set 
+!option,RBARC=FALSE;
+! to keep same length as in MAD8 that Frascati used
+! FT 23.08.05
+! 
+! this manual entry was WRONG!
+! by default, MAD-X calculates the arc trajectory from the straight
+! magnet length given
+! FT 24.08.05
+
+CD.AllQuadsScale = 1.0;
+
+CD.QFF0130scale = 1.0;
+CD.QDF0140scale = 1.0;
+CD.QFE0170scale = 1.0; ! 1.09 makes good dvd505
+CD.QDF0180scale = 1.0;
+CD.QFF0210scale = 1.0;
+CD.QFE0230scale = 1.0;
+CD.QFF0250scale = 1.0;
+CD.QDF0260scale = 1.0;!1.018
+CD.QDF0280scale = 1.0;!1.018
+CD.QFF0290scale = 1.0;
+
+CD.QFF0310scale = 1.0;
+CD.QDF0320scale = 1.0;
+CD.QDF0340scale = 1.0;
+CD.QFF0350scale = 1.0;
+CD.QFE0370scale = 1.0;
+CD.QFF0390scale = 1.0;
+CD.QDF0420scale = 1.0;
+CD.QFE0430scale = 1.0;
+CD.QDF0460scale = 1.0;
+CD.QFF0470scale = 1.0;
+
+
+
+
+DL_SEQX = 1; !marker that allows to verify that this file was loaded
+
+energ:=EN;
+
+
+! DIPOLES
+! EPA main magnet model         T. Risselada    January 2001
+
+dl.nbend    := 12;           ! number of dipoles per ring
+dl.abenddl := -twopi/dl.nbend; ! dipole deflection angle
+dl.hgap     := 0.0225;       ! half gap height
+
+
+! Measurements by R. Chritin and D. Cornuet, SL-Note-2000-031 MS (2000)
+dl.fint  := 0.561;                            ! 400 MeV
+dl.lBend := 0.5648    ; dl.Bin   :=  0.52485;    ! 400 MeV
+dl.lgrad := 0.4681    ; dl.Gin   := -0.37157;    ! 400 MeV
+dl.lsext := 0.6154    ; dl.Sint  :=  0.80;       ! 400 MeV
+
+dl.lBends := 0.55995206; 
+
+dl.b0     := dl.bin / dl.lBend;
+dl.g0     := dl.gin / dl.lgrad;
+dl.s0     := dl.sint / dl.lsext;
+dl.mybrho := dl.bin  / dl.abenddl;
+
+bhf.kscale := 1;
+dl.myk1 := bhf.kscale * dl.g0/dl.mybrho;  !dl.myk1   := g0  / mybrho * dl.k1fact; from file myksave2
+
+value, dl.myk1, dl.myk1* dl.lgrad/dl.lBend;
+
+
+CX.BHE0270:   marker;
+CD.BHE0270:   RBEND, L:=dl.lBends, ANGLE:=dl.abenddl, k1:= dl.myk1* dl.lgrad/dl.lBend,!0.905 to make meas good
+                     fint:=bhf.fint, hgap := bhf.hgap;!, ptcrbend=true, truerbend=true;!0.66
+CX.BHE0330:   marker;
+CD.BHE0330:   RBEND, L:=dl.lBends, ANGLE:=dl.abenddl, k1:= dl.myk1* dl.lgrad/dl.lBend,
+                     fint:=bhf.fint, hgap := bhf.hgap;!, ptcrbend=true, truerbend=true;
+
+
+
+
+bmdl:   rbend, l:=0.561, angle:=dl.abenddl, hgap:=bhe.hgap, fint:=bhe.fint;
+
+value,
+bhe.hgap,
+bhf.hgap,
+bhe.fint,
+bhf.fint;
+
+
+CD.BHE0150: bmdl; 
+CD.BHE0190: bmdl; 
+CD.BHE0220: bmdl; 
+CD.BHE0240: bmdl; 
+CD.BHE0360: bmdl; 
+CD.BHE0380: bmdl; 
+CD.BHE0410: bmdl; 
+CD.BHE0450: bmdl; 
+
+
+
+mqn:   marker;
+mqlar: marker;
+
+ct.lqn := 0.328;
+ct.lql := 0.380;
+
+BXDL := 4.98906447917;
+BYDL := 11.976545974259;
+
+
+KDQFF0130 := IDQFF0130 * FQF/En;
+KDQDF0140 :=-IDQDF0140 * FQF/En;
+KDQFE0170 := IDQFE0170 * FQE/En;
+KDQDF0180 :=-IDQDF0180 * FQF/En;
+KDQFF0210 := IDQFF0210 * FQF/En;
+KDQFE0230 := IDQFE0230 * FQE/En;
+KDQFF0250 := IDQFF0250 * FQF/En;
+KDQDF0260 :=-IDQDF0260 * FQF/En;
+KDQDF0280 :=-IDQDF0280 * FQF/En;
+KDQFF0290 := IDQFF0290 * FQF/En;
+
+! quads first half
+CD.QFF0130: quadrupole, l:=ct.lqn, k1:=KDQFF0130*CD.QFF0130scale*CD.AllQuadsScale, type=qn;
+CD.QDF0140: quadrupole, l:=ct.lqn, k1:=KDQDF0140*CD.QDF0140scale*CD.AllQuadsScale, type=qn;
+CD.QFE0170: quadrupole, l:=ct.lql, k1:=KDQFE0170*CD.QFE0170scale*CD.AllQuadsScale, type=qlarge;
+CD.QDF0180: quadrupole, l:=ct.lqn, k1:=KDQDF0180*CD.QDF0180scale*CD.AllQuadsScale, type=qn;
+
+CD.QFF0210: quadrupole, l:=ct.lqn, k1:=KDQFF0210*CD.QFF0210scale*CD.AllQuadsScale, type=qn;
+CD.QFE0230: quadrupole, l:=ct.lql, k1:=KDQFE0230*CD.QFE0230scale*CD.AllQuadsScale, type=qlarge;
+CD.QFF0250: quadrupole, l:=ct.lqn, k1:=KDQFF0250*CD.QFF0250scale*CD.AllQuadsScale, type=qn;
+CD.QDF0260: quadrupole, l:=ct.lqn, k1:=KDQDF0260*CD.QDF0260scale*CD.AllQuadsScale, type=qn;
+CD.QDF0280: quadrupole, l:=ct.lqn, k1:=KDQDF0280*CD.QDF0280scale*CD.AllQuadsScale, type=qn;
+CD.QFF0290: quadrupole, l:=ct.lqn, k1:=KDQFF0290*CD.QFF0290scale*CD.AllQuadsScale, type=qn;
+
+
+! quads second half
+CD.QFF0470: quadrupole, l:=ct.lqn, k1:=KDQFF0130*CD.QFF0470scale*CD.AllQuadsScale, type=qn;
+CD.QDF0460: quadrupole, l:=ct.lqn, k1:=KDQDF0140*CD.QDF0460scale*CD.AllQuadsScale, type=qn;
+CD.QFE0430: quadrupole, l:=ct.lql, k1:=KDQFE0170*CD.QFE0430scale*CD.AllQuadsScale, type=qlarge;
+CD.QDF0420: quadrupole, l:=ct.lqn, k1:=KDQDF0180*CD.QDF0420scale*CD.AllQuadsScale, type=qn;
+CD.QFF0390: quadrupole, l:=ct.lqn, k1:=KDQFF0210*CD.QFF0390scale*CD.AllQuadsScale, type=qn;
+CD.QFE0370: quadrupole, l:=ct.lql, k1:=KDQFE0230*CD.QFE0370scale*CD.AllQuadsScale, type=qlarge;
+
+CD.QFF0350: quadrupole, l:=ct.lqn, k1:=KDQFF0250*CD.QFF0350scale*CD.AllQuadsScale, type=qn;
+CD.QDF0340: quadrupole, l:=ct.lqn, k1:=KDQDF0260*CD.QDF0340scale*CD.AllQuadsScale, type=qn;
+
+CD.QDF0320: quadrupole, l:=ct.lqn, k1:=KDQDF0280*CD.QDF0320scale*CD.AllQuadsScale, type=qn;
+CD.QFF0310: quadrupole, l:=ct.lqn, k1:=KDQFF0290*CD.QFF0310scale*CD.AllQuadsScale, type=qn;
+
+
+value,
+KDQFF0130*CD.QFF0130scale,
+KDQDF0140*CD.QDF0140scale,
+KDQFE0170*CD.QFE0170scale,
+KDQDF0180*CD.QDF0180scale,
+KDQFF0210*CD.QFF0210scale,
+KDQFE0230*CD.QFE0230scale,
+KDQFF0250*CD.QFF0250scale,
+KDQDF0260*CD.QDF0260scale,
+KDQDF0280*CD.QDF0280scale,
+KDQFF0290*CD.QFF0290scale,
+
+KDQFF0130*CD.QFF0470scale,
+KDQDF0140*CD.QDF0460scale,
+KDQFE0170*CD.QFE0430scale,
+KDQDF0180*CD.QDF0420scale,
+KDQFF0210*CD.QFF0390scale,
+KDQFE0230*CD.QFE0370scale,
+KDQFF0250*CD.QFF0350scale,
+KDQDF0260*CD.QDF0340scale,
+KDQDF0280*CD.QDF0320scale,
+KDQFF0290*CD.QFF0310scale;
+
+
+
+!  SEXTUPOLES
+
+
+lsx:=.1;
+ms: marker;
+ms1: marker;
+ms2: marker;
+ms3: marker;
+
+! Initialise to zero
+kDXLA0145 := 0;
+kDXVA0215 := 0;
+kDXHA0245 := 0;
+
+! sext first half
+CD.XLA0145: SEXTUPOLE, L:=lsx, k2:=kDXLA0145;
+CD.XVA0215: SEXTUPOLE, L:=lsx, k2:=kDXVA0215;
+CD.XHA0245: SEXTUPOLE, L:=lsx, k2:=kDXHA0245;
+
+! sext second half
+CD.XLA0455: SEXTUPOLE, L:=lsx, k2:=kDXLA0145;
+CD.XVA0385: SEXTUPOLE, L:=lsx, k2:=kDXVA0215;
+CD.XHA0355: SEXTUPOLE, L:=lsx, k2:=kDXHA0245;
+
+!**********************************************************************
+!**********************************************************************
+!**********************************************************************
+!**********************************************************************
+!**********************************************************************
+!
+! modelling of ctf3 wiggler based on tracking through the wiggler magnetic field.
+! By has been analytically fitted on the simulated values
+! sextupolar and pseudo sextupolar terms have been taken into account
+! C.B. sept 2007
+!
+
+
+
+!  this is the current of the central pole
+
+
+dlWIG.E0 = 0.51099906;
+dlWIG.Et = EN + E0;
+dlWIG.gamma = dlWIG.Et/dlWIG.E0;
+dlWIG.beta = sqrt(1-dlWIG.gamma^(-2));
+dlWIG.P = dlWIG.beta*dlWIG.Et;
+dlwig.bro = 3.335641 *1e-03 * dlWIG.P;
+
+
+
+beam, particle=electron,energy=EN, EX=ENX/EN/0.511, EY=ENY/EN/0.511, ET=1/1000, SIGT=0, SIGE=sige;
+
+
+DL.WIGscale = 0.77;
+
+! The naming of the wiggler is inconsistant.  In the currents file from matlab, its MAD name is WHA0305
+! and in the matching scripts, it is WHA305.  To maintain compatability, I have allowed both 
+! with preference given to the matching scripts (BC)
+
+if (WHA305 <> 0)
+{  
+    WHA0305 = WHA305;
+};
+if (WHA0305 == 0)
+ {
+   WHA0305 = 0.01;
+ };
+
+value, WHA305, WHA0305;
+
+DL.IWIG := WHA0305*DL.WIGscale;
+
+!
+! dtrj (the diffence between the trajectory in the wiggler and the 
+! straight line) as a function of I (for E = 120MeV)
+! I and Energy are linearly proportional
+
+  dlWIG.p1dlf = 1.9692e-006;
+  dlWIG.p2dlf = -3.4944e-006;
+  dlWIG.p3dlf = 2.8493e-005;
+
+dlWIG.dtrj = dlWIG.p1dlf*DL.IWIG^2 + dlWIG.p2dlf*DL.IWIG + dlWIG.p3dlf ;
+
+value, dlWIG.dtrj;
+
+!
+! values of the elements of the transport matrix of the wiggler + 2 drifts (40 cm long) on the sides 
+! as a function of dtrj (obtained by tracking)
+! in the tracking the beam enters the wiggler on its geometrical centre (xin = 0)
+! as it is now on the cr alignment 
+! If the wiggler will be moved to center the trajectory arond its axis these coeff. will be 
+! slighlty different
+!
+
+dlWIG.J11 = -277.611694 *dlWIG.dtrj^2 +( 9.921173 )*dlWIG.dtrj + (1.002725);
+dlWIG.J12 = -83.388139 *dlWIG.dtrj^2 +( 9.742667 )*dlWIG.dtrj + (2.400989);
+dlWIG.J33 = 547.242139 *dlWIG.dtrj^2 +( -52.415778 )*dlWIG.dtrj + (0.997079);
+dlWIG.J34 = 281.744489 *dlWIG.dtrj^2 +( -51.499366 )*dlWIG.dtrj + (2.399169);
+
+
+value, dlWIG.J11,dlWIG.J12,dlWIG.J33,dlWIG.J34;
+
+
+! field in T at wiggler center as a function of I in A
+
+dl.B0_w = 0.00247*DL.IWIG;
+dl.angwdl = asin(0.40*dl.B0_w/dlwig.bro) ;
+
+dl.an1: = dl.angwdl/6 ;
+dl.an2: = 2*dl.angwdl/3 ;
+dl.ap1: = dl.angwdl/3 ;
+dl.ap2: = 2*dl.angwdl/3 ;
+
+len1=  0.1*dl.an1/sin(dl.an1) ;
+len2 = 0.2*dl.an2/(2*sin(dl.an2/2)*cos(dl.an1+dl.an2/2)) ;                  
+len3 = 0.1*dl.an1/(2*sin(dl.an1/2)*cos(dl.an1+dl.an2+dl.an1/2));           
+len4 = 0.2*dl.ap1/(2*sin(dl.ap1/2)*cos(-2*dl.an1-dl.an2+dl.ap1/2));           
+len5 = 0.2*dl.ap2/sin(dl.ap2) ;
+
+dl.wn1: sbend, l=len1, angle = -dl.an1,e1=-dl.an1/2,e2=-dl.an1/2 ;
+
+dl.wn2: sbend, l=len2, angle=-dl.an2,e1=-dl.an2/2,e2=-dl.an2/2 ;
+
+dl.wn3: sbend, l=len3, angle = -dl.an1,e1=-dl.an1/2,e2=-dl.an1/2;
+
+dl.wp1: sbend, l=len4, angle=dl.ap1, e1= dl.ap1/2, e2=dl.ap1/2;
+
+dl.wp2h1: sbend, l=len5, angle=dl.ap2, e1= dl.ap2, e2=0;
+
+dl.wp2h2: sbend, l=len5, angle=dl.ap2, e2= dl.ap2, e1=0;
+
+CD.WHA0305.ENT: MARKER; ! marker for the end of the wiggler
+CD.WHA0305.MID: MARKER; ! marker for the end of the wiggler
+CD.WHA0305: MARKER; ! marker for the end of the wiggler
+
+
+
+ 
+!lent = 2*(len1+len2+len3+len4+len5)        
+!value lent
+
+
+!xin = 0.0
+!
+! quadrupolar thin lenses which take into account the focusing effect of the off axis field
+! these values correspond to I = 60, E = 120 MeV => dtrj = 6.9 mm
+!
+
+dlwig.negl1  :multipole,   KNL:={0,dlwig.wnl1};
+dlwig.negl2  :multipole,   KNL:={0,dlwig.wnl2}; 
+dlwig.negpos :multipole,   KNL:={0,dlwig.wnp0};
+dlwig.posl1  :multipole,   KNL:={0,dlwig.wpl1};  
+dlwig.posl2  :multipole,   KNL:={0,dlwig.wpl2};
+
+dlwig.wigpos : line=(dl.wp1, dlwig.posl1, dl.wp2h1, CD.WHA0305.MID, dlwig.posl2, dl.wp2h2, dlwig.posl1, dl.wp1);
+dlwig.wigneg1: line=(dlwig.negl1, dl.wn1, dl.wn2, dlwig.negl2, dl.wn3, dlwig.negpos);
+dlwig.wigneg2: line=(dlwig.negpos, dl.wn3, dlwig.negl2, dl.wn2, dl.wn1, dlwig.negl1);
+
+
+
+! xinput = -2.5 cm as after summer shutdown
+
+dlwig.wnl1  =                     1.13942116E-01  ;!  -1.00000000E+20     1.00000000E+20
+dlwig.wnl2   =                   -3.00667656E-01  ;!  -1.00000000E+20     1.00000000E+20
+dlwig.wpl1    =                  -7.14462825E-02  ;!  -1.00000000E+20     1.00000000E+20
+dlwig.wpl2     =                 -3.96469776E-02  ;!  -1.00000000E+20     1.00000000E+20
+dlwig.wnp0      =                 1.06058560E-01  ;!  -1.00000000E+20     1.00000000E+20
+
+
+! deltal is a drift before and after the wiggler needed for fitting the matrix computed by tracking
+! which is done from -1.2 m up to 1.2 m from the wiggler center
+!
+
+dlwig.driftwig1: drift, l = 0.8;
+dlwig.driftwig2: drift, l = 0.8;
+
+dlwig.deltal: drift, l = 0.4;
+
+! Select drift or wiggler here
+dl.wiggler : line = (CD.WHA0305.ENT, dlwig.wigneg1,dlwig.wigpos,dlwig.wigneg2, CD.WHA0305);
+!dl.wiggler : line = (CD.WHA0305.ent, dlwig.driftwig1,CD.WHA0305.MID,dlwig.driftwig2, CD.WHA0305);
+
+dl.wigglerpdrift: line = (dlwig.deltal,dl.wiggler,dlwig.deltal);
+
+
+! matching of the quadrupolar lenses strength as a function of the current (or dtrj)
+
+
+use, period=dl.wigglerpdrift;
+
+match, use_macro;
+
+  vary, NAME = dlwig.wnl1, step = 0.01;
+  vary, NAME = dlwig.wnl2, step = 0.01;
+  vary, NAME = dlwig.wpl1, step = 0.01;
+  vary, NAME = dlwig.wpl2, step = 0.01;
+  vary, NAME = dlwig.wnp0, step = 0.01;
+
+  mdlwigl: macro =
+     {
+        twiss, RMATRIX, betx = 3, bety=2;
+!        value, dlwig.wnp0;
+!        value, table(twiss, dl.wigglerpdrift$end, RE11),
+!               table(twiss, dl.wigglerpdrift$end, RE12),
+!               table(twiss, dl.wigglerpdrift$end, RE33),
+!               table(twiss, dl.wigglerpdrift$end, RE34);
+     };
+  CONSTRAINT, expr=table(twiss, dl.wigglerpdrift$end, RE11) = dlWIG.J11;
+  CONSTRAINT, expr=table(twiss, dl.wigglerpdrift$end, RE12) = dlWIG.J12;
+  CONSTRAINT, expr=table(twiss, dl.wigglerpdrift$end, RE33) = dlWIG.J33;
+  CONSTRAINT, expr=table(twiss, dl.wigglerpdrift$end, RE34) = dlWIG.J34;
+
+  CONSTRAINT, expr=table(twiss, dl.wigglerpdrift$end, betx) < 10e6;
+
+  !rmatrix, range = wigglerpdrift,  rm(1, 3) = 0.
+  migrad,   tolerance:= 1e-24,  calls := 500;
+!  simplex,  tolerance:= 1e-24,  calls := 300;
+endmatch;
+
+
+
+
+!**********************************************************************
+!**********************************************************************
+!**********************************************************************
+!**********************************************************************
+!**********************************************************************
+
+
+! SMALL INJECTION DIPOLE
+
+ldipoletto:=.35;
+
+md1: marker;
+md2: marker;
+
+kangle := 0.015;!0.86 degree
+
+dipoletto: sbend, l:=ldipoletto, angle:=-kangle/2;
+CT.BHD0490: sbend, l:=ldipoletto, angle:=-kangle/2;
+CT.BHD0510: sbend, l:=ldipoletto, angle:=-kangle/2;
+
+
+!SEPTA from EPA
+
+spt1adl:=8*pi/180 - kangle - kangle/2;
+spt2adl := 22*pi/180;
+
+!lspt1dl = 0.52*(spt1adl*0.5/sin(spt1adl/2));
+!lspt2dl = 0.52*(spt2adl*0.5/sin(spt2adl/2));
+! here the angle is only changed for spt1
+! but since the septa are powered in series
+! the bending should be distributed like
+!spt1adl:=8*pi/180 - kangle*3/2 *8/30;
+!spt2adl := 22*pi/180 - kangle*3/2 *22/30;
+! This changes the path length and the description
+! doesn`t close after 1 turn
+! We miss 5.5mm
+! Has to be looked at in more detail...
+! FT 24.01.2006
+
+lspt1dl := 0.52*(spt1adl*0.5/sin(spt1adl/2));
+lspt2dl := 0.52*(spt2adl*0.5/sin(spt2adl/2));
+!value,lspt1dl - lspt1dl0f;
+!value,lspt2dl - lspt2dl0f;
+ 
+msp11: marker;
+msp12: marker;
+msp21: marker;
+msp22: marker;
+!spt1dl: sbend, l:=lspt1dl, angle:=-spt1adl, e1:=-spt1adl/2, e2:=-spt1adl/2, fint=0.5, hgap=0.02;
+!spt2dl: sbend, l:=lspt2dl, angle:=-spt2adl, e1:=-spt2adl/2, e2:=-spt2adl/2, fint=0.5, hgap=0.02;
+
+spt1dl: sbend, l:=lspt1dl, angle:=-spt1adl, e1:= 0, e2:=-spt1adl, fint=0.5, hgap=0.0125;
+spt2dl: sbend, l:=lspt2dl, angle:=-spt2adl, e1:=-spt2adl/2, e2:=-spt2adl/2, fint=0.5, hgap=0.0125;
+
+dl.septfact := 1;
+dl.spt1fint := 0.5;
+dl.spt2fint := 0.5;
+
+CD.SHA0110: sbend, l:=lspt1dl, angle:=-spt1adl, e1:= 0,         e2:=-spt1adl  , fint:=dl.spt1fint, hgap:=0.0125 * dl.septfact;
+CD.SHB0120: sbend, l:=lspt2dl, angle:=-spt2adl, e1:=-spt2adl/2, e2:=-spt2adl/2, fint:=dl.spt2fint, hgap:=0.0125 * dl.septfact;
+CD.SHA0490: sbend, l:=lspt1dl, angle:=-spt1adl, e1:=-spt1adl  , e2:= 0        , fint:=dl.spt1fint, hgap:=0.0125 * dl.septfact;
+CD.SHB0480: sbend, l:=lspt2dl, angle:=-spt2adl, e1:=-spt2adl/2, e2:=-spt2adl/2, fint:=dl.spt2fint, hgap:=0.0125 * dl.septfact;
+
+value, lspt1dl;
+value, lspt2dl;
+
+ro1 := lspt1dl/spt1adl;
+ro2 := lspt2dl/spt2adl;
+
+value, ro1;
+value, ro2;
+
+
+! MONITORS
+
+
+CD.BPI0105:monitor, l:=0; ! = 0.095
+CD.BPI0135:monitor, l:=0; ! = 0.095
+CD.BPI0186:monitor, l:=0; ! = 0.095
+CD.BPI0200:monitor, l:=0; ! = 0.095
+CD.BPI0235:monitor, l:=0; ! = 0.095
+CD.BPI0242:monitor, l:=0; ! = 0.095
+CD.BPI0285:monitor, l:=0; ! = 0.095
+CD.BPI0292:monitor, l:=0; ! = 0.095
+CD.BPI0308:monitor, l:=0; ! = 0.095
+CD.BPI0325:monitor, l:=0; ! = 0.095
+CD.BPI0358:monitor, l:=0; ! = 0.095
+CD.BPI0378:monitor, l:=0; ! = 0.095
+CD.BPI0400:monitor, l:=0; ! = 0.095
+CD.BPI0414:monitor, l:=0; ! = 0.095
+CD.BPI0465:monitor, l:=0; ! = 0.095
+CD.BPI0495:monitor, l:=0; ! = 0.095
+CT.BPI0105:monitor, l:=0; ! = 0.095
+
+
+
+! H Correctors
+lbpkck  = 0.1;
+
+dhk495 := CT.IDHD0495*KD.CORRCALIB / EN;
+dhk505 := CT.IDHD0505*KD.CORRCALIB / EN;
+!kick must be defined with dhk495 because we use it for bypass set up
+CT.DHD0495:kicker, l:=lbpkck, hkick:=dhk495, vkick:=-CT.IDVD0495*KD.CORRCALIB / EN; !before injection
+CT.DHD0505:kicker, l:=lbpkck, hkick:=dhk505, vkick:=-CT.IDVD0505*KD.CORRCALIB / EN; !after injection
+
+CD.DHD0185:hkicker, l:=0, kick:=CD.IDHD0185*KD.CORRCALIB / EN;
+CD.DHD0225:hkicker, l:=0, kick:=CD.IDHD0225*KD.CORRCALIB / EN;
+CD.DHD0375:hkicker, l:=0, kick:=CD.IDHD0375*KD.CORRCALIB / EN;
+CD.DHD0415:hkicker, l:=0, kick:=CD.IDHD0415*KD.CORRCALIB / EN;
+
+CD.DHE0140:Hkicker, l:=0, kick:=CD.IDHE0140*KE.CORRCALIB;
+
+CD.DHE0290:hkicker, l:=0, kick:=CD.IDHE0290*KE.CORRCALIB;
+CD.DHE0350:hkicker, l:=0, kick:=CD.IDHE0350*KE.CORRCALIB;
+
+CD.DHE0460:hkicker, l:=0, kick:=CD.IDHE0460*KE.CORRCALIB;
+
+! V Correctors
+
+CD.DVD0185:Vkicker, l:=0, kick:=-CD.IDVD0185*KD.CORRCALIB / EN;
+CD.DVD0225:Vkicker, l:=0, kick:=-CD.IDVD0225*KD.CORRCALIB / EN;
+CD.DVD0375:Vkicker, l:=0, kick:=-CD.IDVD0375*KD.CORRCALIB / EN;
+CD.DVD0415:Vkicker, l:=0, kick:=-CD.IDVD0415*KD.CORRCALIB / EN;
+
+CD.DVE0280:Vkicker, l:=0, kick:=-CD.IDVE0280*KE.CORRCALIB;
+CD.DVE0340:Vkicker, l:=0, kick:=-CD.IDVE0340*KE.CORRCALIB;
+CD.DVE0470:Vkicker, l:=0, kick:=-CD.IDVE0470*KE.CORRCALIB;
+
+
+! VARIOUS
+
+
+mq1: marker;
+mq2: marker;
+mh: marker;
+mb1: marker;
+mb2: marker;
+
+
+! KICKER from Marcellini
+
+lkck:=0.01; !0.00000000001; !0;
+!kangle := 0.015; defined already above
+
+kckp:  sbend, l:=lkck, angle:=-kangle;
+kckc:  marker;
+CD.SHD0105:       MARKER;
+CD.SHD0105_1TURN: MARKER;
+kckn1: sbend, l:=lkck, angle:=-kangle/2;
+kckn2: sbend, l:=lkck, angle:=-kangle/2;
+
+
+!####### BEAM LINES ########
+
+
+! INPUT AND OUTPUT LINES
+
+
+
+! SEPTUM LINES
+
+l101: drift, L:=2.1 -lkck/2  -0.250/2;
+l104: drift, L := 0.8245 - lbpkck;
+l106: drift, L := 1.975-lkck/2-0.8245;
+l115: drift, L := .4;
+l121: drift, L:=.6;
+l134: drift, l:=.201575;
+l136: drift, l:=0.38-0.201575;
+l142: drift, l:=0.1;
+l146: drift, l:=.848;
+
+drkp: drift, l:=0.250/2-lkck/2;  
+! /2 added to get 1turn length OK for lkck!=0  (FT 23.1.2006)
+! but positions still change since drift before deflector not adjusted
+
+mtr1: marker;
+mtr2: marker;
+
+diptokck:=3.9201;
+
+li2: drift, L:=3.44510041; !diptokck/cos(kangle/2) -0.250/2
+
+dli2b := 0.9424;
+li2a: drift, l:=3.44510041-dli2b - lbpkck;
+li2b: drift, l:=dli2b - lkck/2;
+! - lkck/2 added to get line consistent for lkck != 0 (FT 23.01.2006)
+
+ 
+
+
+! QUARTERS
+
+! primo quarto
+
+
+! DRIFTS
+
+
+
+
+l169: drift, L:=0.34;
+l175: drift, L:=0.30;
+l183: drift, L:=0.186;
+l1855: drift, l:=0.39243-0.186;
+l188: drift, L:=0.916-( 0.39243-0.186);
+
+! aggiunti 5 mm per l`accorciamento
+
+l199: drift, l:=.50069-.187243;
+l201: drift, L:=.187243;
+
+CT.BPI0495: monitor, l:=0; ! = 0.095
+
+lin: line=(md1,CT.BHD0490,md2,li2a,CT.DHD0495,CT.BPI0495,li2b);
+
+sptinfromkck: line=(kckc,CD.SHD0105, mtr1,drkp,kckn2,
+                  l104,CD.BPI0105,CT.DHD0505,l106,msp11,CD.SHA0110,msp12,l115,
+                  msp21,CD.SHB0120,msp22,l121,
+                  CD.QFF0130,l134,CD.BPI0135,l136,
+                  CD.QDF0140,CD.DHE0140,l142,
+                  CD.XLA0145,l146,
+                  mb1,CD.BHE0150,mb2);
+
+injsect: line=(lin,kckn1,drkp,sptinfromkck);
+
+qu1a: line=(l169,  ! CD.QFE0170,mqlar,
+              CD.QFE0170,l175,
+              ! CD.QDF0180,mqn,
+              CD.QDF0180,l183,CD.DHD0185, CD.DVD0185,
+              l1855,CD.BPI0186,
+              l188,mb1,CD.BHE0190,mb2,l199,CD.BPI0200,l201
+              !,CD.QFF0210,mqn
+              );
+
+quarter1: line=(injsect,qu1a);
+
+
+
+mw: marker;
+
+l212: drift, L:=0.32;
+l217: drift, L:=.332965;
+l223: drift, l:=0.925;
+l228: drift, l:=0.16;
+l234: drift, l:=.182481;
+l236: drift, l:=1.085-.182481;
+l241: drift, l:=.675-0.203208;
+l243: drift, l:=.203208;
+l246: drift, l:=.275;
+l252: drift, l:=0.25;
+l262: drift, l:=0.394;
+l278: drift, l:=0.50;
+l284: drift, l:=0.230488;
+l288: drift, l:=0.468172 - 0.230488;
+l292: drift, l:=0.190288;
+l293: drift, l:=0.780094-0.190288;
+
+qu2a: line=(CD.QFF0210,l212,
+          ! CD.XVA0215,ms2,
+              CD.XVA0215,
+          l217,mb1,CD.BHE0220,mb2,l223,CD.DHD0225, CD.DVD0225,
+              l228,
+          ! CD.QFE0230,mqlar,
+              CD.QFE0230,l234,CD.BPI0235,l236,mb1,CD.BHE0240,mb2);
+
+qu2b: line=(l241,CD.BPI0242,l243, ! CD.XHA0245,ms3,
+          CD.XHA0245, l246, ! CD.QFF0250,mqn,
+              CD.QFF0250, l252, ! CD.QDF0260,mqn,
+              CD.QDF0260,l262,
+          mb1,CX.BHE0270, CD.BHE0270,mb2,mw,l278,
+          ! CD.QDF0280,mqn,CD.DVE0280,
+              CD.QDF0280,CD.DVE0280,l284,CD.BPI0285,l288,
+          ! CD.QFF0290,mqn,CD.DHE0290,
+              CD.QFF0290,CD.DHE0290,l292,CD.BPI0292,l293, dl.wiggler );
+
+quarter2: line=(qu2a,qu2b);
+
+
+!terzo quarto
+
+l387: drift, L:=0.32;
+l382: drift, L:=.332965;
+l379: drift, l:=0.925-(0.535445-.16);
+l377: drift, l:=(0.535445-.16);
+l373: drift, l:=0.16;
+l369: drift, l:=1.085;
+l359: drift, l:=.675-0.201842;
+l357: drift, l:=0.201842;
+l356: drift, l:=.275;
+l343: drift, l:=0.25;
+l333: drift, l:=0.394;
+l326: drift, l:=0.5-.186393;
+l323: drift, l:=.186393;
+l313: drift, l:=0.468172;
+l309: drift, l:=0.190408;
+l307: drift, l:=0.780094-0.190408;
+
+lst := 2.55;
+
+qu3a: line=(l307,CD.BPI0308,l309, !CD.QFF0310,mqn,
+          CD.QFF0310,l313, ! CD.QDF0320,mqn,
+              CD.QDF0320,l323,CD.BPI0325,l326,mw,
+          mb1,CX.BHE0330, CD.BHE0330,mb2,l333, ! CD.QDF0340,mqn,CD.DVE0340,
+              CD.QDF0340,CD.DVE0340, l343, ! CD.QFF0350,mqn,CD.DHE0350,
+              CD.QFF0350,CD.DHE0350, l356, ! CD.XHA0355,ms3,
+              CD.XHA0355,l357,CD.BPI0358,l359,mb1,CD.BHE0360,mb2);
+
+qu3b: line=(l369, ! CD.QFE0370,mqlar,
+          CD.QFE0370,l373,
+          CD.DHD0375, CD.DVD0375,
+              l377,CD.BPI0378,l379,
+          mb1,CD.BHE0380,mb2,l382, ! CD.XVA0385,ms2,
+              CD.XVA0385,l387 !,CD.QFF0390,mqn
+              );
+
+quarter3: line=(qu3a,qu3b);
+
+! quarto quarto
+
+l496: drift, L:=0.8245;
+l494: drift, L:=1.975-lkck/2-0.8245;
+l485: drift, L:=.4;
+l479: drift, L:=.6;
+l466: drift, l:=.380-.17846;
+l464: drift, l:=.17846;
+l457: drift, l:=0.1;
+l454: drift, l:=.848;
+
+
+l431: drift, L:=0.34;
+l425: drift, L:=0.30;
+l418: drift, l:=0.186;
+l412: drift, L:=0.916-(0.39003-.186);
+l4145: drift, l:=(0.39003-.186);
+l401: drift, l:=.50069-0.187243;
+l399: drift, l:=0.187243;
+
+
+!Drift between Dipol ct.BHD0510 (end of lout)
+
+!LCORD := 0.30; ! wrong length definition (used for correction)
+!lqd = 0.220;
+!LCORD := LQUADD - lqd;
+L.CD.DCORD := (0.30 - 0.22)/2;
+
+ldl6:  DRIFT , L = 0.6 +0.30 -0.20 - 0.184 + 0.020- 0.1836931919 + 0.04940672- 0.0965;
+CD.DCORD :  DRIFT, L:= L.CD.DCORD;! correction for Q*D type length
+
+mendbypass: marker;
+
+CT.BPM0515: monitor, l:=0; ! = 0.095 !it is very crude positioning
+
+linktotl3: line=(CT.BPM0515,ldl6,CD.DCORD, mendbypass);
+
+lout:    line=(li2b,CT.BPI0105,CT.DHD0505,li2a,md1,CT.BHD0510,md2); !md2 end of Delay Loop
+
+lout_bp: line=(li2b,CD.BPI0105,CT.DHD0505,li2a,md1,CT.BHD0510,md2); !md2 end of Delay Loop
+
+qu4a: line=(CD.QFF0390,l399,CD.BPI0400,l401,mb1,CD.BHE0410,mb2,l412,
+            CD.BPI0414,l4145,CD.DHD0415, CD.DVD0415,
+                l418, ! CD.QDF0420,mqn,
+                CD.QDF0420,l425,
+            ! CD.QFE0430,mqlar,
+                CD.QFE0430,l431,mb1,CD.BHE0450,mb2);
+
+sptout: line=(l454, !CD.XLA0455,ms1,
+            CD.XLA0455, l457, ! CD.QDF0460,mqn,CD.DHE0460,
+            CD.QDF0460,l464,CD.BPI0465,
+            l466, ! CD.QFF0470,mqn,CD.DVE0470,
+            CD.QFF0470,CD.DVE0470,l479,msp21,CD.SHB0480,msp22,
+            l485,msp11,CD.SHA0490,msp12,l494,CD.BPI0495,l496,
+            kckn1,drkp, CD.SHD0105_1TURN, kckc,mtr2,drkp,kckn2);
+
+extsect: line=(sptout,lout);
+
+quarter4: line=(qu4a,extsect); !ends with CT.BHD0510
+
+
+
+! HALFS
+
+half1: line=(quarter1,mq1,quarter2);
+
+half2: line=(quarter3,mq2,quarter4); !ends with CT.BHD0510
+
+half1fromkck: line=(sptinfromkck,qu1a,mq1,quarter2);
+
+
+
+! DELAY
+
+delay: line=(half1,mh,half2,linktotl3);
+
+diff: drift, l:=-diptokck;
+closed: line=(diff,delay,diff);
+
+kckn1_d: drift, l:=lkck; ! deflectors that are drifts if we bypass dl
+kckn2_d: drift, l:=lkck; !
+
+dlbypass: line=(lin,  
+                kckn1_d, drkp, 
+                CD.SHD0105, kckc, CD.SHD0105_1TURN,   !markers
+                drkp, kckn2_d, 
+                lout_bp, linktotl3);
+
+
+deltak := 0.000;
+
+cor1: hkicker, kick:=0.0*1.3*deltak;
+cor2: hkicker, kick:=-0.0*0.5*deltak;
+
+print, text="^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
+print, text="^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
+print, text=" LEAVING dl.seqx";
+print, text="^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
+print, text="^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^";
+
+return;
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!1
+!
+!  RRR   EEEE  TTTTT  U   U  RRR   N   N
+!  R  R  E       T    U   U  R  R  NN  N
+!  RRR   EEE     T    U   U  RRR   N N N
+!  R R   E       T    U   U  R R   N  NN
+!  R  R  EEEE    T     UUU   R  R  N   N
+!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
