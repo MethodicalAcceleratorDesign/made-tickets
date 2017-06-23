@@ -1,0 +1,50 @@
+l.mq=0.3;
+l.mb=10;
+l.cell=l.mb*2;
+
+kf= 0.5;
+kd=-0.5;
+
+mk : marker;
+mqf: multipole, knl:={0,kf*l.mq};
+mqd: multipole, knl:={0,kd*l.mq};
+mqs: multipole, ksl:={0,0.0005};
+
+cell: sequence,l=l.cell;
+mk1: mk, at=0;
+mqf, at=l.mb;
+mqs, at=l.mb;
+mqd, at=2*l.mb;
+mk2: mk, at=l.cell;
+endsequence;
+
+
+emitx=2.5e-6;
+emity=2.5e-6;
+
+beam,exn=emitx,eyn=emity,sigt=0.075,sige=1.1e-4,energy=7000,charge=1e11,particle=proton;
+
+use,sequence=cell;
+
+twiss;
+
+match;
+global,q1=0.31;
+global,q2=0.32;
+vary,name=kf;
+vary,name=kd;
+jacobian,calls=10,tolerance=1e-22;
+endmatch;
+
+!emit;
+select, flag=twiss, column=name,s,l,betx,bety,r11,r12,r21,r22,
+                           sig11,sig12,sig22,sig21,sig13,sig14,sig23,sig24;
+savebeta, label=mqf_save,place=mk1,sequence=cell;
+twiss,file=twiss_cell_periodic.tfs;
+show, mqf_save;
+
+
+TWISS,BETA0=mqf_save, file=twiss_cell_withinitialconditions.tfs;
+
+system, "tail -n 11 twiss_cell_periodic.tfs";
+system, "tail -n 11 twiss_cell_withinitialconditions.tfs";
